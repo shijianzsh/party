@@ -7,6 +7,14 @@ use App\Services\Login\Login;
 
 class User_ extends User
 {
+     public const UserTypeMap = [
+        '超级管理员' => 0,
+        '单位超级管理员' => 1,
+        '单位领导' => 2,
+        '单位党员' => 3,
+        '群众' => 4,
+    ];
+
     static public function getMyId(): int
     {
         $Obj = new AccessToken();
@@ -55,6 +63,7 @@ class User_ extends User
     static public function createUser(array $requestData): array
     {
         $validator = Validator::make($requestData, [
+            'type' => 'required',
             'department_id' => 'required',
             'user_login' => 'required',
             'user_password' => 'required',
@@ -66,6 +75,7 @@ class User_ extends User
             }
 
             $Obj = new User;
+            $Obj->type = $requestData['type'];
             $Obj->department_id = $requestData['department_id'];
             $Obj->user_login = $requestData['user_login'];
             $Obj->user_password = $requestData['user_password'];
@@ -81,7 +91,10 @@ class User_ extends User
 
     static public function editUser(int $userId, array $requestData): array
     {
+        return ['success' => 0, 'msg' => '功能未开放'];
+
         $validator = Validator::make($requestData, [
+            'type' => 'required',
             'department_id' => 'required',
             'user_login' => 'required',
             'user_password' => 'required',
@@ -94,6 +107,7 @@ class User_ extends User
 
             $Obj = new User;
             $Obj->find($userId);
+            $Obj->type = $requestData['type'];
             $Obj->department_id = $requestData['department_id'];
             $Obj->user_login = $requestData['user_login'];
             $Obj->user_password = $requestData['user_password'];
@@ -112,6 +126,45 @@ class User_ extends User
         $delete = $Obj->delete();
 
         return ['success' => $delete];
+    }
+
+    static public function changePassword(array $requestData): array
+    {
+        $validator = Validator::make($requestData, [
+            'user_password_old' => 'required',
+            'user_password' => 'required',
+            'user_password2' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+            if ($requestData['user_password'] !== $requestData['user_password2']) {
+                throw new \Exception('两次密码输入不一致');
+            }
+
+            $Obj = User::find(User_::getMyId());
+            if (!$Obj) {
+                throw new \Exception('未查询到用户信息');
+            }
+            if (Login::getPassword($requestData['user_password']) !== $Obj->user_password) {
+                throw new \Exception('当前密码输入有误');
+            }
+
+            $Obj->user_password = Login::getPassword($requestData['user_password']);
+            $success = $Obj->save();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+    }
+
+    static public function changeDepartment()
+    {
+
     }
 
     /**

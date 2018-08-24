@@ -4,6 +4,8 @@ namespace App\Models;
 
 class ExamPaper extends _BaseModel
 {
+    public const IsRestrictUserMap = ['否' => 0, '是' => 1];
+
     public function questions()
     {
         return $this->hasMany('App\Models\ExamPaperQuestion', 'paper_id');

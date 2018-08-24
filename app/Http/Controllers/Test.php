@@ -7,7 +7,7 @@
  */
 
 namespace App\Http\Controllers;
-use App\Services\Excel\Excel;
+use App\Services\Exam\Excel;
 use App\Models\ExamExcel_;
 
 class Test

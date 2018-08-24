@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\Excel\Excel;
+use App\Services\Exam\Excel;
 use DB;
 
 class ExamExcel_ extends ExamExcel

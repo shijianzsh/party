@@ -13,4 +13,5 @@ yarn-error.log
 .env
 .phpunit.result.cache
 /frontend
-/经信委政务云网站
+/文档
+DS_store

@@ -6,18 +6,18 @@
  * Time: 下午9:53
  */
 
-namespace App\Services\Excel;
+namespace App\Services\Exam;
 
 use PFinal\Excel\Excel as ExcelClass;
 use App\Services\CheckParams\CheckParams;
 
 class Excel
 {
-    private $map = [
+    public const Map = [
         'excel_index' => '序号',
         'title' => '题目',
         'options' => '选项',
-        'answers' => '答案',
+        'answer' => '答案',
         'disabled' => '是否禁用'
     ];
 
@@ -29,7 +29,7 @@ class Excel
             throw new \Exception('Excel readFile file does not exists');
         }
 
-        $this->data = ExcelClass::readExcelFile($file, $this->map, 3);
+        $this->data = ExcelClass::readExcelFile($file, Excel::Map, 3);
         return $this;
     }
 
@@ -37,7 +37,7 @@ class Excel
     {
         $data = $this->data;
 
-        $checkParams = CheckParams::checkParams($data, array_keys($this->map));
+        $checkParams = CheckParams::checkParams($data, array_keys(Excel::Map));
         if (!$checkParams['success']) {
             throw new \Exception($checkParams['msg']);
         }

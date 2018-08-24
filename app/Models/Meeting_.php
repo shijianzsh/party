@@ -7,7 +7,7 @@ use DB, Validator;
 
 class Meeting_ extends Meeting
 {
-    static public $auditStatusMap = [
+    public const AuditStatusMap = [
         '未审核' => 0,
         '初审失败' => -2,
         '初审成功' => 2,
@@ -16,7 +16,7 @@ class Meeting_ extends Meeting
         '通过审核' => 4
     ];
 
-    static public $aheadSignInTimestamp = 3600 * 2;//允许提前先到的时间
+    public const AheadSignInTimestamp = 3600 * 2;//允许提前先到的时间
 
     static public function getMeetingList(
         int $currPage = 0,
@@ -125,7 +125,7 @@ class Meeting_ extends Meeting
                     $Obj->audit()
                         ->create([
                             'audit_user_id' => $requestData['audit_user_id'],
-                            'status' => Self::$auditStatusMap['未审核']
+                            'status' => Meeting_::AuditStatusMap['未审核']
                         ]);
                 }
             });
@@ -195,14 +195,14 @@ class Meeting_ extends Meeting
             $audit = MeetingAudit
                 ::where('meeting_id', $meetingId)
                 ->where('audit_user_id', User_::getMYId())
-                ->where('status', self::$auditStatusMap['未审核'])
+                ->where('status', Meeting_::AuditStatusMap['未审核'])
                 ->first();
 
             if (!$audit) {
                 throw new \Exception('没有找到符合审核条件的会议');
             }
 
-            $audit->status = $requestData['is_passed'] ? self::$auditStatusMap['初审成功'] : self::$auditStatusMap['初审失败'];
+            $audit->status = $requestData['is_passed'] ? Meeting_::AuditStatusMap['初审成功'] : Meeting_::AuditStatusMap['初审失败'];
             $audit->reason = $requestData['is_passed'] ? '' : $requestData['reason'];
             $audit->save();
         } catch (\Exception $e) {
@@ -260,10 +260,10 @@ class Meeting_ extends Meeting
             if (!$meeting->audit) {
                 throw new \Exception('signIn Obj audit null error');
             }
-            if ($meeting->audit['status'] !== self::$auditStatusMap['通过审核']) {
+            if ($meeting->audit['status'] !== Meeting_::AuditStatusMap['通过审核']) {
                 throw new \Exception('会议状态错误');
             }
-            if ($meeting->opened_at < Carbon::now()->timestamp - Self::$aheadSignInTimestamp) {
+            if ($meeting->opened_at < Carbon::now()->timestamp - Meeting_::AheadSignInTimestamp) {
                 throw new \Exception('未到签到时间');
             }
             if ($meeting->ended_at > Carbon::now()->timestamp) {

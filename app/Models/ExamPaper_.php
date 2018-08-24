@@ -12,9 +12,17 @@ class ExamPaper_ extends ExamPaper
         //TODO
     }
 
-    static public function getExamPaper(int $examPaperId)
+    static public function getExamPaper(int $examPaperId, bool $getObject = false)
     {
-        //TODO
+        $Obj=ExamPaper::with(['questions','attendUsers'])->find($examPaperId);
+
+        if ($getObject) {
+            $result = $Obj;
+        } else {
+            $result = $Obj->toArray();
+        }
+
+        return $result;
     }
 
     //TODO 如何关联用户
@@ -53,7 +61,6 @@ class ExamPaper_ extends ExamPaper
 
             shuffle($questions);
             $paperQuestions = array_slice($questions, 0, $questions_count);
-
 
             DB::transaction(function () use ($requestData, $paperQuestions) {
                 $name =& $requestData['name'];

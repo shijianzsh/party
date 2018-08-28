@@ -4,14 +4,40 @@ namespace App\Models;
 
 class Department_ extends Department
 {
-    static public function getDepartmentList(): array
+    static public function getDepartmentList(
+        int $currPage = 0,
+        int $pageNumber = 0,
+        array $filter = [
+            '' => "",
+        ],
+        array $with = []
+    ): array
     {
+        $Obj = Department::with($with);
 
+        $total = $Obj->count();
+
+        if ($currPage && $pageNumber) {
+            $offset = ($currPage - 1) * $pageNumber;
+            $Obj->offset($offset)->limit($pageNumber);
+        }
+
+        $get = $Obj->get();
+
+        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
     }
 
-    static public function getDepartment(int $departmentId): array
+    static public function getDepartment(int $departmentId, bool $getObject = false)
     {
+        $Obj=Department::with([])->find($departmentId);
 
+        if ($getObject) {
+            $result = $Obj;
+        } else {
+            $result = $Obj->toArray();
+        }
+
+        return $result;
     }
 
     static public function createDepartment(): array

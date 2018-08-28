@@ -6,6 +6,7 @@ use App\Models\PortalPost;
 use Illuminate\Http\Request;
 use  App\Models\PortalPost_;
 use Illuminate\Support\Facades\Crypt;
+use Gate;
 
 class ArticleController extends Controller
 {

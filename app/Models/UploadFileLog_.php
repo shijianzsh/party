@@ -4,6 +4,29 @@ namespace App\Models;
 
 class UploadFileLog_ extends UploadFileLog
 {
+    static public function getUploadFileLogList(
+        int $currPage = 0,
+        int $pageNumber = 0,
+        array $filter = [
+            '' => "",
+        ],
+        array $with = []
+    ): array
+    {
+        $Obj = UploadFileLog::with($with);
+
+        $total = $Obj->count();
+
+        if ($currPage && $pageNumber) {
+            $offset = ($currPage - 1) * $pageNumber;
+            $Obj->offset($offset)->limit($pageNumber);
+        }
+
+        $get = $Obj->get();
+
+        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+    }
+
     static public function create(string $url): array
     {
         if (empty($url)) {

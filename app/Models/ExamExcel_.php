@@ -7,14 +7,40 @@ use DB;
 
 class ExamExcel_ extends ExamExcel
 {
-    static public function getExamExcelList(): array
+    static public function getExamExcelList(
+        int $currPage = 0,
+        int $pageNumber = 0,
+        array $filter = [
+            '' => "",
+        ],
+        array $with = []
+    ): array
     {
+        $Obj = ExamExcel::with($with);
 
+        $total = $Obj->count();
+
+        if ($currPage && $pageNumber) {
+            $offset = ($currPage - 1) * $pageNumber;
+            $Obj->offset($offset)->limit($pageNumber);
+        }
+
+        $get = $Obj->get();
+
+        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
     }
 
-    static public function getExamExcel(int $examExcelId): array
+    static public function getExamExcel(int $examExcelId, bool $getObject = false)
     {
+        $Obj = ExamExcel::with([])->find($examExcelId);
 
+        if ($getObject) {
+            $result = $Obj;
+        } else {
+            $result = $Obj->toArray();
+        }
+
+        return $result;
     }
 
     static public function createExamExcel(int $examCategoryId, string $fileUrl): array

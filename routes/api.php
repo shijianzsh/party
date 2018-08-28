@@ -13,7 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::options('/{all}', function (Request $request) {})->middleware(\App\Http\Middleware\Cors::class);
+Route::options('/{all}', function (Request $request) {
+})->middleware(\App\Http\Middleware\Cors::class);
 
 
 Route::get('/', function (Request $request) {
@@ -21,8 +22,6 @@ Route::get('/', function (Request $request) {
 });
 
 Route::get('/test', 'Test');
-
-
 
 Route::get('/token', 'Token');
 Route::get('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::class);
@@ -33,6 +32,7 @@ Route::group(['middleware' => [
     \App\Http\Middleware\Cors::class,
 ]], function () {
     Route::post('upload', 'Upload');
+
     Route::prefix('super')->group(function () {
         Route::resource('users', 'UserController');
         Route::resource('articles', 'ArticleController');

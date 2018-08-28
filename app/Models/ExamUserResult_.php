@@ -9,6 +9,29 @@ class ExamUserResult_ extends ExamUserResult
 {
     public const SubmitDelayTimestamp = 60;
 
+    static public function getExamUserResultList(
+        int $currPage = 0,
+        int $pageNumber = 0,
+        array $filter = [
+            '' => "",
+        ],
+        array $with = []
+    ): array
+    {
+        $Obj = ExamUserResult::with($with);
+
+        $total = $Obj->count();
+
+        if ($currPage && $pageNumber) {
+            $offset = ($currPage - 1) * $pageNumber;
+            $Obj->offset($offset)->limit($pageNumber);
+        }
+
+        $get = $Obj->get();
+
+        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+    }
+
     public function startExam(int $paperId): array
     {
         try {

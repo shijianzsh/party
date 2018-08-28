@@ -7,9 +7,27 @@ use DB;
 
 class ExamPaper_ extends ExamPaper
 {
-    static public function getExamPaperList()
+    static public function getExamPaperList(
+        int $currPage = 0,
+        int $pageNumber = 0,
+        array $filter = [
+            '' => "",
+        ],
+        array $with = []
+    ): array
     {
-        //TODO
+        $Obj = ExamPaper::with($with);
+
+        $total = $Obj->count();
+
+        if ($currPage && $pageNumber) {
+            $offset = ($currPage - 1) * $pageNumber;
+            $Obj->offset($offset)->limit($pageNumber);
+        }
+
+        $get = $Obj->get();
+
+        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
     }
 
     static public function getExamPaper(int $examPaperId, bool $getObject = false)

@@ -1,6 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
+/public/upload/*
 /storage/*.key
 /vendor
 /.idea
@@ -14,4 +15,4 @@ yarn-error.log
 .phpunit.result.cache
 /frontend
 /文档
-DS_store
+.DS_store

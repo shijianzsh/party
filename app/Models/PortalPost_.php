@@ -52,17 +52,19 @@ class PortalPost_ extends PortalPost
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(),
+            'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]
+        ];
     }
 
     static public function getPost(int $postId, array $with = []): array
     {
-        return $Obj = PortalPost::with($with)->find($postId)->toArray();
+        return $Obj = PortalPost::with($with)->findOrFail($postId)->toArray();
     }
 
     static public function createPost(array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'user_id' => 'required',
             'need_audit' => 'required',
             'post_status' => 'required',
@@ -112,12 +114,12 @@ class PortalPost_ extends PortalPost
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function updatePost(int $postId, array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'user_id' => 'required',
             'need_audit' => 'required',
             'post_status' => 'required',
@@ -140,7 +142,7 @@ class PortalPost_ extends PortalPost
             }
 
             DB::transaction(function () use ($postId, $requestData) {
-                $Obj = PortalPost::find($postId);
+                $Obj = PortalPost::findOrFail($postId);
 //                $Obj->user_id = $requestData['user_id'];
                 $Obj->need_audit = $requestData['need_audit'];
                 $Obj->post_status = $requestData['post_status'];
@@ -177,7 +179,7 @@ class PortalPost_ extends PortalPost
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function deletePost(int $postId): array

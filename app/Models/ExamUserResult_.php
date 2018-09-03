@@ -29,7 +29,7 @@ class ExamUserResult_ extends ExamUserResult
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
     }
 
     public function startExam(int $paperId): array
@@ -78,12 +78,12 @@ class ExamUserResult_ extends ExamUserResult
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     public function submitExam(int $examUserResultId, array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'answers' => 'required',
             'is_auto_submit' => 'required',
         ]);
@@ -100,7 +100,7 @@ class ExamUserResult_ extends ExamUserResult
                 throw new \Exception($validator->errors()->first());
             }
 
-            $Obj = ExamPaperUser::find($examUserResultId);
+            $Obj = ExamPaperUser::findOrFail($examUserResultId);
             if (!$Obj) {
                 throw new \Exception('查询考试记录错误');
             }
@@ -150,6 +150,6 @@ class ExamUserResult_ extends ExamUserResult
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'data' => $data ?? null, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'data' => $data ?? null, 'msg' => $msg ?? null];
     }
 }

@@ -27,12 +27,12 @@ class ExamPaper_ extends ExamPaper
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
     }
 
     static public function getExamPaper(int $examPaperId, bool $getObject = false)
     {
-        $Obj=ExamPaper::with(['questions','attendUsers'])->find($examPaperId);
+        $Obj = ExamPaper::with(['questions', 'attendUsers'])->findOrFail($examPaperId);
 
         if ($getObject) {
             $result = $Obj;
@@ -46,7 +46,7 @@ class ExamPaper_ extends ExamPaper
     //TODO 如何关联用户
     static public function createExamPaper(array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'exam_category_id' => 'required',
             'per_question_score' => 'required',
             'questions_count' => 'required',
@@ -66,7 +66,7 @@ class ExamPaper_ extends ExamPaper
             $exam_category_id =& $requestData['exam_category_id'];
             $questions_count =& $requestData['questions_count'];
 
-            $examCategory = ExamCategory::with('questions')->find($exam_category_id);
+            $examCategory = ExamCategory::with('questions')->findOrFail($exam_category_id);
             if (!$examCategory) {
                 throw new \Exception('考题类别不存在');
             }
@@ -115,13 +115,13 @@ class ExamPaper_ extends ExamPaper
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     //TODO 如何关联用户
     static public function updateExamPaper(int $examPaperId, array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'per_question_score' => 'required',
             'name' => 'required',
             'duration' => 'required',
@@ -145,7 +145,7 @@ class ExamPaper_ extends ExamPaper
                 $published_at =& $requestData['published_at'];
                 $finished_at =& $requestData['finished_at'];
 
-                $Obj = ExamPaper::find($examPaperId);
+                $Obj = ExamPaper::findOrFail($examPaperId);
                 if (!$Obj) {
                     throw new \Exception('updateExamPaper ExamPaper Obj null');
                 }
@@ -166,14 +166,14 @@ class ExamPaper_ extends ExamPaper
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function deleteExamPaper(int $examPaperId)
     {
         try {
             DB::transaction(function () use ($examPaperId) {
-                $Obj = ExamPaper::find($examPaperId);
+                $Obj = ExamPaper::findOrFail($examPaperId);
                 if (!$Obj) {
                     throw new \Exception('deleteExamPaper ExamPaper Obj null');
                 }
@@ -190,6 +190,6 @@ class ExamPaper_ extends ExamPaper
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 }

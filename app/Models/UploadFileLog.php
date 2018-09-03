@@ -4,7 +4,7 @@ namespace App\Models;
 
 class UploadFileLog extends _BaseModel
 {
-    protected const UPDATED_AT = null;
+    public const UPDATED_AT = null;
 
     public function user()
     {

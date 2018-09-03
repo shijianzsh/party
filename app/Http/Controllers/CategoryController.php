@@ -14,28 +14,10 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $list = PortalCategory_::getUserList(
-            $request->input('curr_page', 0),
-            $request->input('page_number', 0),
-            [
-                'parentId' => $request->input('parent_id'),
-                'keyWord' => $request->input('key_word'),
-            ],
-            []
-        );
+        $list = PortalCategory_::getCategoryList();
 
-        $result = ['success' => 1, 'data' => $list];
+        $result = ['success' => 1, 'data' => $list, '$request' => $request];
         return response()->json($result);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //TODO
     }
 
     /**
@@ -46,7 +28,8 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //TODO
+        $result = PortalCategory_::createCategory($request->input('data'));
+        return response()->json($result);
     }
 
     /**
@@ -57,18 +40,12 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //TODO
-    }
+        $list = PortalCategory_::getCategory(
+            $id, false, ['parent', 'children']
+        );
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //TODO
+        $result = ['success' => 1, 'data' => $list];
+        return response()->json($result);
     }
 
     /**
@@ -80,7 +57,8 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //TODO
+        $result = PortalCategory_::updateCategory($id,$request->input('data'));
+        return response()->json($result);
     }
 
     /**

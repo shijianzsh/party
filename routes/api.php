@@ -29,14 +29,13 @@ Route::get('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::
 
 Route::group(['middleware' => [
 //    \App\Http\Middleware\CheckAccessToken::class,
-    \App\Http\Middleware\Cors::class,
 ]], function () {
     Route::post('upload', 'Upload');
 
     Route::prefix('super')->group(function () {
         Route::resource('users', 'UserController');
         Route::resource('articles', 'ArticleController');
-        Route::resource('categorys', 'CategoryController');
+        Route::resource('categories', 'CategoryController');
     });
 });
 

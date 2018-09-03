@@ -24,12 +24,12 @@ class Department_ extends Department
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
     }
 
     static public function getDepartment(int $departmentId, bool $getObject = false)
     {
-        $Obj=Department::with([])->find($departmentId);
+        $Obj = Department::with([])->findOrFail($departmentId);
 
         if ($getObject) {
             $result = $Obj;
@@ -53,7 +53,7 @@ class Department_ extends Department
     static public function deleteDepartment(int $departmentId): array
     {
         try {
-            $Obj = Department::with(['children', 'users'])->find($departmentId);
+            $Obj = Department::with(['children', 'users'])->findOrFail($departmentId);
             if (!$Obj) {
                 throw new \Exception('deleteDepartment Obj null error');
             }
@@ -72,6 +72,6 @@ class Department_ extends Department
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 }

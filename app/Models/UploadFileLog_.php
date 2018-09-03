@@ -24,7 +24,7 @@ class UploadFileLog_ extends UploadFileLog
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
     }
 
     static public function create(string $url): array
@@ -40,6 +40,6 @@ class UploadFileLog_ extends UploadFileLog
         $success = $Obj->save();
 
         end:
-        return ['success' => $success];
+        return ['success' => (int)$success ?? 1, 'data' => $url];
     }
 }

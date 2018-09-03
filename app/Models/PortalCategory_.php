@@ -8,8 +8,8 @@ class PortalCategory_ extends PortalCategory
         int $currPage = 0,
         int $pageNumber = 0,
         array $filter = [
-            'parent_id' => "",
-            'keyword' => "",
+            'parent_id' => null,
+            'keyword' => null,
         ],
         array $with = []
     ): array
@@ -19,11 +19,11 @@ class PortalCategory_ extends PortalCategory
 
         $Obj = PortalCategory::with($with);
 
-        if ($parentId) {
+        if ($parentId !== null) {
             $Obj->where('parent_id', $parentId);
         }
 
-        if ($keyWord) {
+        if ($keyWord !== null) {
             $Obj->where('name', 'like', "%{$keyWord}%");
         }
 
@@ -36,19 +36,27 @@ class PortalCategory_ extends PortalCategory
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
+    }
+
+    static public function getCategory(int $categoryId, bool $getObject = false, array $with = [])
+    {
+        $Obj = PortalCategory::with($with);
+        $get = $Obj->findOrFail($categoryId);
+
+        return $getObject ? $get : $get->toArray();
     }
 
     static public function createCategory(array $requestData): array
     {
-        $validator = Validator::make($requestData, [
-            'parent_id' => 'required',
-            'sort_order' => 'required',
+        $validator = \Validator::make($requestData, [
+            'parent_id' => '',
+            'sort_order' => '',
             'name' => 'required',
-            'description' => 'required',
-            'list_template' => 'required',
-            'one_template' => 'required',
-            'thumbnail' => 'required',
+            'description' => '',
+            'list_template' => '',
+            'article_template' => '',
+            'thumbnail' => '',
         ]);
 
         try {
@@ -57,13 +65,14 @@ class PortalCategory_ extends PortalCategory
             }
 
             $Obj = new PortalCategory();
-            $Obj->parent_id = $requestData['parent_id'];
-            $Obj->sort_order = $requestData['sort_order'];
+            $Obj->parent_id = $requestData['parent_id'] ?? 0;
+            $Obj->sort_order = $requestData['sort_order'] ?? 10000;
             $Obj->name = $requestData['name'];
-            $Obj->description = $requestData['description'];
-            $Obj->list_template = $requestData['list_template'];
-            $Obj->one_template = $requestData['one_template'];
-            $Obj->more['thumbnail'] = $requestData['thumbnail'];
+            $Obj->description = $requestData['description'] ?? '';
+            $Obj->list_template = $requestData['list_template'] ?? '';
+            $Obj->article_template = $requestData['article_template'] ?? '';
+            $Obj->path = null;
+            $Obj->more = ['thumbnail' => $requestData['thumbnail'] ?? ''];
             $success = $Obj->save();
 
         } catch (\Exception $e) {
@@ -71,19 +80,19 @@ class PortalCategory_ extends PortalCategory
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null, '$requestData' => $requestData ?? null];
     }
 
     static public function updateCategory(int $categoryId, array $requestData): array
     {
-        $validator = Validator::make($requestData, [
-            'parent_id' => 'required',
-            'sort_order' => 'required',
+        $validator = \Validator::make($requestData, [
+            'parent_id' => '',
+            'sort_order' => '',
             'name' => 'required',
-            'description' => 'required',
-            'list_template' => 'required',
-            'one_template' => 'required',
-            'thumbnail' => 'required',
+            'description' => '',
+            'list_template' => '',
+            'article_template' => '',
+            'thumbnail' => '',
         ]);
 
         try {
@@ -91,38 +100,43 @@ class PortalCategory_ extends PortalCategory
                 throw new \Exception($validator->errors()->first());
             }
 
-            $Obj = PortalCategory::find($categoryId);
-            $Obj->parent_id = $requestData['parent_id'];
-            $Obj->sort_order = $requestData['sort_order'];
+            $Obj = PortalCategory::findOrFail($categoryId);
+            $Obj->parent_id = $requestData['parent_id'] ?? 0;
+            $Obj->sort_order = $requestData['sort_order'] ?? 10000;
             $Obj->name = $requestData['name'];
-            $Obj->description = $requestData['description'];
-            $Obj->list_template = $requestData['list_template'];
-            $Obj->one_template = $requestData['one_template'];
-            $Obj->more['thumbnail'] = $requestData['thumbnail'];
+            $Obj->description = $requestData['description'] ?? '';
+            $Obj->list_template = $requestData['list_template'] ?? '';
+            $Obj->article_template = $requestData['article_template'] ?? '';
+            $Obj->path = null;
+            $Obj->more = ['thumbnail' => $requestData['thumbnail'] ?? ''];
             $success = $Obj->save();
-
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function deleteCategory(int $categoryId): array
     {
-        $Obj = PortalCategory::with('posts')->find($categoryId);
+        $Obj = PortalCategory::with(['posts', 'children'])->findOrFail($categoryId);
         if (!$Obj) {
             $result = ['success' => 0, 'msg' => '栏目不存在'];
             goto end;
         }
 
-        if ($Obj->posts) {
+        if (count($Obj->posts)) {
             $result = ['success' => 0, 'msg' => '栏目中有关联的文章，禁止删除'];
             goto end;
         }
 
-        $result = ['success' => $Obj->delete()];
+        if (count($Obj->children)) {
+            $result = ['success' => 0, 'msg' => '有关联的子栏目，禁止删除'];
+            goto end;
+        }
+
+        $result = ['success' => (int)$Obj->delete()];
 
         end:
         return $result;

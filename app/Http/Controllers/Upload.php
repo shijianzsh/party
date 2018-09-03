@@ -17,7 +17,6 @@ class Upload extends Controller
     public function __invoke(Request $request)
     {
         $url = UploadService::handleUpload();
-        $createLog = UploadFileLog_::create($url);
-        return ['success' => $createLog, 'data' => $url];
+        return UploadFileLog_::create($url);
     }
 }

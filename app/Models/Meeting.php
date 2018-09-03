@@ -15,6 +15,8 @@ class Meeting extends _BaseModel
     }
 
     public function attendUsers(){
+        return $this->hasMany('App\Models\MeetingUser', 'meeting_id');
+
         return $this->hasManyThrough(
             'App\Models\User',
             'App\Models\MeetingUser',

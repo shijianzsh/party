@@ -61,7 +61,7 @@ class Meeting_ extends Meeting
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
     }
 
     static public function getMeeting(int $meetingId, bool $getObject = false)
@@ -73,7 +73,7 @@ class Meeting_ extends Meeting
             'initiateUser',
             'attendUsers'
         ])
-            ->find($meetingId);
+            ->findOrFail($meetingId);
 
         if ($getObject) {
             $result = $Obj;
@@ -86,7 +86,7 @@ class Meeting_ extends Meeting
 
     static public function createMeeting(array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'need_audit' => 'required',
             'title' => 'required',
             'type' => 'required',
@@ -94,6 +94,8 @@ class Meeting_ extends Meeting
             'opened_at' => 'required',
             'ended_at' => 'required',
             'audit_user_id' => 'required',
+            'leaders' => 'required',
+            'users' => 'required',
         ]);
 
         try {
@@ -128,18 +130,31 @@ class Meeting_ extends Meeting
                             'status' => Meeting_::AuditStatusMap['未审核']
                         ]);
                 }
+
+                $attendUsersData = [];
+                for ($i = 0; $i < count($requestData['users']); $i++) {
+                    //TODO
+                    $attendUsersData[] = [
+                        'user_id' => $requestData['users']['user_id'],
+                        'type' => $requestData['users']['type'],
+                        'need_appointment' => $requestData['users']['need_appointment'],
+                    ];
+                }
+
+                $Obj->attendUsers()
+                    ->createMany($attendUsersData);
             });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null, 'data' => $Obj];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null, 'data' => $Obj];
     }
 
     static public function updateMeeting(int $meetingId, array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'need_audit' => 'required',
             'title' => 'required',
             'type' => 'required',
@@ -153,11 +168,10 @@ class Meeting_ extends Meeting
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first());
             }
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
-
 
 
         $meeting = Meeting_::getMeeting($meetingId, true);
@@ -172,12 +186,12 @@ class Meeting_ extends Meeting
 
         //TODO
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function auditMeeting(int $meetingId, array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'is_passed' => 'required',
             'reason' => 'required',
         ]);
@@ -210,27 +224,7 @@ class Meeting_ extends Meeting
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
-    }
-
-    static public function reserveMeeting(int $meetingId): array
-    {
-        $meeting = Meeting_::getMeeting($meetingId, true);
-        if (!$meeting) {
-            throw new \Exception('reserveMeeting Obj null error');
-        }
-
-        if (!$meeting->audit) {
-            throw new \Exception('reserveMeeting Obj audit null error');
-        }
-
-        if ($meeting->audit['audit_user_id'] !== User_::getMyId()) {
-            throw new \Exception('auditMeeting audit_user_id error');
-        }
-
-        //TODO
-
-        return [];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function deleteMeeting(int $meetingId): array
@@ -288,6 +282,6 @@ class Meeting_ extends Meeting
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 }

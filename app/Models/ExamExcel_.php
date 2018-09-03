@@ -27,12 +27,12 @@ class ExamExcel_ extends ExamExcel
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
     }
 
     static public function getExamExcel(int $examExcelId, bool $getObject = false)
     {
-        $Obj = ExamExcel::with([])->find($examExcelId);
+        $Obj = ExamExcel::with([])->findOrFail($examExcelId);
 
         if ($getObject) {
             $result = $Obj;
@@ -69,7 +69,7 @@ class ExamExcel_ extends ExamExcel
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function updateExamExcel(int $examExcelId, int $examCategoryId, string $fileUrl): array
@@ -81,7 +81,7 @@ class ExamExcel_ extends ExamExcel
 
         try {
             DB::transaction(function () use ($examExcelId, $examCategoryId, $fileUrl, $analysis) {
-                $Obj = ExamExcel::find($examExcelId);
+                $Obj = ExamExcel::findOrFail($examExcelId);
                 $Obj->examCategoryId = $examCategoryId;
                 $Obj->url = $fileUrl;
                 $Obj->question_count = count((array)$analysis['data']);
@@ -100,14 +100,14 @@ class ExamExcel_ extends ExamExcel
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function deleteExamExcel(int $examExcelId): array
     {
         try {
             DB::transaction(function () use ($examExcelId) {
-                $Obj = ExamExcel::find($examExcelId);
+                $Obj = ExamExcel::findOrFail($examExcelId);
                 $Obj->questions()->delete();
                 $Obj->delete();
             });
@@ -116,6 +116,6 @@ class ExamExcel_ extends ExamExcel
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 }

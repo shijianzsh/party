@@ -7,11 +7,12 @@ use App\Services\Login\Login;
 
 class User_ extends User
 {
-     public const UserTypeMap = [
+    public const UserTypeMap = [
         '超级管理员' => 0,
         '单位超级管理员' => 1,
         '单位领导' => 2,
         '单位党员' => 3,
+        '入党积极分子' => 4,
         '群众' => 4,
     ];
 
@@ -23,7 +24,7 @@ class User_ extends User
 
     static public function getUser(int $userId = 0, bool $getObject = false): array
     {
-        $Obj = User::find($userId ? $userId : User_::getMyId());
+        $Obj = User::findOrFail($userId ? $userId : User_::getMyId());
         if ($getObject) {
             return $Obj;
         } else {
@@ -57,12 +58,12 @@ class User_ extends User
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray()];
+        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
     }
 
     static public function createUser(array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'type' => 'required',
             'department_id' => 'required',
             'user_login' => 'required',
@@ -86,14 +87,14 @@ class User_ extends User
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function editUser(int $userId, array $requestData): array
     {
         return ['success' => 0, 'msg' => '功能未开放'];
 
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'type' => 'required',
             'department_id' => 'required',
             'user_login' => 'required',
@@ -106,7 +107,7 @@ class User_ extends User
             }
 
             $Obj = new User;
-            $Obj->find($userId);
+            $Obj->findOrFail($userId);
             $Obj->type = $requestData['type'];
             $Obj->department_id = $requestData['department_id'];
             $Obj->user_login = $requestData['user_login'];
@@ -117,12 +118,12 @@ class User_ extends User
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function deleteUser(int $userId): array
     {
-        $Obj = User::find($userId);
+        $Obj = User::findOrFail($userId);
         $delete = $Obj->delete();
 
         return ['success' => $delete];
@@ -130,7 +131,7 @@ class User_ extends User
 
     static public function changePassword(array $requestData): array
     {
-        $validator = Validator::make($requestData, [
+        $validator = \Validator::make($requestData, [
             'user_password_old' => 'required',
             'user_password' => 'required',
             'user_password2' => 'required',
@@ -144,7 +145,7 @@ class User_ extends User
                 throw new \Exception('两次密码输入不一致');
             }
 
-            $Obj = User::find(User_::getMyId());
+            $Obj = User::findOrFail(User_::getMyId());
             if (!$Obj) {
                 throw new \Exception('未查询到用户信息');
             }
@@ -159,7 +160,7 @@ class User_ extends User
             $msg = $e->getMessage();
         }
 
-        return ['success' => $success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
     }
 
     static public function changeDepartment()

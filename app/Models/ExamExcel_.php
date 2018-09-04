@@ -69,7 +69,7 @@ class ExamExcel_ extends ExamExcel
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     static public function updateExamExcel(int $examExcelId, int $examCategoryId, string $fileUrl): array
@@ -100,7 +100,7 @@ class ExamExcel_ extends ExamExcel
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     static public function deleteExamExcel(int $examExcelId): array
@@ -116,6 +116,6 @@ class ExamExcel_ extends ExamExcel
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 }

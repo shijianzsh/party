@@ -78,7 +78,7 @@ class ExamUserResult_ extends ExamUserResult
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     public function submitExam(int $examUserResultId, array $requestData): array
@@ -150,6 +150,6 @@ class ExamUserResult_ extends ExamUserResult
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'data' => $data ?? null, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'data' => $data ?? null, 'msg' => $msg ?? null];
     }
 }

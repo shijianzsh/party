@@ -115,7 +115,7 @@ class ExamPaper_ extends ExamPaper
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     //TODO 如何关联用户
@@ -166,7 +166,7 @@ class ExamPaper_ extends ExamPaper
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     static public function deleteExamPaper(int $examPaperId)
@@ -190,6 +190,6 @@ class ExamPaper_ extends ExamPaper
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 }

@@ -40,6 +40,6 @@ class UploadFileLog_ extends UploadFileLog
         $success = $Obj->save();
 
         end:
-        return ['success' => (int)$success ?? 1, 'data' => $url];
+        return ['success' => (int)($success ?? 1), 'data' => $url];
     }
 }

@@ -72,6 +72,6 @@ class Department_ extends Department
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 }

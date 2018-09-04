@@ -149,7 +149,7 @@ class Meeting_ extends Meeting
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null, 'data' => $Obj];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj];
     }
 
     static public function updateMeeting(int $meetingId, array $requestData): array
@@ -186,7 +186,7 @@ class Meeting_ extends Meeting
 
         //TODO
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     static public function auditMeeting(int $meetingId, array $requestData): array
@@ -224,7 +224,7 @@ class Meeting_ extends Meeting
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     static public function deleteMeeting(int $meetingId): array
@@ -282,6 +282,6 @@ class Meeting_ extends Meeting
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 }

@@ -80,7 +80,7 @@ class PortalCategory_ extends PortalCategory
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null, '$requestData' => $requestData ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, '$requestData' => $requestData ?? null];
     }
 
     static public function updateCategory(int $categoryId, array $requestData): array
@@ -115,7 +115,7 @@ class PortalCategory_ extends PortalCategory
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)$success ?? 1, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
     static public function deleteCategory(int $categoryId): array

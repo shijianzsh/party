@@ -34,16 +34,6 @@ class ArticleController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //TODO
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -51,7 +41,8 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        //TODO
+        $result = PortalPost_::createPost($request->input('data'));
+        return response()->json($result);
     }
 
     /**
@@ -69,17 +60,6 @@ class ArticleController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //TODO
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -88,7 +68,8 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //TODO
+        $result = PortalPost_::updatePost($id,$request->input('data'));
+        return response()->json($result);
     }
 
     /**

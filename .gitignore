@@ -1,6 +1,8 @@
 /node_modules
 /public/hot
 /public/storage
+/public/upload
+/public/upload/
 /public/upload/*
 /storage/*.key
 /vendor
@@ -16,3 +18,4 @@ yarn-error.log
 /frontend
 /文档
 .DS_store
+.DS_Store

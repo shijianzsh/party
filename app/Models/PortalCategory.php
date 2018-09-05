@@ -7,7 +7,7 @@ class PortalCategory extends _BaseModel
     protected $casts = [
         'more' => 'json',
     ];
-    protected $appends = ['level'];
+    protected $appends = ['level','posts_count'];
 
     public function parent()
     {
@@ -29,6 +29,11 @@ class PortalCategory extends _BaseModel
             'id',
             'post_id'
         );
+    }
+
+    public function getPostsCountAttribute()
+    {
+        return $this->posts()->count();
     }
 
     public function getLevelAttribute()

@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PortalPost;
 use Illuminate\Http\Request;
-use  App\Models\PortalPost_;
-use Illuminate\Support\Facades\Crypt;
-use Gate;
+use  App\Models\Department_;
 
-class ArticleController extends Controller
+class DepartmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,20 +14,8 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
-        $list = PortalPost_::getPostList(
-            $request->input('current_page', 0),
-            $request->input('page_size', 0),
-            [
-                'category_id' => &$filter['category_id'],
-                'keyword' => &$filter['keyword'],
-                'start_timestamp' => &$filter['start_timestamp'],
-                'end_timestamp' => &$filter['end_timestamp'],
-            ],
-            ['user']
-        );
-
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(),'$filter'=>$filter];
+        $list = Department_::getDepartmentList();
+        $result = ['success' => 1, 'data' => $list, '$request' => $request];
         return response()->json($result);
     }
 
@@ -42,7 +27,7 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        $result = PortalPost_::createPost($request->input('data'));
+        $result = Department_::createDepartment($request->input('data'));
         return response()->json($result);
     }
 
@@ -54,9 +39,11 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $row = PortalPost_::getPost($id, []);
+        $list = Department_::getDepartment(
+            $id, false, ['parent', 'children']
+        );
 
-        $result = ['success' => 1, 'data' => $row];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 
@@ -69,7 +56,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = PortalPost_::updatePost($id, $request->input('data'));
+        $result = Department_::updateDepartment($id,$request->input('data'));
         return response()->json($result);
     }
 
@@ -81,6 +68,6 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json(PortalPost_::deletePost($id));
+        return response()->json(Department_::deleteDepartment($id));
     }
 }

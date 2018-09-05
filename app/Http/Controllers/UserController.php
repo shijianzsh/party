@@ -16,8 +16,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $list = User_::getUserList(
-            $request->input('curr_page', 0),
-            $request->input('page_number', 0),
+            $request->input('current_page', 0),
+            $request->input('page_size', 0),
             [
                 'departmentId' => $request->input('department_id'),
             ],

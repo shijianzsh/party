@@ -15,11 +15,16 @@ class PortalPost extends _BaseModel
         'more' => 'json',
         'category_ids' => 'array',
     ];
-    protected $appends = ['category_id','category_ids'];
+    protected $appends = ['category_name','category_id','category_ids'];
 
     public function audit()
     {
         return $this->hasOne('App\Models\PortalPostAudit', 'post_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     public function categorys()
@@ -43,6 +48,12 @@ class PortalPost extends _BaseModel
     public function getCategoryIdAttribute()
     {
         return count($this->category_ids)?$this->category_ids[0]:null;
+    }
+
+    public function getCategoryNameAttribute()
+    {
+        $categorys = $this->categorys->toArray();
+        return count($categorys)?$categorys[0]['name']:'无';
     }
 
     public function setCategoryIdsAttribute($value)

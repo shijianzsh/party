@@ -8,8 +8,8 @@ use DB;
 class ExamPaper_ extends ExamPaper
 {
     static public function getExamPaperList(
-        int $currPage = 0,
-        int $pageNumber = 0,
+        int $currentPage = 0,
+        int $pageSize = 0,
         array $filter = [
             '' => "",
         ],
@@ -20,14 +20,19 @@ class ExamPaper_ extends ExamPaper
 
         $total = $Obj->count();
 
-        if ($currPage && $pageNumber) {
-            $offset = ($currPage - 1) * $pageNumber;
-            $Obj->offset($offset)->limit($pageNumber);
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
         }
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
+        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
     static public function getExamPaper(int $examPaperId, bool $getObject = false)

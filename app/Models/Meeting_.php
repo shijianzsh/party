@@ -19,8 +19,8 @@ class Meeting_ extends Meeting
     public const AheadSignInTimestamp = 3600 * 2;//允许提前先到的时间
 
     static public function getMeetingList(
-        int $currPage = 0,
-        int $pageNumber = 0,
+        int $currentPage = 0,
+        int $pageSize = 0,
         array $filter = [
             'initiate_user_id' => null,
             'need_audit' => null,
@@ -54,14 +54,19 @@ class Meeting_ extends Meeting
 
         $total = $Obj->count();
 
-        if ($currPage && $pageNumber) {
-            $offset = ($currPage - 1) * $pageNumber;
-            $Obj->offset($offset)->limit($pageNumber);
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
         }
 
         $get = $Obj->get();
 
-        return ['total' => $total ?? 0, 'rows' => $get->toArray(), 'pagination' => ['current' => $currPage, 'page_number' => $pageNumber]];
+        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
     static public function getMeeting(int $meetingId, bool $getObject = false)

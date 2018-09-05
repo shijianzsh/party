@@ -33,6 +33,7 @@ Route::group(['middleware' => [
     Route::post('upload', 'Upload');
 
     Route::prefix('super')->group(function () {
+        Route::resource('departments', 'DepartmentController');
         Route::resource('users', 'UserController');
         Route::resource('articles', 'ArticleController');
         Route::resource('categories', 'CategoryController');

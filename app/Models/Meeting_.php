@@ -215,7 +215,7 @@ class Meeting_ extends Meeting
                 ::where('meeting_id', $meetingId)
                 ->where('audit_user_id', User_::getMYId())
                 ->where('status', Meeting_::AuditStatusMap['未审核'])
-                ->first();
+                ->firstOrFail();
 
             if (!$audit) {
                 throw new \Exception('没有找到符合审核条件的会议');
@@ -271,7 +271,7 @@ class Meeting_ extends Meeting
 
             $Obj = $meeting->attendUsers()->where('user_id', User_::getMyId())
                 ->where('meeting_id', $meeting->id)
-                ->first();
+                ->firstOrFail();
 
             if (!$Obj) {
                 throw new \Exception('未参会错误');

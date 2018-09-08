@@ -40,7 +40,9 @@ class CategoryController extends Controller
     public function show($id)
     {
         $list = PortalCategory_::getCategory(
-            $id, false, ['parent', 'children']
+            $id, false, ['parent', 'children','siblings'=>function($query){
+                $query->orderBy('sort_order', 'asc');
+            }]
         );
 
         $result = ['success' => 1, 'data' => $list];

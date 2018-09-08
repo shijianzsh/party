@@ -19,6 +19,10 @@ class PortalCategory extends _BaseModel
         return $this->hasMany('App\Models\PortalCategory', 'parent_id');
     }
 
+    public function siblings(){
+        return $this->hasMany('App\Models\PortalCategory', 'parent_id','parent_id');
+    }
+
     public function posts()
     {
         return $this->hasManyThrough(
@@ -43,7 +47,7 @@ class PortalCategory extends _BaseModel
 
     public function setPathAttribute($value)
     {
-        if ($this->parent_id === 0) {
+        if ($this->parent_id === 0||!$this->parent_id) {
             $this->attributes['path'] = "0-";
         } else {
             $this->attributes['path'] =

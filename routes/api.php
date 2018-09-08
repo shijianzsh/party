@@ -34,8 +34,12 @@ Route::group(['middleware' => [
 
     Route::prefix('super')->group(function () {
         Route::resource('departments', 'DepartmentController');
+
         Route::resource('users', 'UserController');
+
+        Route::post('articles/{id}/audit', 'Article@audit');
         Route::resource('articles', 'ArticleController');
+
         Route::resource('categories', 'CategoryController');
     });
 });

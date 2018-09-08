@@ -58,7 +58,7 @@ class ExamUserResult_ extends ExamUserResult
                 $paperUser = ExamPaperUser
                     ::where('user_id', User_::getMyId())
                     ->where('paper_id', $paperId)
-                    ->first();
+                    ->firstOrFail();
 
                 if (!$paperUser) {
                     throw new \Exception('没有考试资格');
@@ -66,7 +66,7 @@ class ExamUserResult_ extends ExamUserResult
 
                 $checkResult = ExamUserResult::where('user_id', User_::getMyId())
                     ->where('paper_id', $paperId)
-                    ->first();
+                    ->firstOrFail();
 
                 if ($checkResult) {
                     throw new \Exception('已经参加过该考试了');

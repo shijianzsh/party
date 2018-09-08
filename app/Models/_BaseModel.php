@@ -26,7 +26,16 @@ class _BaseModel extends Model
 
     public function getCreatedAtFormatAttribute()
     {
-        //TODO
-        return $this->created_at;
+        return date("Y-m-d H:i:s", $this->created_at->timestamp);
+    }
+
+    public function getUpdatedAtFormatAttribute()
+    {
+        return $this->updated_at ? date("Y-m-d H:i:s", $this->updated_at->timestamp) : '';
+    }
+
+    public function getPublishedAtFormatAttribute()
+    {
+        return $this->published_at ? date("Y-m-d H:i:s", $this->published_at) : '';
     }
 }

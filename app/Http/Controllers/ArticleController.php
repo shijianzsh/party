@@ -23,6 +23,7 @@ class ArticleController extends Controller
             $request->input('page_size', 0),
             [
                 'category_id' => &$filter['category_id'],
+                'is_published' => &$filter['is_published'],
                 'keyword' => &$filter['keyword'],
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],
@@ -30,7 +31,7 @@ class ArticleController extends Controller
             ['user']
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(),'$filter'=>$filter];
+        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
         return response()->json($result);
     }
 
@@ -65,11 +66,10 @@ class ArticleController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $result = PortalPost_::updatePost($id, $request->input('data'));
+        return $result = PortalPost_::updatePost($id, $request->input('data'));
         return response()->json($result);
     }
 

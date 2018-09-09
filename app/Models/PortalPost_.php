@@ -247,6 +247,10 @@ class PortalPost_ extends PortalPost
             $statusNow = array_flip(PortalPostAudit::STATUS)[$row->status];
             throw new \Exception('操作失败，已经审核过了。当前状态为 ' . $statusNow);
         }
-        return $row;
+
+        $row->status = $status;
+        $row->reason = $reason;
+
+        return ['success' => (int)$row->save()];
     }
 }

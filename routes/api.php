@@ -41,6 +41,8 @@ Route::group(['middleware' => [
         Route::resource('articles', 'ArticleController');
 
         Route::resource('categories', 'CategoryController');
+
+        Route::resource('comments', 'CommentController');
     });
 });
 

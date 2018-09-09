@@ -7,7 +7,7 @@ class PortalCategory extends _BaseModel
     protected $casts = [
         'more' => 'json',
     ];
-    protected $appends = ['level','posts_count'];
+    protected $appends = ['level', 'posts_count'];
 
     public function parent()
     {
@@ -19,8 +19,14 @@ class PortalCategory extends _BaseModel
         return $this->hasMany('App\Models\PortalCategory', 'parent_id');
     }
 
-    public function siblings(){
-        return $this->hasMany('App\Models\PortalCategory', 'parent_id','parent_id');
+    public function siblings()
+    {
+        return $this->hasMany('App\Models\PortalCategory', 'parent_id', 'parent_id');
+    }
+
+    public function postsMiddle()
+    {
+        return $this->hasMany('App\Models\PortalCategoryPost', 'category_id');
     }
 
     public function posts()
@@ -47,7 +53,7 @@ class PortalCategory extends _BaseModel
 
     public function setPathAttribute($value)
     {
-        if ($this->parent_id === 0||!$this->parent_id) {
+        if ($this->parent_id === 0 || !$this->parent_id) {
             $this->attributes['path'] = "0-";
         } else {
             $this->attributes['path'] =

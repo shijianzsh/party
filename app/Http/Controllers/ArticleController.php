@@ -69,7 +69,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return $result = PortalPost_::updatePost($id, $request->input('data'));
+        $result = PortalPost_::updatePost($id, $request->input('data'));
         return response()->json($result);
     }
 

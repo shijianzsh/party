@@ -4,16 +4,21 @@ namespace App\Models;
 
 class User extends _BaseModel
 {
+    const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
+    protected $appends = ['type_format'];
+
     public function department()
     {
-        return $this->belongsTo('App\Models\Department','department_id');
+        return $this->belongsTo('App\Models\Department', 'department_id');
     }
 
-    public function uploadFiles(){
-    return $this->hasMany('App\Models\UploadFileLog', 'user_id');
-}
+    public function uploadFiles()
+    {
+        return $this->hasMany('App\Models\UploadFileLog', 'user_id');
+    }
 
-    public function payments(){
+    public function payments()
+    {
         return $this->hasMany('App\Models\UserPayment', 'user_id');
     }
 
@@ -32,7 +37,8 @@ class User extends _BaseModel
         return $this->hasMany('App\Models\UserComment', 'to_user_id');
     }
 
-    public function auditComments(){
+    public function auditComments()
+    {
         return $this->hasManyThrough(
             'App\Models\UserComment',
             'App\Models\UserCommentAudit',
@@ -43,11 +49,13 @@ class User extends _BaseModel
         );
     }
 
-    public function posts(){
+    public function posts()
+    {
         return $this->hasMany('App\Models\PortalPost', 'user_id');
     }
 
-    public function auditPosts(){
+    public function auditPosts()
+    {
         return $this->hasManyThrough(
             'App\Models\PortalPost',
             'App\Models\ExamPaperAudit',
@@ -58,11 +66,13 @@ class User extends _BaseModel
         );
     }
 
-    public function initiateMeetings(){
+    public function initiateMeetings()
+    {
         return $this->hasMany('App\Models\Meeting', 'initiate_user_id');
     }
 
-    public function auditMeetings(){
+    public function auditMeetings()
+    {
         return $this->hasManyThrough(
             'App\Models\Meeting',
             'App\Models\MeetingAudit',
@@ -73,7 +83,8 @@ class User extends _BaseModel
         );
     }
 
-    public function attendMeetings(){
+    public function attendMeetings()
+    {
         return $this->hasManyThrough(
             'App\Models\Meeting',
             'App\Models\MeetingUser',
@@ -84,11 +95,13 @@ class User extends _BaseModel
         );
     }
 
-    public function initiateVotes(){
+    public function initiateVotes()
+    {
         return $this->hasMany('App\Models\Vote', 'initiate_user_id');
     }
 
-    public function attendVotes(){
+    public function attendVotes()
+    {
         return $this->hasManyThrough(
             'App\Models\Vote',
             'App\Models\VoteUser',
@@ -102,5 +115,10 @@ class User extends _BaseModel
     public function examResults()
     {
         return $this->hasMany('App\Models\ExamUserResult', 'user_id');
+    }
+
+    public function getTypeFormatAttribute()
+    {
+        return array_flip(self::TYPE)[$this->type];
     }
 }

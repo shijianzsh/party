@@ -51,7 +51,11 @@ class User_ extends User
 
         $total = $Obj->count();
 
-        if ($currentPage) {             $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;         } else {             $pageSize = 0;         }
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
         if ($currentPage && $pageSize) {
             $offset = ($currentPage - 1) * $pageSize;
             $Obj->offset($offset)->limit($pageSize);
@@ -67,6 +71,7 @@ class User_ extends User
         $validator = \Validator::make($requestData, [
             'type' => 'required',
             'department_id' => 'required',
+            'name' => 'required',
             'user_login' => 'required',
             'user_password' => 'required',
         ]);
@@ -79,6 +84,7 @@ class User_ extends User
             $Obj = new User;
             $Obj->type = $requestData['type'];
             $Obj->department_id = $requestData['department_id'];
+            $Obj->name = $requestData['name'];
             $Obj->user_login = $requestData['user_login'];
             $Obj->user_password = $requestData['user_password'];
             $success = $Obj->save();

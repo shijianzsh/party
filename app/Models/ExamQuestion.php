@@ -7,7 +7,7 @@ class ExamQuestion extends _BaseModel
     protected $casts = [
         'status' => 'integer',
         'options' => 'json',
-        'answer' => 'json',
+        'answers' => 'json',
     ];
 
     protected $fillable = ['excel_index', 'disabled', 'title', 'options', 'answers'];

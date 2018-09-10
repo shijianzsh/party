@@ -17,7 +17,7 @@ class Excel
         'excel_index' => '序号',
         'title' => '题目',
         'options' => '选项',
-        'answer' => '答案',
+        'answers' => '答案',
         'disabled' => '是否禁用'
     ];
 
@@ -104,9 +104,7 @@ class Excel
                     throw new \Exception('Excel analyzeDataAnswers answer length error');
                 }
             }
-
         }
-
         $this->data = $data;
         return $this;
     }

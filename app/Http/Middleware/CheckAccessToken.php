@@ -19,12 +19,16 @@ class CheckAccessToken
     {
         $AccessTokenObj = new AccessToken();
 
-        $verify = $AccessTokenObj->verifyAndSetToSession($request->input('access_token', ''));
+        try {
+            $verify = $AccessTokenObj->verifyAndSetToSession($request->input('access_token', ''));
+        } catch (\Exception $e) {
+            $verify = ['success' => 0, 'msg' => $e->getMessage()];
+            return response()->json($verify);
+        }
         if (!$verify['success']) {
             return $next($request);
 
             //TODO 跨域header为空
-            return response()->json($verify);
         }
 
         return $next($request);

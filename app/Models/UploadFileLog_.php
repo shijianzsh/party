@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use DB;
+
 class UploadFileLog_ extends UploadFileLog
 {
     static public function getUploadFileLogList(

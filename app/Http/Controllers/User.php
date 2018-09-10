@@ -18,9 +18,8 @@ class User extends Controller
     {
         $Obj = new User_();
         return $Obj->getAccessToken(
-            $request->input('token'),
-            $request->input('account'),
-            $request->input('password')
+            $request->input('token',''),
+            $request->input()
         );
     }
 }

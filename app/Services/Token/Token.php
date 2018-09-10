@@ -22,9 +22,9 @@ class Token extends TokenBase
             return ['success' => 0, 'msg' => 'Token verify error,code 1'];
         }
 
-        try{
+        try {
             $data = $this->decrypt($token);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return ['success' => 0, 'msg' => $e->getMessage()];
         }
 

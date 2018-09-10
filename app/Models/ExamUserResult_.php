@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\Exam\Exam;
 use Carbon\Carbon;
+use DB;
 
 class ExamUserResult_ extends ExamUserResult
 {

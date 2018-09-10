@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use DB;
+
 class UserComment_ extends UserComment
 {
     static public function getCommentList(

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\Token\Token, App\Services\Token\AccessToken;
 use App\Services\Login\Login;
+use DB;
 
 class User_ extends User
 {
@@ -22,7 +23,7 @@ class User_ extends User
         return $Obj->getUserId();
     }
 
-    static public function getUser(int $userId = 0, bool $getObject = false): array
+    static public function getUser(int $userId = 0, bool $getObject = false)
     {
         $Obj = User::findOrFail($userId ? $userId : User_::getMyId());
         if ($getObject) {
@@ -178,28 +179,53 @@ class User_ extends User
     /**
      * 登录、获取access_token的接口
      */
-    static public function getAccessToken(string $token, string $account, string $password): array
+    static public function getAccessToken(string $token, array $requestData): array
     {
-        $TokenObj = new Token();
-        $verify = $TokenObj->verify($token);
-        if (!$verify['success']) {
-            return $verify;
+        $validator = \Validator::make($requestData, [
+            'user_login' => 'required',
+            'user_password' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+            $user_login = $requestData['user_login'];
+            $user_password = $requestData['user_password'];
+
+            $TokenObj = new Token();
+            $verify = $TokenObj->verify($token);
+            if (!$verify['success']) {
+                return $verify;
+            }
+
+            $user = User::where('user_login', $user_login)->first();
+            if (empty($user)) {
+                throw new \Exception('用户不存在或密码错误');
+            }
+
+            $passwordNow = Login::getPassword($user_password);
+            if ($passwordNow !== $user['user_password']) {
+                throw new \Exception('用户不存在或密码错误');
+            }
+
+            $AccessTokenObj = new AccessToken();
+            $getAccessToken = $AccessTokenObj->create($token, (int)$user['id']);
+
+            $data = array_merge($getAccessToken['data'], ['user' => $user->toArray()]);
+
+            $user->access_token = $getAccessToken['data']['access_token'];
+            $success = $user->save();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
         }
 
-        $user = User::where('user_login', $account)->first();
-        if (empty($user)) {
-            return ['success' => 0, 'msg' => '用户不存在或密码错误'];
-        }
-
-        $passwordNow = Login::getPassword($password);
-        if ($passwordNow !== $user['user_password']) {
-            return ['success' => 0, 'msg' => '用户不存在或密码错误'];
-        }
-
-        $AccessTokenObj = new AccessToken();
-        $getAccessToken = $AccessTokenObj->create($token, (int)$user['id']);
-
-        $user->access_token = $getAccessToken['data'];
-        return $getAccessToken;
+        return [
+            'success' => (int)($success ?? 1),
+            'data' => $data ?? ['user_id' => $user['id'] ?? null],
+            'msg' => $msg ?? null,
+            '$requestData' => $requestData,
+        ];
     }
 }

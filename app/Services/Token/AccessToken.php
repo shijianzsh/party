@@ -17,22 +17,22 @@ class AccessToken extends TokenBase
     public function create(string $token, int $userId): array
     {
         if (empty($token)) {
-            return ['success' => 0, 'msg' => 'AccessToken create param error,code 1'];
+            throw new \Exception('AccessToken create param error,code 1');
         }
         if (empty($userId)) {
-            return ['success' => 0, 'msg' => 'AccessToken create param error,code 2'];
+            throw new \Exception('AccessToken create param error,code 2');
         }
 
         $baseData = $this->createBaseData();
         $baseData['token'] = $token;
         $baseData['user_id'] = $userId;
-        return ['success' => 1, 'data' => $this->encrypt($baseData)];
+        return ['success' => 1, 'data' => ['access_token' => $this->encrypt($baseData), 'user_id' => $userId]];
     }
 
     public function verifyAndSetToSession(string $accessToken): array
     {
         if (empty($accessToken)) {
-            return ['success' => 0, 'msg' => 'AccessToken verify error,code 1'];
+            throw new \Exception('接口错误：未登录');
         }
 
         $TokenObj = new Token();
@@ -44,11 +44,11 @@ class AccessToken extends TokenBase
         $data = $verifyAccessToken['data'];
 
         if (!array_key_exists('token', $data)) {
-            return ['success' => 0, 'msg' => 'AccessToken verify error,code 2'];
+            throw new \Exception('AccessToken verify error,code 2');
         }
 
         if (!array_key_exists('user_id', $data)) {
-            return ['success' => 0, 'msg' => 'AccessToken verify error,code 3'];
+            throw new \Exception('AccessToken verify error,code 3');
         }
         $this->userId = $data['user_id'];
 
@@ -59,16 +59,16 @@ class AccessToken extends TokenBase
         $data['token'] = $verifyToken['data'];
 
         if ($data['ip'] !== $data['token']['ip']) {
-            return ['success' => 0, 'msg' => 'AccessToken verify different ip error'];
+            throw new \Exception('AccessToken verify different ip error');
         }
 
-        $user = User_::getUser($data['user_id']);
+        $user = User_::getUser($data['user_id'],true);
         if (empty($user)) {
-            return ['success' => 0, 'msg' => 'AccessToken verify empty user error'];
+            throw new \Exception('AccessToken verify empty user error');
         }
 
         if ($user->access_token !== $accessToken) {
-            return ['success' => 0, 'msg' => 'AccessToken verify access_token changed error'];
+            throw new \Exception('AccessToken verify access_token changed error');
         }
 
         $this->setUserIdToSession($data['user_id']);
@@ -87,8 +87,8 @@ class AccessToken extends TokenBase
             return $this->userId;
         }
 
-        if (session()->get('user_id')){
-            return session()->get('user_id',0);
+        if (session()->get('user_id')) {
+            return session()->get('user_id', 0);
         }
 
         return 0;

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use DB;
+
 class PortalCategory_ extends PortalCategory
 {
     static public function getCategoryList(

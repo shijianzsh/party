@@ -13,8 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::options('/{all}', function (Request $request) {
-})->middleware(\App\Http\Middleware\Cors::class);
+//Route::options('/{all}', function (Request $request) {
+//})->middleware(\App\Http\Middleware\Cors::class);
 
 
 Route::get('/', function (Request $request) {
@@ -24,7 +24,7 @@ Route::get('/', function (Request $request) {
 Route::get('/test', 'Test');
 
 Route::get('/token', 'Token');
-Route::get('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::class);
+Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::class);
 
 
 Route::group(['middleware' => [
@@ -32,17 +32,20 @@ Route::group(['middleware' => [
 ]], function () {
     Route::post('upload', 'Upload');
 
-    Route::prefix('super')->group(function () {
-        Route::resource('departments', 'DepartmentController');
+    Route::resource('departments', 'DepartmentController');
 
-        Route::resource('users', 'UserController');
+    Route::resource('users', 'UserController');
 
-        Route::post('articles/{id}/audit', 'Article@audit');
-        Route::resource('articles', 'ArticleController');
+    Route::post('articles/{id}/audit', 'Article@audit');
+    Route::resource('articles', 'ArticleController');
 
-        Route::resource('categories', 'CategoryController');
+    Route::resource('categories', 'CategoryController');
 
-        Route::resource('comments', 'CommentController');
-    });
+    Route::resource('comments', 'CommentController');
+
+    Route::resource('exam_category', 'ExamCategoryController');
+    Route::resource('exam_excel', 'ExamExcelController');
+    Route::resource('exam_paper', 'ExamPaperController');
+    Route::resource('exam_result', 'ExamResultController');
 });
 

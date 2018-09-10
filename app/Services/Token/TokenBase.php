@@ -5,6 +5,7 @@
  * Date: 2018/8/21
  * Time: 下午9:53
  */
+
 namespace App\Services\Token;
 
 use Illuminate\Support\Facades\Crypt;
@@ -25,7 +26,7 @@ class TokenBase
 
     private function getClientIpAddress()
     {
-        return $_SERVER['REMOTE_ADDR']??'0.0.0.0';
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     protected function createBaseData()

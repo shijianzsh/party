@@ -72,17 +72,17 @@ class PortalPost extends _BaseModel
         $this->attributes['first_name'] = strtolower($value);
     }
 
-    public function getMoreAttribute($value)
-    {
-        $value= json_decode($value, true);
-        if (!$value) return (array)$value;
-
-        array_walk($value, function (&$value, $key) {
-            if($value){
-                $value = json_decode($value);
-            }
-        });
-
-        return $value;
-    }
+//    public function getMoreAttribute($value)
+//    {
+//        $value= json_decode($value, true);
+//        if (!$value) return (array)$value;
+//
+//        array_walk($value, function (&$value, $key) {
+//            if($value){
+//                $value = json_decode($value);
+//            }
+//        });
+//
+//        return $value;
+//    }
 }

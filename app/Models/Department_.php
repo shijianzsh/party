@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use DB;
+
 class Department_ extends Department
 {
     static public function getDepartmentList(

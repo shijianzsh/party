@@ -6,10 +6,10 @@ class ExamPaperQuestion extends _BaseModel
 {
     protected $casts = [
         'options' => 'json',
-        'answer' => 'json',
+        'answers' => 'json',
     ];
 
-    protected $fillable = ['question_id', 'question_score', 'title', 'options', 'answer'];
+    protected $fillable = ['question_id', 'question_score', 'title', 'options', 'answers'];
 
     public function paper()
     {

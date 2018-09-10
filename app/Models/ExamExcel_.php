@@ -11,7 +11,6 @@ class ExamExcel_ extends ExamExcel
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-            '' => "",
         ],
         array $with = []
     ): array
@@ -48,19 +47,31 @@ class ExamExcel_ extends ExamExcel
         return $result;
     }
 
-    static public function createExamExcel(int $examCategoryId, string $fileUrl): array
+    static public function createExamExcel(array $requestData): array
     {
-        $analysis = Excel::staticRun($fileUrl);
-        if (!$analysis['success']) {
-            return $analysis;
-        }
-
+        $validator = \Validator::make($requestData, [
+//            'user_id' => 'user_id',
+            'category_id' => 'required',
+            'more_file' => 'required',
+        ]);
         try {
-            DB::transaction(function () use ($examCategoryId, $fileUrl, $analysis) {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            $analysis = Excel::staticRun(public_path().$requestData['more_file'][0]['url']);
+            if (!$analysis['success']) {
+                return $analysis;
+            }
+
+            DB::transaction(function () use ($requestData, $analysis) {
                 $Obj = new ExamExcel();
-                $Obj->examCategoryId = $examCategoryId;
-                $Obj->url = $fileUrl;
+                $Obj->user_id = $requestData['user_id'];
+                $Obj->category_id = $requestData['category_id'];
                 $Obj->question_count = count((array)$analysis['data']);
+                $Obj->more = [
+                    'file' => $requestData['more_file'],
+                ];
                 $Obj->save();
 
                 $saveMany = [];
@@ -77,19 +88,32 @@ class ExamExcel_ extends ExamExcel
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function updateExamExcel(int $examExcelId, int $examCategoryId, string $fileUrl): array
+    static public function updateExamExcel(int $examExcelId, array $requestData): array
     {
-        $analysis = Excel::staticRun($fileUrl);
-        if (!$analysis['success']) {
-            return $analysis;
-        }
+        $validator = \Validator::make($requestData, [
+            'user_id' => 'required',
+            'category_id' => 'required',
+            'more_file' => 'required',
+        ]);
 
         try {
-            DB::transaction(function () use ($examExcelId, $examCategoryId, $fileUrl, $analysis) {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            $analysis = Excel::staticRun(public_path().$requestData['more_file'][0]['url']);
+            if (!$analysis['success']) {
+                return $analysis;
+            }
+
+            DB::transaction(function () use ($examExcelId, $requestData, $analysis) {
                 $Obj = ExamExcel::findOrFail($examExcelId);
-                $Obj->examCategoryId = $examCategoryId;
-                $Obj->url = $fileUrl;
+                $Obj->user_id = $requestData['user_id'];
+                $Obj->category_id = $requestData['category_id'];
                 $Obj->question_count = count((array)$analysis['data']);
+                $Obj->more = [
+                    'file' => $requestData['more_file'],
+                ];
                 $Obj->save();
 
                 $Obj->questions()->delete();

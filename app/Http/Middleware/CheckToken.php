@@ -16,8 +16,8 @@ class CheckToken
      */
     public function handle($request, Closure $next)
     {
-        $AccessTokenObj = new Token();
-        $verify = $AccessTokenObj->verify($request->input('token',''));
+        $TokenObj = new Token();
+        $verify = $TokenObj->verify($request->input('token',''));
         if (!$verify['success']) {
             return response()->json($verify);
         }

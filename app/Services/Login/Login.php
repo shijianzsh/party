@@ -17,8 +17,8 @@ class Login
 
     static public function getPassword(string $password): string
     {
-        $a = md5(Login::salt . Carbon::now()->timestamp);
-        $b = md5($a . Carbon::now()->timestamp);
+        $a = md5(Login::salt . $password);
+        $b = md5(Login::salt . $a);
         return substr($b, 0, Login::length);
     }
 }

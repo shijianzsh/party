@@ -23,7 +23,8 @@ class ExamUserResult_ extends ExamUserResult
 
         $userId =& $filter['user_id'];
         if ($userId !== null) {
-            $Obj->where('user_id', $userId);
+            $Obj->where('user_id', $userId)
+                ->where('is_submitted', 1);
         }
 
         $total = $Obj->count();
@@ -161,6 +162,7 @@ class ExamUserResult_ extends ExamUserResult
             $msg = $isPassed ? '恭喜您！考试通过！' : '很遗憾，没有通过考试，请再接再厉！';
 
             //更新记录
+            $Obj->is_submitted = 1;
             $Obj->score = $score;
             $Obj->is_passed = $isPassed;
             $Obj->answers_snapshoot = $requestData['answers'];

@@ -20,7 +20,7 @@ class ExamResultController extends Controller
         $list = ExamUserResult_::getExamUserResultList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
-            [],
+            ['user_id' => &$filter['user_id']],
             ['user', 'paper']
         );
 

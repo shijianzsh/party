@@ -21,6 +21,7 @@ class ExamPaperController extends Controller
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
+                'attend_user_id' => &$filter['attend_user_id'],
             ]
         );
 

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\DepartmentActivityPlan_, App\Models\PortalPost_;
+use App\Models\Meeting_, App\Models\PortalPost_;
 
-class DepartmentActivityPlanController extends Controller
+class MeetingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,12 +15,13 @@ class DepartmentActivityPlanController extends Controller
     public function index(Request $request)
     {
         $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
-        $list = DepartmentActivityPlan_::getActivityPlanList(
+        $list = Meeting_::getMeetingList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-//                'user_id' => &$filter['user_id'],
-//                'to_user_id' => &$filter['to_user_id'],
+                'initiate_user_id' => &$filter['initiate_user_id'],
+                'need_audit' => &$filter['need_audit'],
+                'keyword' => &$filter['keyword'],
             ]
         );
 
@@ -36,7 +37,7 @@ class DepartmentActivityPlanController extends Controller
      */
     public function store(Request $request)
     {
-        $result = DepartmentActivityPlan_::createActivityPlan($request->input('data'));
+        $result = Meeting_::createMeeting($request->input('data'));
         return response()->json($result);
     }
 
@@ -48,8 +49,8 @@ class DepartmentActivityPlanController extends Controller
      */
     public function show($id)
     {
-        $list = DepartmentActivityPlan_::getActivityPlan(
-            $id,  []
+        $list = Meeting_::getMeeting(
+            $id, []
         );
 
         $result = ['success' => 1, 'data' => $list];
@@ -65,7 +66,7 @@ class DepartmentActivityPlanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = DepartmentActivityPlan_::updateActivityPlan($id,$request->input('data'));
+        $result = Meeting_::updateMeeting($id, $request->input('data'));
         return response()->json($result);
     }
 
@@ -77,6 +78,6 @@ class DepartmentActivityPlanController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json(DepartmentActivityPlan_::deleteActivityPlan($id));
+        return response()->json(Meeting_::deleteMeeting($id));
     }
 }

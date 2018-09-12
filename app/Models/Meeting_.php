@@ -37,7 +37,7 @@ class Meeting_ extends Meeting
                 $query->with(['auditUser']);
             },
             'initiateUser',
-            'attendUsers'
+//            'attendUsers'
         ]);
 
         if ($initiate_user_id) {
@@ -49,7 +49,223 @@ class Meeting_ extends Meeting
         }
 
         if ($keyword) {
-            $Obj->where('title', 'like', "%{$keyword}%");
+            $Obj->where(function ($query) use ($keyword) {
+                $query->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('location', 'like', "%{$keyword}%");
+            });
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+    }
+
+    static public function getDepartmentMeetingList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'initiate_user_id' => null,
+            'need_audit' => null,
+            'keyword' => null,
+            'department_id' => null,
+        ]
+    ): array
+    {
+        $validator = \Validator::make($filter, [
+            'department_id' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+            return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        }
+
+        $initiate_user_id =& $filter['user_id'];
+        $keyword =& $filter['keyword'];
+        $need_audit =& $filter['need_audit'];
+        $departmentId =& $filter['department_id'];
+
+        $Obj = Meeting::with([
+            'audit' => function ($query) {
+                $query->with(['auditUser']);
+            },
+            'initiateUser',
+//            'attendUsers'
+        ]);
+
+        $Obj->whereIn('department_id', Department_::getEscendants($departmentId)['ids']);
+
+        if ($initiate_user_id) {
+            $Obj->where('initiate_user_id', $initiate_user_id);
+        }
+
+        if ($need_audit) {
+            $Obj->where('need_audit', $need_audit);
+        }
+
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('location', 'like', "%{$keyword}%");
+            });
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+    }
+
+    static public function getAttendUserMeetingList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'initiate_user_id' => null,
+            'need_audit' => null,
+            'keyword' => null,
+            'attend_user_id' => null,
+        ]
+    ): array
+    {
+        $validator = \Validator::make($filter, [
+            'attend_user_id' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+            return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        }
+
+        $initiate_user_id =& $filter['user_id'];
+        $keyword =& $filter['keyword'];
+        $need_audit =& $filter['need_audit'];
+        $userId =& $filter['attend_user_id'];
+
+        $Obj = Meeting::with([
+            'audit' => function ($query) {
+                $query->with(['auditUser']);
+            },
+            'initiateUser',
+//            'attendUsers'
+        ]);
+        $Obj->whereHas('attendUsersMiddle', function ($query) use ($userId) {
+            $query->where('meeting_user.user_id', $userId);
+        });
+
+        if ($initiate_user_id) {
+            $Obj->where('initiate_user_id', $initiate_user_id);
+        }
+
+        if ($need_audit) {
+            $Obj->where('need_audit', $need_audit);
+        }
+
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('location', 'like', "%{$keyword}%");
+            });
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+    }
+
+    static public function getAuditUserMeetingList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'initiate_user_id' => null,
+            'keyword' => null,
+            'audit_user_id' => null,
+        ]
+    ): array
+    {
+        $validator = \Validator::make($filter, [
+            'audit_user_id' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+            return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        }
+
+        $initiate_user_id =& $filter['user_id'];
+        $keyword =& $filter['keyword'];
+        $userId =& $filter['audit_user_id'];
+
+        $Obj = Meeting::with([
+            'audit' => function ($query) {
+                $query->with(['auditUser']);
+            },
+            'initiateUser',
+//            'attendUsers'
+        ]);
+        $Obj->where('need_audit', 1)
+            ->whereHas('audit', function ($query) use ($userId) {
+                $query->where('meeting_audit.audit_user_id', $userId);
+            });
+
+        if ($initiate_user_id) {
+            $Obj->where('initiate_user_id', $initiate_user_id);
+        }
+
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('location', 'like', "%{$keyword}%");
+            });
         }
 
         $total = $Obj->count();

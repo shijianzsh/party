@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 8.0.12)
 # Database: party
-# Generation Time: 2018-09-12 04:02:20 +0000
+# Generation Time: 2018-09-12 15:52:18 +0000
 # ************************************************************
 
 
@@ -152,7 +152,8 @@ LOCK TABLES `par_exam_category` WRITE;
 
 INSERT INTO `par_exam_category` (`id`, `name`, `created_at`, `updated_at`)
 VALUES
-	(1,'考题分类1',0,1536592702);
+	(1,'考题分类1',0,1536592702),
+	(3,'考题分类2',0,0);
 
 /*!40000 ALTER TABLE `par_exam_category` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -167,6 +168,7 @@ CREATE TABLE `par_exam_excel` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) unsigned NOT NULL,
   `category_id` int(11) unsigned NOT NULL,
+  `file_url` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `question_count` int(11) unsigned NOT NULL DEFAULT '0',
   `more` text CHARACTER SET utf8 COLLATE utf8_general_ci,
   `created_at` int(11) unsigned NOT NULL DEFAULT '0',
@@ -177,13 +179,14 @@ CREATE TABLE `par_exam_excel` (
 LOCK TABLES `par_exam_excel` WRITE;
 /*!40000 ALTER TABLE `par_exam_excel` DISABLE KEYS */;
 
-INSERT INTO `par_exam_excel` (`id`, `user_id`, `category_id`, `question_count`, `more`, `created_at`, `updated_at`)
+INSERT INTO `par_exam_excel` (`id`, `user_id`, `category_id`, `file_url`, `question_count`, `more`, `created_at`, `updated_at`)
 VALUES
-	(10,1,2,4,NULL,0,0),
-	(16,1,2,2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536596998,1536596998),
-	(17,1,2,2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536597018,1536597018),
-	(22,1,2,2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536597322,1536597322),
-	(24,1,2,2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536597472,1536597472);
+	(10,1,2,'1',4,NULL,0,0),
+	(16,1,2,'2',2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536596998,1536596998),
+	(17,1,2,'3',2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536597018,1536597018),
+	(22,1,2,'4',2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536597322,1536597322),
+	(24,9,2,'55',2,'{\"file\":[{\"uid\":\"\\/upload\\/20180910\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8958,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180910\\/\\u9898.xlsx\"}]}',1536597472,1536597472),
+	(25,9,2,'/upload/20180912/题.xlsx',2,'{\"file\":[{\"uid\":\"\\/upload\\/20180912\\/\\u9898.xlsx\",\"name\":\"\\u9898.xlsx\",\"size\":8914,\"type\":\"application\\/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/\\u9898.xlsx\"}]}',1536762695,1536762907);
 
 /*!40000 ALTER TABLE `par_exam_excel` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -215,7 +218,7 @@ LOCK TABLES `par_exam_paper` WRITE;
 INSERT INTO `par_exam_paper` (`id`, `name`, `duration`, `is_restrict_user`, `max_score`, `pass_score`, `questions_count`, `published_at`, `finished_at`, `created_at`, `updated_at`)
 VALUES
 	(1,'测试paper',50,1,8,60,1,555,555,0,1535013092),
-	(4,'测试paper',1,1,16,60,1,555,555,1535009728,1535009728),
+	(4,'测试paper',1,0,16,60,1,555,555,1535009728,1535009728),
 	(5,'测试paper',50,1,16,60,1,555,555,1535010189,1535010189);
 
 /*!40000 ALTER TABLE `par_exam_paper` ENABLE KEYS */;
@@ -305,7 +308,9 @@ VALUES
 	(21,22,1,1,'问题1     12312312','{\"A\":\"\\u7b54\\u6848a\",\"B\":\"\\u7b54\\u6848b\",\"C\":\"\\u7b54\\u6848c\"}','A;B',1536597322,1536597322),
 	(22,22,2,0,'问题2','{\"A\":\"\\u7b54\\u6848a\",\"B\":\"\\u7b54\\u6848b\",\"C\":\"\\u7b54\\u6848c\",\"D\":\"\\u7b54\\u6848d\"}','B',1536597322,1536597322),
 	(23,24,1,1,'问题1     12312312','{\"A\":\"\\u7b54\\u6848a\",\"B\":\"\\u7b54\\u6848b\",\"C\":\"\\u7b54\\u6848c\"}','[\"A\",\"B\"]',1536597472,1536597472),
-	(24,24,2,0,'问题2','{\"A\":\"\\u7b54\\u6848a\",\"B\":\"\\u7b54\\u6848b\",\"C\":\"\\u7b54\\u6848c\",\"D\":\"\\u7b54\\u6848d\"}','[\"B\"]',1536597472,1536597472);
+	(24,24,2,0,'问题2','{\"A\":\"\\u7b54\\u6848a\",\"B\":\"\\u7b54\\u6848b\",\"C\":\"\\u7b54\\u6848c\",\"D\":\"\\u7b54\\u6848d\"}','[\"B\"]',1536597472,1536597472),
+	(31,25,1,1,'问题1     12312312','{\"A\":\"\\u7b54\\u6848a\",\"B\":\"\\u7b54\\u6848b\",\"C\":\"\\u7b54\\u6848c\"}','[\"A\",\"B\"]',1536762907,1536762907),
+	(32,25,2,0,'问题22222','{\"A\":\"\\u7b54\\u6848a\",\"B\":\"\\u7b54\\u6848b\",\"C\":\"\\u7b54\\u6848c\",\"D\":\"\\u7b54\\u6848d\"}','[\"B\"]',1536762907,1536762907);
 
 /*!40000 ALTER TABLE `par_exam_question` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -320,9 +325,10 @@ CREATE TABLE `par_exam_user_result` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) unsigned NOT NULL,
   `paper_id` int(11) unsigned NOT NULL,
+  `is_submitted` tinyint(1) DEFAULT '0' COMMENT '是否交卷',
   `paper_snapshoot` longtext NOT NULL,
-  `answers_snapshoot` longtext NOT NULL,
-  `score` int(11) unsigned NOT NULL DEFAULT '0',
+  `answers_snapshoot` longtext CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `score` int(11) unsigned DEFAULT NULL,
   `is_passed` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:未通过;1:通过',
   `created_at` int(11) unsigned NOT NULL,
   `updated_at` int(11) unsigned NOT NULL,
@@ -332,9 +338,9 @@ CREATE TABLE `par_exam_user_result` (
 LOCK TABLES `par_exam_user_result` WRITE;
 /*!40000 ALTER TABLE `par_exam_user_result` DISABLE KEYS */;
 
-INSERT INTO `par_exam_user_result` (`id`, `user_id`, `paper_id`, `paper_snapshoot`, `answers_snapshoot`, `score`, `is_passed`, `created_at`, `updated_at`)
+INSERT INTO `par_exam_user_result` (`id`, `user_id`, `paper_id`, `is_submitted`, `paper_snapshoot`, `answers_snapshoot`, `score`, `is_passed`, `created_at`, `updated_at`)
 VALUES
-	(2,0,0,'','',11,1,123,2132321);
+	(2,9,1,1,'','',11,1,123,2132321);
 
 /*!40000 ALTER TABLE `par_exam_user_result` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -350,7 +356,7 @@ CREATE TABLE `par_meeting` (
   `initiate_user_id` int(11) unsigned NOT NULL COMMENT '发起人，预约人',
   `need_audit` tinyint(1) unsigned NOT NULL,
   `title` varchar(255) NOT NULL DEFAULT '',
-  `type` int(11) unsigned NOT NULL,
+  `type` int(11) unsigned NOT NULL COMMENT '会议类型:1:线下;2:线上',
   `location` varchar(255) NOT NULL DEFAULT '',
   `opened_at` int(11) unsigned NOT NULL,
   `ended_at` int(11) unsigned NOT NULL,
@@ -364,8 +370,8 @@ LOCK TABLES `par_meeting` WRITE;
 
 INSERT INTO `par_meeting` (`id`, `initiate_user_id`, `need_audit`, `title`, `type`, `location`, `opened_at`, `ended_at`, `created_at`, `updated_at`)
 VALUES
-	(3,0,1,'测试title',2,'测试location',1535096224,1535096324,1535096124,1535096124),
-	(4,0,1,'测试title',2,'测试location',1535096355,1535096455,1535096255,1535096255);
+	(3,5,1,'测试title1',2,'测试location2',1535096224,1535096324,1535096124,1535096124),
+	(4,1,1,'测试title1',1,'测试location2',1535096355,1535096455,1535096255,1535096255);
 
 /*!40000 ALTER TABLE `par_meeting` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -680,7 +686,18 @@ VALUES
 	(99,0,'/upload/20180910/平台首页5.jpg',1536595464),
 	(100,0,'/upload/20180910/平台首页5.jpg',1536596209),
 	(101,0,'/upload/20180910/题.xlsx',1536596368),
-	(102,0,'/upload/20180910/题.xlsx',1536596498);
+	(102,0,'/upload/20180910/题.xlsx',1536596498),
+	(103,0,'/upload/20180912/IMG_20160403_055750.jpg',1536733157),
+	(104,0,'/upload/20180912/IMG_20170907_170000.jpg',1536733157),
+	(105,0,'/upload/20180912/IMG_20170907_170000.jpg',1536757975),
+	(106,0,'/upload/20180912/IMG_20171013_111047.jpg',1536758038),
+	(107,0,'/upload/20180912/IMG_20170907_170000.jpg',1536758038),
+	(108,0,'/upload/20180912/IMG_20171013_111047.jpg',1536758823),
+	(109,0,'/upload/20180912/IMG_20170907_170000.jpg',1536758823),
+	(110,0,'/upload/20180912/题.xlsx',1536762692),
+	(111,0,'/upload/20180912/题.xlsx',1536762835),
+	(112,0,'/upload/20180912/题.xlsx',1536762898),
+	(113,0,'/upload/20180912/题.xlsx',1536762905);
 
 /*!40000 ALTER TABLE `par_upload_file_log` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -711,7 +728,7 @@ LOCK TABLES `par_user` WRITE;
 
 INSERT INTO `par_user` (`id`, `type`, `department_id`, `name`, `sex`, `cellphone`, `user_login`, `user_password`, `created_at`, `updated_at`, `access_token`)
 VALUES
-	(1,0,0,'李静波','男',NULL,'admin','bd417e904f9c00d3',0,1536668174,'eyJpdiI6IlNwYW5DWVo5ZldMMWFlQUJlbkQrS1E9PSIsInZhbHVlIjoiVVZhTTVSeXMrUllvTFhsN3o5N0dWMzJoa0ZDc2pkYkFiVEpFQUxNWm5NS2hLK0E1MFY1RHV0R1wvTzNHREpqYU9nbEdSdERScTU3UkhvXC81TDJkRzhSMGp3WDNseW80VnhCUm1NT2NQamVXbUZIU0piQm4zYXBHck5WK0RmakJ0K2s5cm5OMTRaZDQ1SEpqaURKMHNSMGpcL3I5bnBXZnprckpNRGM3Q3AwcytLQldSNmJha2tRMjRSNklYR3NiRlwvUExCT2h6eGd2QlNyTjBvYUlEWFVwa2drWjExWGtacHBGbkpidXJwZXFyWEViTG5GWThraXdCbk1vNkZFblBmUElKU2NSeFo5ZWFoVUhXb1ZncXZrdlJNN0NLQ1RTUGhlMUo2UFl4UHlnRlpzQjZZekZMa1M4c3ZWODl2c1k1aHByek0wQTB5YjczSHc1cGtId3NrOHQ2ZVwvVTh0T1pjSUFPcWRXb3IwdXBrXC9HQUhDZmJQVFBidGhCTEx5U2FGN2xhSWtLUUYxcnA2a3daTlcwYllUbUpRWU5SSlhFZGVxXC9cLzZMK0xzMkNPVUhnPSIsIm1hYyI6IjFkNjg5MjMxMGQ3MDY0MTljY2Y2NGIxNWUzMzAzZjMwNjA3ZDEwMmNjZTkzMDc3ODYyNzkwMzk5YmU5MGM3YTkifQ=='),
+	(1,0,0,'李静波','男',NULL,'admin','bd417e904f9c00d3',0,1536732819,'eyJpdiI6IjhGRDlRYmh0R0greUtxXC92eEpcL2x3dz09IiwidmFsdWUiOiJ2RE56VHVCUkFneHV1clVqOEM3U1pSbXpneXhKQXRMd0k5Y2V4OGlIVGl4dGJZMEpBamloVzNHdks0RWVyVHZkK1d0anI3OGV6WFJQOTNyRW10ajVFejc3WUcyUGlqOXNiWUVoOGtcL3E2eHJpOEJ3dk9EMmVES2hSZmhrbFhHUGtLcVYyVnlzTVZLYk1sTXZUejRDbW9DM3lpdVl5UGl2ZmZsQ29TdTk2MTEwdWRnaFwvMmxrRjVxZjBhZndLV0xHQlk4VXlJSm1hSFhJd3FFR21IOSszUFJhV0RNVkZjcHk3RDFuTTZsbW1NeEwycW5TNWRSWFhydUR6VlUxa20wRWNUSkhEeFdxeEhPR2FNMjZpeTJkZ0xDN0dIZVNVYUg2SWorZldOUnFNVFNLTDhhdGZEcmhNbzZiR3RBQVBmUGJLMWhUaXZITWloRGNDaExzXC9oR2hNa3poTFNLMWJneUVxbE5ocFRlclNaTVlPN3pnT2FiaVNQckNWK01CeE1LVVN4cTZzXC9Wc3hydCt3NUtTSytLaytCbWpZd1N3ekRNK0FvT1daNjlPaEtvOD0iLCJtYWMiOiI5NDY0MWVlMzRkY2U5YjllMzM0NmE3OTY2ZDk1YWJhOWJmOTUxNjNkYjFlNDgwNzczZGJhYjE0MzcwNDM5MzJiIn0='),
 	(2,1,1,'123','女',NULL,'leader','bd417e904f9c00d3',0,1536716120,'eyJpdiI6IlU0YWRVZHFcL0plbDNiak1VMHY1WVB3PT0iLCJ2YWx1ZSI6InV3a2VDQ2RIdUNnUVg2eUFGNWkwZWg3Y0ptZVhVOXpFRlpzYks0YldRN1wvUUR4b2x1Um5tR3N2VEprMTUrSlwvNUczaUFUeTZMQW1OSHpxVGYwMUlDdWUyTk1XSGNhbWRcL1VFVDRVRWs0eDNyVGFZYm5zamZFaHBoMFZENWxyNWR6a0ZlZlRlT281aWVFcGptaEF5ekdCaUFDeFRscmdyb1gwMURPOTBjNFVCaENoS0hONVwvV09MUVdkTERJMTQyT0JuVzhORXkzWGloSTVia0JNV01nUDRUbXNsN3N6RnBIYjhJOStTd3E1VEs2QU5TWG1xVzlKeGhQYVZ3RkI4ZXBUNmtIOHJ3bVcyekU3R2VrZlpUSGNudE5OU1h1eHdBS1JqdStGZDJnQkJ6clhFRkNMOTlzeHZ3VFppQ3hUUUNObE1TXC9VYVNZd2EyUFl5UVJ5RTZvUFdZRFpPazVSOUoyRjB0VlgyMmdMM1laeXFWdmRcL2kyRVpubmV1Z1RBaFNXMXhnRTdERlRJZkY0VkpBM2FSckkwSFFtZTRrc0pIOWVwbk1RSjZHVTY3RGs9IiwibWFjIjoiZmVmMzkxZDNiMDJkMDA4NGE2ZjFmOGZiNmRlYjhhNWQ0NmJlOGM1Mzk4MDVkZjg4ZWU5NWFhODdlNGFmMmI3YyJ9'),
 	(5,2,2,'张三','男','15598259922','party','',0,0,NULL);
 
@@ -728,8 +745,8 @@ CREATE TABLE `par_user_comment` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '发起人id',
   `need_audit` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `comment_title` int(11) DEFAULT NULL,
-  `comment_content` int(11) DEFAULT NULL,
+  `comment_title` varchar(255) DEFAULT NULL,
+  `comment_content` text,
   `more` text CHARACTER SET utf8 COLLATE utf8_general_ci,
   `leave_at` int(11) DEFAULT NULL,
   `created_at` int(11) DEFAULT NULL,
@@ -742,7 +759,13 @@ LOCK TABLES `par_user_comment` WRITE;
 
 INSERT INTO `par_user_comment` (`id`, `user_id`, `need_audit`, `comment_title`, `comment_content`, `more`, `leave_at`, `created_at`, `updated_at`)
 VALUES
-	(1,1,0,11,22,NULL,NULL,1,2);
+	(1,1,0,'11','22',NULL,NULL,1,2),
+	(8,0,0,'0','0','{\"thumbnail\":null,\"photos\":null,\"videos\":null,\"files\":null}',NULL,1536758591,1536758591),
+	(9,9,0,'31222','<h1>32131122</h1>','{\"files\":[{\"uid\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\",\"name\":\"IMG_20170907_170000.jpg\",\"size\":5127998,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\"},{\"uid\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\",\"name\":\"IMG_20171013_111047.jpg\",\"size\":4245915,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\"}]}',NULL,1536758805,1536758805),
+	(10,9,0,'0','0','{\"files\":[{\"uid\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\",\"name\":\"IMG_20170907_170000.jpg\",\"size\":5127998,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\"},{\"uid\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\",\"name\":\"IMG_20171013_111047.jpg\",\"size\":4245915,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\"}]}',NULL,1536758826,1536758826),
+	(11,0,0,'0','0','{\"files\":[{\"uid\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\",\"name\":\"IMG_20170907_170000.jpg\",\"size\":5127998,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\"},{\"uid\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\",\"name\":\"IMG_20171013_111047.jpg\",\"size\":4245915,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\"}]}',NULL,1536758844,1536758844),
+	(12,0,1,'0','0','{\"files\":[{\"uid\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\",\"name\":\"IMG_20170907_170000.jpg\",\"size\":5127998,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\"},{\"uid\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\",\"name\":\"IMG_20171013_111047.jpg\",\"size\":4245915,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\"}]}',1536845224,1536758864,1536758864),
+	(14,9,1,'321','321','{\"files\":null}',1536760316,1536760317,1536760317);
 
 /*!40000 ALTER TABLE `par_user_comment` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -757,13 +780,23 @@ CREATE TABLE `par_user_comment_audit` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `comment_id` int(11) DEFAULT NULL,
   `audit_user_id` int(11) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT NULL COMMENT '审核状态;1:通过;2:不通过',
+  `status` tinyint(1) DEFAULT '0' COMMENT '审核状态;1:通过;2:不通过',
   `reason` varchar(255) DEFAULT NULL,
   `created_at` int(11) DEFAULT NULL,
   `updated_at` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `par_user_comment_audit` WRITE;
+/*!40000 ALTER TABLE `par_user_comment_audit` DISABLE KEYS */;
+
+INSERT INTO `par_user_comment_audit` (`id`, `comment_id`, `audit_user_id`, `status`, `reason`, `created_at`, `updated_at`)
+VALUES
+	(2,12,2,1,NULL,1,1),
+	(3,14,2,0,NULL,1536760317,1536760317);
+
+/*!40000 ALTER TABLE `par_user_comment_audit` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table par_user_comment_user
@@ -785,7 +818,18 @@ LOCK TABLES `par_user_comment_user` WRITE;
 
 INSERT INTO `par_user_comment_user` (`id`, `comment_id`, `user_id`, `created_at`, `updated_at`)
 VALUES
-	(1,1,1,1,1);
+	(1,1,1,1,1),
+	(2,8,2,1536758591,1536758591),
+	(3,8,5,1536758591,1536758591),
+	(4,9,2,1536758805,1536758805),
+	(5,9,5,1536758805,1536758805),
+	(6,10,2,1536758826,1536758826),
+	(7,10,5,1536758826,1536758826),
+	(8,11,2,1536758844,1536758844),
+	(9,11,5,1536758844,1536758844),
+	(10,12,2,1536758864,1536758864),
+	(11,12,9,1536758864,1536758864),
+	(12,14,2,1536760317,1536760317);
 
 /*!40000 ALTER TABLE `par_user_comment_user` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -842,13 +886,22 @@ CREATE TABLE `par_user_payment` (
   `user_id` int(11) unsigned NOT NULL,
   `type` tinyint(1) unsigned NOT NULL,
   `amount` int(11) unsigned NOT NULL,
-  `api_recive_msg` text NOT NULL,
+  `api_recive_msg` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '支付接口接受到的信息',
   `created_at` int(11) unsigned NOT NULL,
   `finished_at` int(11) unsigned NOT NULL,
   `updated_at` int(11) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `par_user_payment` WRITE;
+/*!40000 ALTER TABLE `par_user_payment` DISABLE KEYS */;
+
+INSERT INTO `par_user_payment` (`id`, `user_id`, `type`, `amount`, `api_recive_msg`, `created_at`, `finished_at`, `updated_at`)
+VALUES
+	(1,5,1,1234,'',1536668100,1536668174,0);
+
+/*!40000 ALTER TABLE `par_user_payment` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table par_user_role

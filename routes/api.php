@@ -40,6 +40,8 @@ Route::group(['middleware' => [
 
     Route::resource('users', 'UserController');
 
+    Route::resource('user_payments', 'UserPaymentController');
+
     Route::post('articles/{id}/audit', 'Article@audit');
     Route::resource('articles', 'ArticleController');
 
@@ -47,15 +49,19 @@ Route::group(['middleware' => [
 
     Route::resource('comments', 'CommentController');
 
-    Route::resource('exam_category', 'ExamCategoryController');
+    Route::get('meetings/department', 'Meeting@department');
+    Route::get('meetings/attend_user', 'Meeting@attendUser');
+    Route::get('meetings/audit_user', 'Meeting@auditUser');
+    Route::resource('meetings', 'MeetingController');
 
-    Route::resource('exam_excel', 'ExamExcelController');
+    Route::resource('exam_categorys', 'ExamCategoryController');
 
-    Route::get('exam_paper/user', 'ExamPaper@userList');
-    Route::resource('exam_paper', 'ExamPaperController');
+    Route::resource('exam_excels', 'ExamExcelController');
 
-    Route::post('exam_result/{paperId}/start', 'ExamResult@start');
-    Route::post('exam_result/{id}/submit', 'ExamResult@submit');
-    Route::resource('exam_result', 'ExamResultController');
+    Route::resource('exam_papers', 'ExamPaperController');
+
+    Route::post('exam_results/{paperId}/start', 'ExamResult@start');
+    Route::post('exam_results/{id}/submit', 'ExamResult@submit');
+    Route::resource('exam_results', 'ExamResultController');
 });
 

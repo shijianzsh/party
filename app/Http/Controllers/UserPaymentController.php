@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\DepartmentActivityPlan_, App\Models\PortalPost_;
+use App\Models\UserPayment_, App\Models\PortalPost_;
 
-class DepartmentActivityPlanController extends Controller
+class UserPaymentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +15,7 @@ class DepartmentActivityPlanController extends Controller
     public function index(Request $request)
     {
         $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
-        $list = DepartmentActivityPlan_::getActivityPlanList(
+        $list = UserPayment_::getPaymentList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
@@ -36,7 +36,7 @@ class DepartmentActivityPlanController extends Controller
      */
     public function store(Request $request)
     {
-        $result = DepartmentActivityPlan_::createActivityPlan($request->input('data'));
+        $result = UserPayment_::createPayment($request->input('data'));
         return response()->json($result);
     }
 
@@ -48,7 +48,7 @@ class DepartmentActivityPlanController extends Controller
      */
     public function show($id)
     {
-        $list = DepartmentActivityPlan_::getActivityPlan(
+        $list = UserPayment_::getPayment(
             $id,  []
         );
 
@@ -65,7 +65,7 @@ class DepartmentActivityPlanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = DepartmentActivityPlan_::updateActivityPlan($id,$request->input('data'));
+        $result = UserPayment_::updatePayment($id,$request->input('data'));
         return response()->json($result);
     }
 
@@ -77,6 +77,6 @@ class DepartmentActivityPlanController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json(DepartmentActivityPlan_::deleteActivityPlan($id));
+        return response()->json(UserPayment_::deletePayment($id));
     }
 }

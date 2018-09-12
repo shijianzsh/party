@@ -120,4 +120,33 @@ class Department_ extends Department
 
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
+
+    static public function getEscendants(int $departmentIds, array $with = []): array
+    {
+        $array = Department
+            ::with($with)
+            ->where('parent_id', '<>', 0)
+            ->get()
+            ->toArray();
+
+        $ids = [$departmentIds];
+        $result = [];
+        $isChanged = true;
+
+        while ($isChanged) {
+            $isChanged = false;
+            for ($i = 0; $i < count($array); $i++) {
+                if (in_array($array[$i]['parent_id'], $ids)) {
+                    $ids[] = $array[$i]['id'];
+                    $result[] = $array[$i];
+                    $array[$i] = null;
+                    $isChanged = true;
+                }
+            }
+            $array = array_values($array);
+        }
+        unset($array);
+
+        return ['rows' => $result, 'ids' => array_unique($ids)];
+    }
 }

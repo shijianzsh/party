@@ -8,7 +8,7 @@ class ExamPaper extends _BaseModel
 {
     public const IS_RESTRICT_USER = ['否' => 0, '是' => 1];
     public const TIME_STATUS = ['未知状态' => -1, '未开始' => 0, '进行中' => 1, '已结束' => 2];
-    protected $appends = ['time_status'];
+    protected $appends = ['time_status', 'time_status_format'];
 
     public function questions()
     {
@@ -57,7 +57,12 @@ class ExamPaper extends _BaseModel
         if (Carbon::now()->timestamp > $this->published_at && Carbon::now()->timestamp < $this->finished_at) {
             return self::TIME_STATUS['进行中'];
         }
-        return self::TIME_STATUS['未知状态'];
 
+        return self::TIME_STATUS['未知状态'];
+    }
+
+    public function getTimeStatusFormatAttribute()
+    {
+        return array_flip(self::TIME_STATUS)[$this->time_status];
     }
 }

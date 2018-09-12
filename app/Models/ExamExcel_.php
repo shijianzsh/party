@@ -11,11 +11,18 @@ class ExamExcel_ extends ExamExcel
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
+            'user_id' => null
         ],
         array $with = []
     ): array
     {
         $Obj = ExamExcel::with($with);
+
+        $userId =& $filter['user_id'];
+
+        if ($userId !== null) {
+            $Obj->where('user_id', $userId);
+        }
 
         $total = $Obj->count();
 
@@ -59,7 +66,7 @@ class ExamExcel_ extends ExamExcel
                 throw new \Exception($validator->errors()->first());
             }
 
-            $analysis = Excel::staticRun(public_path().$requestData['more_file'][0]['url']);
+            $analysis = Excel::staticRun(public_path() . $requestData['more_file'][0]['url']);
             if (!$analysis['success']) {
                 return $analysis;
             }
@@ -68,6 +75,7 @@ class ExamExcel_ extends ExamExcel
                 $Obj = new ExamExcel();
                 $Obj->user_id = $requestData['user_id'];
                 $Obj->category_id = $requestData['category_id'];
+                $Obj->file_url = $requestData['more_file'][0]['url'];
                 $Obj->question_count = count((array)$analysis['data']);
                 $Obj->more = [
                     'file' => $requestData['more_file'],
@@ -101,7 +109,7 @@ class ExamExcel_ extends ExamExcel
                 throw new \Exception($validator->errors()->first());
             }
 
-            $analysis = Excel::staticRun(public_path().$requestData['more_file'][0]['url']);
+            $analysis = Excel::staticRun(public_path() . $requestData['more_file'][0]['url']);
             if (!$analysis['success']) {
                 return $analysis;
             }
@@ -110,6 +118,7 @@ class ExamExcel_ extends ExamExcel
                 $Obj = ExamExcel::findOrFail($examExcelId);
                 $Obj->user_id = $requestData['user_id'];
                 $Obj->category_id = $requestData['category_id'];
+                $Obj->file_url = $requestData['more_file'][0]['url'];
                 $Obj->question_count = count((array)$analysis['data']);
                 $Obj->more = [
                     'file' => $requestData['more_file'],

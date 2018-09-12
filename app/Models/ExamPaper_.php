@@ -11,12 +11,27 @@ class ExamPaper_ extends ExamPaper
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-            '' => "",
+            'attend_user_id' => null,
         ],
         array $with = []
     ): array
     {
         $Obj = ExamPaper::with($with);
+
+        $attendUserId =& $filter['attend_user_id'];
+
+        if ($attendUserId !== null) {
+            //获取用户可以参加考试的列表，包含任意时间段
+            $Obj->where(function ($query) {
+                $query->where('is_restrict_user', 0)
+                    ->orWhere(function ($query) {
+                        $query->where('is_restrict_user', 1)
+                            ->whereHas('attendUsersMiddle', function ($query) {
+                                $query->where('exam_paper_user.user_id', 1);
+                            });
+                    });
+            });
+        }
 
         $total = $Obj->count();
 
@@ -33,30 +48,6 @@ class ExamPaper_ extends ExamPaper
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
-    }
-
-    //获取用户可以参加考试的列表，包含任意时间段
-    static public function getUserExamPaperList(int $userId)
-    {
-        $with = ['questions', 'attendUsersMiddle'];
-        $Obj1 = ExamPaper::with($with)
-//            ->where('published_at', '<=', Carbon::now()->timestamp)
-//            ->where('finished_at', '>=', Carbon::now()->timestamp)
-            ->where('is_restrict_user', 0)
-            ->get()
-            ->toArray();
-
-        $Obj2 = ExamPaper::with($with)
-//            ->where('published_at', '<=', Carbon::now()->timestamp)
-//            ->where('finished_at', '>=', Carbon::now()->timestamp)
-            ->where('is_restrict_user', 1)
-            ->whereHas('attendUsersMiddle', function ($query) use ($userId) {
-                $query->where('exam_paper_user.user_id', $userId);
-            })
-            ->get()
-            ->toArray();
-
-        return array_merge($Obj1, $Obj2);
     }
 
     static public function getExamPaper(int $examPaperId, bool $getObject = false)

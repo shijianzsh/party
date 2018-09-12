@@ -29,6 +29,16 @@ class UserComment_ extends UserComment
             $Obj->whereHas('commentUsersMiddle', function ($query) use ($toUserId) {
                 $query->where('user_comment_user.user_id', $toUserId);
             });
+
+            $Obj->where(function ($query) {
+                $query->where('need_audit', 0)
+                    ->orWhere(function ($query) {
+                        $query->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('user_comment_audit.status', 1);
+                            });
+                    });
+            });
         }
 
         $total = $Obj->count();
@@ -78,13 +88,11 @@ class UserComment_ extends UserComment
             DB::transaction(function () use ($requestData) {
                 $Obj = new UserComment();
                 $Obj->user_id = $requestData['user_id'] ?? 0;
-                $Obj->need_audit = $requestData['need_audit'] ?? 0;
-                $Obj->comment_title = $requestData['comment_title'] ?? 0;
-                $Obj->comment_content = $requestData['comment_content'] ?? 0;
+                $Obj->need_audit = $requestData['need_audit'] ?? 1;//默认需要审核
+                $Obj->comment_title = $requestData['comment_title'] ?? '';
+                $Obj->comment_content = $requestData['comment_content'] ?? '';
+                $Obj->leave_at = $requestData['leave_at'] ?? 0;
                 $Obj->more = [
-                    'thumbnail' => $requestData['more_thumbnail'] ?? null,
-                    'photos' => $requestData['more_photos'] ?? null,
-                    'videos' => $requestData['more_videos'] ?? null,
                     'files' => $requestData['more_files'] ?? null,
                 ];
                 $Obj->save();
@@ -134,14 +142,12 @@ class UserComment_ extends UserComment
 
             DB::transaction(function () use ($CommentId, $requestData) {
                 $Obj = UserComment::findOrFail($CommentId);
-                $Obj->user_id = $requestData['user_id'] ?? 0;
-                $Obj->need_audit = $requestData['need_audit'] ?? 0;
-                $Obj->comment_title = $requestData['comment_title'] ?? 0;
-                $Obj->comment_content = $requestData['comment_content'] ?? 0;
+//                $Obj->user_id = $requestData['user_id'] ?? 0;
+//                $Obj->need_audit = $requestData['need_audit'] ?? 1;//默认需要审核
+                $Obj->comment_title = $requestData['comment_title'] ?? '';
+                $Obj->comment_content = $requestData['comment_content'] ?? '';
+                $Obj->leave_at = $requestData['leave_at'] ?? 0;
                 $Obj->more = [
-                    'thumbnail' => $requestData['more_thumbnail'] ?? null,
-                    'photos' => $requestData['more_photos'] ?? null,
-                    'videos' => $requestData['more_videos'] ?? null,
                     'files' => $requestData['more_files'] ?? null,
                 ];
                 $Obj->save();

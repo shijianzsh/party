@@ -20,7 +20,7 @@ class ExamExcelController extends Controller
         $list = ExamExcel_::getExamExcelList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
-            []
+            ['user_id'=>&$filter['user_id']]
         );
 
         $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];

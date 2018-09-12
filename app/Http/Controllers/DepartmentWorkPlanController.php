@@ -14,7 +14,16 @@ class DepartmentWorkPlanController extends Controller
      */
     public function index(Request $request)
     {
-        $list = DepartmentWorkPlan_::getWorkPlanList();
+        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+        $list = DepartmentWorkPlan_::getWorkPlanList(
+            $request->input('current_page', 0),
+            $request->input('page_size', 0),
+            [
+//                'user_id' => &$filter['user_id'],
+//                'to_user_id' => &$filter['to_user_id'],
+            ]
+        );
+
         $result = ['success' => 1, 'data' => $list, '$request' => $request];
         return response()->json($result);
     }

@@ -15,16 +15,19 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+
         $list = User_::getUserList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-                'departmentId' => $request->input('department_id'),
+                'department_id' => &$filter['department_id'],
+                'type' => &$filter['type'],
             ],
             []
         );
 
-        $result = ['success' => 1, 'data' => $list];
+        $result = ['success' => 1, 'data' => $list, '$request' => $list];
         return response()->json($result);
     }
 

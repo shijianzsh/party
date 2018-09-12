@@ -12,6 +12,11 @@ class User extends _BaseModel
         return $this->belongsTo('App\Models\Department', 'department_id');
     }
 
+    public function partyInfo()
+    {
+        return $this->hasOne('App\Models\UserPartyInfo','user_id','id');
+    }
+
     public function uploadFiles()
     {
         return $this->hasMany('App\Models\UploadFileLog', 'user_id');

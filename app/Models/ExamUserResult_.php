@@ -14,12 +14,17 @@ class ExamUserResult_ extends ExamUserResult
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-            '' => "",
+            'user_id' => null,
         ],
         array $with = []
     ): array
     {
         $Obj = ExamUserResult::with($with);
+
+        $userId =& $filter['user_id'];
+        if ($userId !== null) {
+            $Obj->where('user_id', $userId);
+        }
 
         $total = $Obj->count();
 
@@ -38,13 +43,23 @@ class ExamUserResult_ extends ExamUserResult
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
-    public function startExam(int $paperId): array
+    static public function getExamUserResult(int $id, bool $getObject = false)
+    {
+        $Obj = ExamUserResult::with(['user', 'paper'])->findOrFail($id);
+
+        if ($getObject) {
+            $result = $Obj;
+        } else {
+            $result = $Obj->toArray();
+        }
+
+        return $result;
+    }
+
+    public function startExam(int $paperId, int $userId): array
     {
         try {
             $paper = ExamPaper_::getExamPaper($paperId, true);
-            if (!$paper) {
-                throw new \Exception('查询考试信息错误');
-            }
             if (!$paper->questions_count) {
                 throw new \Exception('查询考试题目错误');
             }
@@ -55,9 +70,9 @@ class ExamUserResult_ extends ExamUserResult
                 throw new \Exception('已经错过了考试时间');
             }
 
-            if ($paper->is_restrict_user == ExamPaper::IsRestrictUserMap['是']) {
+            if ($paper->is_restrict_user == ExamPaper::IS_RESTRICT_USER['是']) {
                 $paperUser = ExamPaperUser
-                    ::where('user_id', User_::getMyId())
+                    ::where('user_id', $userId)
                     ->where('paper_id', $paperId)
                     ->firstOrFail();
 
@@ -65,7 +80,7 @@ class ExamUserResult_ extends ExamUserResult
                     throw new \Exception('没有考试资格');
                 }
 
-                $checkResult = ExamUserResult::where('user_id', User_::getMyId())
+                $checkResult = ExamUserResult::where('user_id', $userId)
                     ->where('paper_id', $paperId)
                     ->firstOrFail();
 
@@ -75,9 +90,9 @@ class ExamUserResult_ extends ExamUserResult
             }
 
             $Obj = new ExamPaperUser();
-            $Obj->user_id = User_::getMyId();
+            $Obj->user_id = $userId;
             $Obj->paper_id = $paperId;
-            $Obj->paper_snapshoot = $paper->toArray();
+            $Obj->paper_snapshot = $paper->toArray();
             $success = $Obj->save();
         } catch (\Exception $e) {
             $success = 0;

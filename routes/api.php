@@ -34,6 +34,10 @@ Route::group(['middleware' => [
 
     Route::resource('departments', 'DepartmentController');
 
+    Route::resource('department_work_plans', 'DepartmentWorkPlanController');
+
+    Route::resource('department_activity_plans', 'DepartmentActivityPlanController');
+
     Route::resource('users', 'UserController');
 
     Route::post('articles/{id}/audit', 'Article@audit');
@@ -44,8 +48,14 @@ Route::group(['middleware' => [
     Route::resource('comments', 'CommentController');
 
     Route::resource('exam_category', 'ExamCategoryController');
+
     Route::resource('exam_excel', 'ExamExcelController');
+
+    Route::get('exam_paper/user', 'ExamPaper@userList');
     Route::resource('exam_paper', 'ExamPaperController');
+
+    Route::post('exam_result/{paperId}/start', 'ExamResult@start');
+    Route::post('exam_result/{id}/submit', 'ExamResult@submit');
     Route::resource('exam_result', 'ExamResultController');
 });
 

@@ -38,16 +38,21 @@ class User_ extends User
         int $pageSize = 0,
         array $filter = [
             'department_id' => 0,
+            'type' => null,
         ],
         array $with = []
     )
     {
         $departmentId =& $filter['department_id'];
+        $type =& $filter['type'];
 
-        $Obj = User::with($with);
+        $Obj = User::with(array_merge($with,['department','partyInfo']));
 
-        if ($departmentId) {
+        if ($departmentId !== null) {
             $Obj->where('department_id', $departmentId);
+        }
+        if ($type !== null) {
+            $Obj->where('type', $type);
         }
 
         $total = $Obj->count();

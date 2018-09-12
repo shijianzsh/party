@@ -35,6 +35,30 @@ class ExamPaper_ extends ExamPaper
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
+    //获取用户可以参加考试的列表，包含任意时间段
+    static public function getUserExamPaperList(int $userId)
+    {
+        $with = ['questions', 'attendUsersMiddle'];
+        $Obj1 = ExamPaper::with($with)
+//            ->where('published_at', '<=', Carbon::now()->timestamp)
+//            ->where('finished_at', '>=', Carbon::now()->timestamp)
+            ->where('is_restrict_user', 0)
+            ->get()
+            ->toArray();
+
+        $Obj2 = ExamPaper::with($with)
+//            ->where('published_at', '<=', Carbon::now()->timestamp)
+//            ->where('finished_at', '>=', Carbon::now()->timestamp)
+            ->where('is_restrict_user', 1)
+            ->whereHas('attendUsersMiddle', function ($query) use ($userId) {
+                $query->where('exam_paper_user.user_id', $userId);
+            })
+            ->get()
+            ->toArray();
+
+        return array_merge($Obj1, $Obj2);
+    }
+
     static public function getExamPaper(int $examPaperId, bool $getObject = false)
     {
         $Obj = ExamPaper::with(['questions', 'attendUsers'])->findOrFail($examPaperId);
@@ -48,7 +72,6 @@ class ExamPaper_ extends ExamPaper
         return $result;
     }
 
-    //TODO 如何关联用户
     static public function createExamPaper(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
@@ -58,6 +81,7 @@ class ExamPaper_ extends ExamPaper
             'name' => 'required',
             'duration' => 'required',
             'is_restrict_user' => 'required',
+            'user_ids' => 'required',
             'pass_score' => 'required',
             'published_at' => 'required',
             'finished_at' => 'required',
@@ -66,6 +90,13 @@ class ExamPaper_ extends ExamPaper
         try {
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first());
+            }
+
+            if ($requestData['published_at'] >= $requestData['finished_at']) {
+                throw new \Exception('结束日期不能小于发布日期');
+            }
+            if ($requestData['published_at'] <= Carbon::now()->timestamp) {
+                throw new \Exception('发布日期不可以小于当前时间');
             }
 
             $exam_category_id =& $requestData['exam_category_id'];
@@ -95,13 +126,6 @@ class ExamPaper_ extends ExamPaper
                 $published_at =& $requestData['published_at'];
                 $finished_at =& $requestData['finished_at'];
 
-                $saveMany = [];
-                for ($i = 0; $i < count($paperQuestions); $i++) {
-                    $paperQuestions[$i]['question_id'] = $paperQuestions[$i]['id'];
-                    $paperQuestions[$i]['question_score'] = $per_question_score;
-                    $saveMany[] = new ExamPaperQuestion($paperQuestions[$i]);
-                }
-
                 $Obj = new ExamPaper();
                 $Obj->name = $name;
                 $Obj->duration = $duration;
@@ -113,7 +137,22 @@ class ExamPaper_ extends ExamPaper
                 $Obj->finished_at = $finished_at;
                 $Obj->save();
 
+                $saveMany = [];
+                for ($i = 0; $i < count($paperQuestions); $i++) {
+                    $paperQuestions[$i]['question_id'] = $paperQuestions[$i]['id'];
+                    $paperQuestions[$i]['question_score'] = $per_question_score;
+                    $saveMany[] = new ExamPaperQuestion($paperQuestions[$i]);
+                }
                 $Obj->questions()->saveMany($saveMany);
+
+                if ((bool)$Obj->is_restrict_user) {
+                    $saveMany = [];
+                    for ($i = 0; $i < count($requestData['user_ids']); $i++) {
+                        $paperQuestions[$i]['user_id'] = $requestData['user_ids'][$i];
+                        $saveMany[] = new ExamPaperUser($paperQuestions[$i]);
+                    }
+                    $Obj->attendUsersMiddle()->saveMany($saveMany);
+                }
             });
         } catch (\Exception $e) {
             $success = 0;
@@ -123,14 +162,13 @@ class ExamPaper_ extends ExamPaper
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    //TODO 如何关联用户
     static public function updateExamPaper(int $examPaperId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
             'per_question_score' => 'required',
             'name' => 'required',
             'duration' => 'required',
-            'is_restrict_user' => 'required',
+//            'is_restrict_user' => 'required',
             'pass_score' => 'required',
             'published_at' => 'required',
             'finished_at' => 'required',
@@ -139,6 +177,13 @@ class ExamPaper_ extends ExamPaper
         try {
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first());
+            }
+
+            if ($requestData['published_at'] >= $requestData['finished_at']) {
+                throw new \Exception('结束日期不能小于发布日期');
+            }
+            if ($requestData['published_at'] <= Carbon::now()->timestamp) {
+                throw new \Exception('发布日期不可以小于当前时间');
             }
 
             DB::transaction(function () use ($examPaperId, $requestData) {
@@ -155,9 +200,13 @@ class ExamPaper_ extends ExamPaper
                     throw new \Exception('updateExamPaper ExamPaper Obj null');
                 }
 
+                if ($Obj->published_at <= Carbon::now()->timestamp) {
+                    throw new \Exception('已开考了，不允许修改');
+                }
+
                 $Obj->name = $name;
                 $Obj->duration = $duration;
-                $Obj->is_restrict_user = $is_restrict_user;
+//                $Obj->is_restrict_user = $is_restrict_user;
                 $Obj->max_score = $per_question_score * $Obj->questions_count;
                 $Obj->pass_score = $pass_score;
                 $Obj->published_at = $published_at;

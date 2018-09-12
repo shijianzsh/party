@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use  App\Models\Department_;
+use  App\Models\Department,App\Models\Department_;
 
 class DepartmentController extends Controller
 {
@@ -14,6 +14,7 @@ class DepartmentController extends Controller
      */
     public function index(Request $request)
     {
+//        return Department::with('users')->get();
         $list = Department_::getDepartmentList(0, 0, [],
             $request->query('with', []) ? $request->query('with', []) : []
         );

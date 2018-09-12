@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use  App\Models\ExamPaper_;
-use Illuminate\Support\Facades\Crypt;
-use Gate;
+use App\Models\DepartmentWorkPlan_, App\Models\PortalPost_;
 
-class ExamPaperController extends Controller
+class DepartmentWorkPlanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,15 +14,8 @@ class ExamPaperController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
-        $list = ExamPaper_::getExamPaperList(
-            $request->input('current_page', 0),
-            $request->input('page_size', 0),
-            [
-            ]
-        );
-
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
+        $list = DepartmentWorkPlan_::getWorkPlanList();
+        $result = ['success' => 1, 'data' => $list, '$request' => $request];
         return response()->json($result);
     }
 
@@ -36,7 +27,7 @@ class ExamPaperController extends Controller
      */
     public function store(Request $request)
     {
-        $result = ExamPaper_::createExamPaper($request->input('data'));
+        $result = DepartmentWorkPlan_::createWorkPlan($request->input('data'));
         return response()->json($result);
     }
 
@@ -48,9 +39,11 @@ class ExamPaperController extends Controller
      */
     public function show($id)
     {
-        $row = ExamPaper_::getExamPaper($id, []);
+        $list = DepartmentWorkPlan_::getWorkPlan(
+            $id, []
+        );
 
-        $result = ['success' => 1, 'data' => $row];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 
@@ -59,10 +52,11 @@ class ExamPaperController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
+     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $result = ExamPaper_::updateExamPaper($id, $request->input('data'));
+        $result = DepartmentWorkPlan_::updateWorkPlan($id, $request->input('data'));
         return response()->json($result);
     }
 
@@ -74,6 +68,6 @@ class ExamPaperController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json(ExamPaper_::deleteExamPaper($id));
+        return response()->json(DepartmentWorkPlan_::deleteWorkPlan($id));
     }
 }

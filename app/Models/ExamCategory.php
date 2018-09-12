@@ -4,6 +4,8 @@ namespace App\Models;
 
 class ExamCategory extends _BaseModel
 {
+    protected $appends = ['questions_count'];
+
     public function excels()
     {
         return $this->hasMany('App\Models\ExamExcel','category_id');
@@ -18,5 +20,10 @@ class ExamCategory extends _BaseModel
             'id',
             'id'
         );
+    }
+
+    public function getQuestionsCountAttribute()
+    {
+        return $this->questions()->count();
     }
 }

@@ -25,7 +25,7 @@ class MeetingController extends Controller
             ]
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request];
+        $result = ['success' => 1, 'data' => $list, '$request' => $request, '$filter' => $filter];
         return response()->json($result);
     }
 
@@ -49,9 +49,7 @@ class MeetingController extends Controller
      */
     public function show($id)
     {
-        $list = Meeting_::getMeeting(
-            $id, []
-        );
+        $list = Meeting_::getMeeting($id);
 
         $result = ['success' => 1, 'data' => $list];
         return response()->json($result);

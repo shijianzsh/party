@@ -28,7 +28,7 @@ class Meeting_ extends Meeting
         ]
     ): array
     {
-        $initiate_user_id =& $filter['user_id'];
+        $initiate_user_id =& $filter['initiate_user_id'];
         $need_audit =& $filter['need_audit'];
         $keyword =& $filter['keyword'];
 
@@ -40,15 +40,16 @@ class Meeting_ extends Meeting
 //            'attendUsers'
         ]);
 
-        if ($initiate_user_id) {
+
+        if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);
         }
 
-        if ($need_audit) {
+        if ($need_audit !== null) {
             $Obj->where('need_audit', $need_audit);
         }
 
-        if ($keyword) {
+        if ($keyword !== null) {
             $Obj->where(function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")
                     ->orWhere('location', 'like', "%{$keyword}%");
@@ -87,17 +88,11 @@ class Meeting_ extends Meeting
             'department_id' => 'required',
         ]);
 
-        try {
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first());
-            }
-        } catch (\Exception $e) {
-            $success = 0;
-            $msg = $e->getMessage();
-            return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        if ($validator->fails()) {
+            throw new \Exception($validator->errors()->first());
         }
 
-        $initiate_user_id =& $filter['user_id'];
+        $initiate_user_id =& $filter['initiate_user_id'];
         $keyword =& $filter['keyword'];
         $need_audit =& $filter['need_audit'];
         $departmentId =& $filter['department_id'];
@@ -112,15 +107,15 @@ class Meeting_ extends Meeting
 
         $Obj->whereIn('department_id', Department_::getEscendants($departmentId)['ids']);
 
-        if ($initiate_user_id) {
+        if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);
         }
 
-        if ($need_audit) {
+        if ($need_audit !== null) {
             $Obj->where('need_audit', $need_audit);
         }
 
-        if ($keyword) {
+        if ($keyword !== null) {
             $Obj->where(function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")
                     ->orWhere('location', 'like', "%{$keyword}%");
@@ -159,14 +154,8 @@ class Meeting_ extends Meeting
             'attend_user_id' => 'required',
         ]);
 
-        try {
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first());
-            }
-        } catch (\Exception $e) {
-            $success = 0;
-            $msg = $e->getMessage();
-            return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        if ($validator->fails()) {
+            throw new \Exception($validator->errors()->first());
         }
 
         $initiate_user_id =& $filter['user_id'];
@@ -189,11 +178,11 @@ class Meeting_ extends Meeting
             $Obj->where('initiate_user_id', $initiate_user_id);
         }
 
-        if ($need_audit) {
+        if ($need_audit !== null) {
             $Obj->where('need_audit', $need_audit);
         }
 
-        if ($keyword) {
+        if ($keyword !== null) {
             $Obj->where(function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")
                     ->orWhere('location', 'like', "%{$keyword}%");
@@ -231,14 +220,8 @@ class Meeting_ extends Meeting
             'audit_user_id' => 'required',
         ]);
 
-        try {
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first());
-            }
-        } catch (\Exception $e) {
-            $success = 0;
-            $msg = $e->getMessage();
-            return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        if ($validator->fails()) {
+            throw new \Exception($validator->errors()->first());
         }
 
         $initiate_user_id =& $filter['user_id'];
@@ -257,11 +240,11 @@ class Meeting_ extends Meeting
                 $query->where('meeting_audit.audit_user_id', $userId);
             });
 
-        if ($initiate_user_id) {
+        if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);
         }
 
-        if ($keyword) {
+        if ($keyword !== null) {
             $Obj->where(function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")
                     ->orWhere('location', 'like', "%{$keyword}%");
@@ -308,6 +291,7 @@ class Meeting_ extends Meeting
     static public function createMeeting(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
+//            'initiate_user_id' => 'initiate_user_id',//自动获取
             'need_audit' => 'required',
             'title' => 'required',
             'type' => 'required',
@@ -332,9 +316,11 @@ class Meeting_ extends Meeting
             if ($requestData['opened_at'] <= Carbon::now()->timestamp) {
                 throw new \Exception('会议开始时间错误');
             }
+
             $Obj = null;
             DB::transaction(function () use (&$Obj, $requestData) {
                 $Obj = new Meeting;
+                $Obj->department_id = User::where('id', User_::getMyId())->first()->department['id'];
                 $Obj->initiate_user_id = User_::getMyId();
                 $Obj->need_audit = $requestData['need_audit'];
                 $Obj->title = $requestData['title'];

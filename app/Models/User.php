@@ -7,6 +7,8 @@ class User extends _BaseModel
     const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
     protected $appends = ['type_format'];
 
+    //TODO 批量查询隐藏掉登录用户名和密码
+
     public function department()
     {
         return $this->belongsTo('App\Models\Department', 'department_id');

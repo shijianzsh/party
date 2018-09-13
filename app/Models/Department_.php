@@ -121,6 +121,7 @@ class Department_ extends Department
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
+    //获取所有后裔department
     static public function getEscendants(int $departmentIds, array $with = []): array
     {
         $array = Department

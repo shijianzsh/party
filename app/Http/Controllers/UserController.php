@@ -60,7 +60,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return response()->json(User_::getUser($id));
+        $with = [];
+        $result = ['success' => 1, 'data' =>User_::getUser($id, $with)];
+        return response()->json($result);
     }
 
     /**
@@ -83,7 +85,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json(User_::editUser($id,$request->all()));
+        return response()->json(User_::editUser($id, $request->all()));
     }
 
     /**

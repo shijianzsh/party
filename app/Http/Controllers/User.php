@@ -22,4 +22,10 @@ class User extends Controller
             $request->input()
         );
     }
+
+    public function getUserWithPartyInfo($id)
+    {
+        $result = ['success' => 1, 'data' =>User_::getUserWithPartyInfo($id)];
+        return response()->json($result);
+    }
 }

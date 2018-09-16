@@ -6,11 +6,12 @@ class Meeting extends _BaseModel
 {
     const TYPE = ['未知类型' => 0, '线下' => 1, '线上' => 2];
 
-    protected $appends = ['type_format',
+    protected $appends = [
+        'type_format',
         'attend_users_count',
         'opened_at_format',
-        'meeting_leader','meeting_leader_name_format',
-        'meeting_attend_user','meeting_attend_user_name_format',
+        'meeting_leader', 'meeting_leader_name_format',
+        'meeting_attend_user', 'meeting_attend_user_name_format',
     ];
 
     public function audit()
@@ -42,7 +43,11 @@ class Meeting extends _BaseModel
 
     public function getTypeFormatAttribute()
     {
-        return array_flip(self::TYPE)[$this->type];
+        if ($this->type !== null) {
+            return array_flip(self::TYPE)[$this->type];
+        } else {
+            return null;
+        }
     }
 
     public function getAttendUsersCountAttribute()

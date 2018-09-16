@@ -237,7 +237,7 @@ class PortalPost_ extends PortalPost
         return ['success' => PortalPost::destroy($postId)];
     }
 
-    static public function auditPost(int $postId, int $status, string $reason)
+    static public function auditPost(int $postId, int $status, string $reason = '')
     {
         $row = PortalPostAudit::where('post_id', $postId)
             ->where('audit_user_id', User_::getMyId())

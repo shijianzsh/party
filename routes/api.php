@@ -38,6 +38,7 @@ Route::group(['middleware' => [
 
     Route::resource('department_activity_plans', 'DepartmentActivityPlanController');
 
+    Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
     Route::resource('users', 'UserController');
 
     Route::resource('user_payments', 'UserPaymentController');
@@ -49,9 +50,11 @@ Route::group(['middleware' => [
 
     Route::resource('comments', 'CommentController');
 
-    Route::get('meetings/department', 'Meeting@department');
-    Route::get('meetings/attend_user', 'Meeting@attendUser');
-    Route::get('meetings/audit_user', 'Meeting@auditUser');
+    Route::get('meetings/department', 'Meeting@departmentMeetingList');
+    Route::get('meetings/attend_user', 'Meeting@attendUserMeetingList');
+    Route::get('meetings/audit_user', 'Meeting@auditUserMeetingList');
+    Route::post('meetings/{id}/audit', 'Meeting@audit');
+    Route::post('meetings/{id}/sign_in', 'Meeting@signIn');
     Route::resource('meetings', 'MeetingController');
 
     Route::resource('exam_categorys', 'ExamCategoryController');

@@ -12,7 +12,7 @@ class Meeting extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function department(Request $request)
+    public function departmentMeetingList(Request $request)
     {
         try {
             $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
@@ -36,7 +36,7 @@ class Meeting extends Controller
         }
     }
 
-    public function attendUser(Request $request)
+    public function attendUserMeetingList(Request $request)
     {
         try {
             $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
@@ -60,7 +60,7 @@ class Meeting extends Controller
         }
     }
 
-    public function auditUser(Request $request)
+    public function auditUserMeetingList(Request $request)
     {
         try {
             $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
@@ -81,5 +81,19 @@ class Meeting extends Controller
             $msg = $e->getMessage();
             return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
         }
+    }
+
+    public function signIn(Request $request, $id)
+    {
+        $result = Meeting_::signIn($id,$request->input('user_id'));
+        return response()->json($result);
+    }
+
+    public function audit(Request $request, $id)
+    {
+        $result = Meeting_::auditMeeting($id,
+            $request->input('status'),
+            $request->input('reason'));
+        return response()->json($result);
     }
 }

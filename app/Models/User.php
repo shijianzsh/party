@@ -5,7 +5,11 @@ namespace App\Models;
 class User extends _BaseModel
 {
     const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
-    protected $appends = ['type_format'];
+
+    protected $appends = ['type_format','borned_at_format'];
+    protected $casts = [
+        'more' => 'json',
+    ];
 
     //TODO 批量查询隐藏掉登录用户名和密码
 
@@ -14,9 +18,16 @@ class User extends _BaseModel
         return $this->belongsTo('App\Models\Department', 'department_id');
     }
 
-    public function partyInfo()
+    //党员经历
+    public function partyExperience()
     {
-        return $this->hasOne('App\Models\UserPartyInfo','user_id','id');
+        return $this->hasOne('App\Models\UserInfoPartyExperience', 'user_id', 'id');
+    }
+
+    //党员关系
+    public function partyRelation()
+    {
+        return $this->hasMany('App\Models\UserInfoPartyRelation', 'user_id');
     }
 
     public function uploadFiles()
@@ -127,5 +138,10 @@ class User extends _BaseModel
     public function getTypeFormatAttribute()
     {
         return array_flip(self::TYPE)[$this->type];
+    }
+
+    public function getBornedAtFormatAttribute()
+    {
+        return $this->borned_at ? date("Y-m-d", $this->borned_at) : '';
     }
 }

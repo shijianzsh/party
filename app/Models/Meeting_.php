@@ -7,16 +7,9 @@ use DB, Validator;
 
 class Meeting_ extends Meeting
 {
-    public const AuditStatusMap = [
-        '未审核' => 0,
-        '初审失败' => -2,
-        '初审成功' => 2,
-        '预约失败' => -3,
-        '预约成功' => 3,
-        '通过审核' => 4
-    ];
+    public const TYPE = ['未知类型' => 0, '线下' => 1, '线上' => 2];
 
-    public const AheadSignInTimestamp = 3600 * 2;//允许提前先到的时间
+    public const AHEAD_SIGN_IN_TIMESTAMP = 3600 * 2;//允许提前先到的时间
 
     static public function getMeetingList(
         int $currentPage = 0,
@@ -292,15 +285,15 @@ class Meeting_ extends Meeting
     {
         $validator = \Validator::make($requestData, [
 //            'initiate_user_id' => 'initiate_user_id',//自动获取
-            'need_audit' => 'required',
+//            'need_audit' => 'required',
             'title' => 'required',
             'type' => 'required',
             'location' => 'required',
             'opened_at' => 'required',
-            'ended_at' => 'required',
+//            'ended_at' => 'required',
             'audit_user_id' => 'required',
-            'leaders' => 'required',
-            'users' => 'required',
+            'leader_ids' => 'required',
+            'attend_user_ids' => 'required',
         ]);
 
         try {
@@ -308,7 +301,88 @@ class Meeting_ extends Meeting
                 throw new \Exception($validator->errors()->first());
             }
 
-            if ($requestData['opened_at']
+            if (array_key_exists('ended_at', $requestData)
+                && $requestData['opened_at']
+                && $requestData['ended_at']
+                && $requestData['opened_at'] >= $requestData['ended_at']) {
+                throw new \Exception('会议结束时间不能早于开始时间');
+            }
+            if ($requestData['opened_at'] <= Carbon::now()->timestamp) {
+                throw new \Exception('会议开始时间错误');
+            }
+
+            $Obj = null;
+            DB::transaction(function () use (&$Obj, $requestData) {
+                $Obj = new Meeting;
+                $Obj->department_id = User::where('id', User_::getMyId())->first()->department->id;
+                $Obj->initiate_user_id = User_::getMyId();
+                $Obj->need_audit = 1;
+                $Obj->title = $requestData['title'];
+                $Obj->type = $requestData['type'];
+                $Obj->location = $requestData['location'];
+                $Obj->opened_at = $requestData['opened_at'];
+//                $Obj->ended_at = $requestData['ended_at'];
+                $Obj->save();
+
+                if ($Obj->need_audit) {
+                    $Obj->audit()
+                        ->create([
+                            'audit_user_id' => $requestData['audit_user_id'],
+                            'status' => MeetingAudit::STATUS['未审核']
+                        ]);
+                }
+
+                $saveMany = [];
+                for ($i = 0; $i < count($requestData['leader_ids']); $i++) {
+                    $saveMany[] =
+                        new MeetingUser([
+                            'user_id' => $requestData['leader_ids'][$i],
+                            'type' => MeetingUser::TYPE['参会领导'],
+                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
+                        ]);
+                }
+                for ($i = 0; $i < count($requestData['attend_user_ids']); $i++) {
+                    $saveMany[] =
+                        new MeetingUser([
+                            'user_id' => $requestData['attend_user_ids'][$i],
+                            'type' => MeetingUser::TYPE['参会人员'],
+                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
+                        ]);
+                }
+                $Obj->attendUsersMiddle()->saveMany($saveMany);
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj ?? null];
+    }
+
+    static public function updateMeeting(int $meetingId, array $requestData): array
+    {
+        //TODO
+        return [];
+        $validator = \Validator::make($requestData, [
+//            'initiate_user_id' => 'initiate_user_id',//自动获取
+//            'need_audit' => 'required',
+            'title' => 'required',
+            'type' => 'required',
+            'location' => 'required',
+            'opened_at' => 'required',
+//            'ended_at' => 'required',
+            'audit_user_id' => 'required',
+            'leader_ids' => 'required',
+            'attend_user_ids' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            if (array_key_exists('ended_at', $requestData)
+                && $requestData['opened_at']
                 && $requestData['ended_at']
                 && $requestData['opened_at'] >= $requestData['ended_at']) {
                 throw new \Exception('会议结束时间不能早于开始时间');
@@ -322,135 +396,85 @@ class Meeting_ extends Meeting
                 $Obj = new Meeting;
                 $Obj->department_id = User::where('id', User_::getMyId())->first()->department['id'];
                 $Obj->initiate_user_id = User_::getMyId();
-                $Obj->need_audit = $requestData['need_audit'];
+                $Obj->need_audit = 1;
                 $Obj->title = $requestData['title'];
                 $Obj->type = $requestData['type'];
                 $Obj->location = $requestData['location'];
                 $Obj->opened_at = $requestData['opened_at'];
-                $Obj->ended_at = $requestData['ended_at'];
+//                $Obj->ended_at = $requestData['ended_at'];
                 $Obj->save();
 
                 if ($Obj->need_audit) {
                     $Obj->audit()
                         ->create([
                             'audit_user_id' => $requestData['audit_user_id'],
-                            'status' => Meeting_::AuditStatusMap['未审核']
+                            'status' => MeetingAudit::STATUS['未审核']
                         ]);
                 }
 
-                $attendUsersData = [];
-                for ($i = 0; $i < count($requestData['users']); $i++) {
-                    //TODO
-                    $attendUsersData[] = [
-                        'user_id' => $requestData['users']['user_id'],
-                        'type' => $requestData['users']['type'],
-                        'need_appointment' => $requestData['users']['need_appointment'],
-                    ];
+                $saveMany = [];
+                for ($i = 0; $i < count($requestData['leader_ids']); $i++) {
+                    $saveMany[] =
+                        new MeetingUser([
+                            'user_id' => $requestData['leader_ids'][$i],
+                            'type' => MeetingUser::TYPE['参会领导'],
+                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
+                        ]);
                 }
-
-                $Obj->attendUsers()
-                    ->createMany($attendUsersData);
+                for ($i = 0; $i < count($requestData['attend_user_ids']); $i++) {
+                    $saveMany[] =
+                        new MeetingUser([
+                            'user_id' => $requestData['attend_user_ids'][$i],
+                            'type' => MeetingUser::TYPE['参会人员'],
+                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
+                        ]);
+                }
+                $Obj->attendUsersMiddle()->saveMany($saveMany);
             });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj];
-    }
-
-    static public function updateMeeting(int $meetingId, array $requestData): array
-    {
-        $validator = \Validator::make($requestData, [
-            'need_audit' => 'required',
-            'title' => 'required',
-            'type' => 'required',
-            'location' => 'required',
-            'opened_at' => 'required',
-            'ended_at' => 'required',
-            'audit_user_id' => 'required',
-        ]);
-
-        try {
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first());
-            }
-        } catch (\Exception $e) {
-            $success = 0;
-            $msg = $e->getMessage();
-        }
-
-
-        $meeting = Meeting_::getMeeting($meetingId, true);
-
-        if (!$meeting) {
-            throw new \Exception('updateMeeting Obj null error');
-        }
-
-        if (!$meeting->audit) {
-            throw new \Exception('updateMeeting Obj audit null error');
-        }
-
-        //TODO
-
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
-    }
-
-    static public function auditMeeting(int $meetingId, array $requestData): array
-    {
-        $validator = \Validator::make($requestData, [
-            'is_passed' => 'required',
-            'reason' => 'required',
-        ]);
-
-        try {
-            if ($validator->fails()) {
-                throw new \Exception($validator->errors()->first());
-            }
-
-            $meeting = Meeting_::getMeeting($meetingId, true);
-            if (!$meeting) {
-                throw new \Exception('auditMeeting Obj null error');
-            }
-
-            $audit = MeetingAudit
-                ::where('meeting_id', $meetingId)
-                ->where('audit_user_id', User_::getMYId())
-                ->where('status', Meeting_::AuditStatusMap['未审核'])
-                ->firstOrFail();
-
-            if (!$audit) {
-                throw new \Exception('没有找到符合审核条件的会议');
-            }
-
-            $audit->status = $requestData['is_passed'] ? Meeting_::AuditStatusMap['初审成功'] : Meeting_::AuditStatusMap['初审失败'];
-            $audit->reason = $requestData['is_passed'] ? '' : $requestData['reason'];
-            $audit->save();
-        } catch (\Exception $e) {
-            $success = 0;
-            $msg = $e->getMessage();
-        }
-
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj ?? null];
     }
 
     static public function deleteMeeting(int $meetingId): array
     {
-        $meeting = Meeting_::getMeeting($meetingId, true);
-        if (!$meeting) {
-            throw new \Exception('deleteMeeting Obj null error');
+        try {
+            $meeting = Meeting_::getMeeting($meetingId, true);
+
+            if (!empty($meeting->audit) && $meeting->audit->status === MeetingAudit::STATUS['初审成功']) {
+                throw new \Exception('会议已通过初审，不允许删除');
+            }
+
+            if (!empty($meeting->audit) && $meeting->audit->status === MeetingAudit::STATUS['通过审核']) {
+                throw new \Exception('会议已通过审核，不允许删除');
+            }
+
+            if (!empty($meeting->audit) && $meeting->audit->status === MeetingAudit::STATUS['预约成功']) {
+                throw new \Exception('会议已预约成功，不允许删除');
+            }
+
+            if ($meeting->opened_at <= Carbon::now()->timestamp) {
+                throw new \Exception('会议已经开始，不允许删除');
+            }
+
+            DB::transaction(function () use ($meetingId) {
+                $Obj = Meeting::findOrFail($meetingId);
+                $Obj->attendUsersMiddle()->delete();
+                $Obj->audit()->delete();
+                $Obj->delete();
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
         }
 
-        if (!$meeting->audit) {
-            throw new \Exception('deleteMeeting Obj audit null error');
-        }
-
-        //TODO
-
-        return [];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $meeting];
     }
 
-    static public function signIn(int $meetingId): array
+    static public function signIn(int $meetingId, int $userId): array
     {
         try {
             $meeting = Meeting_::getMeeting($meetingId, true);
@@ -461,22 +485,24 @@ class Meeting_ extends Meeting
             if (!$meeting->audit) {
                 throw new \Exception('signIn Obj audit null error');
             }
-            if ($meeting->audit['status'] !== Meeting_::AuditStatusMap['通过审核']) {
+            if ($meeting->audit['status'] !== MeetingAudit::STATUS['通过审核']) {
                 throw new \Exception('会议状态错误');
             }
-            if ($meeting->opened_at < Carbon::now()->timestamp - Meeting_::AheadSignInTimestamp) {
+            if ($meeting->opened_at < Carbon::now()->timestamp - Meeting_::AHEAD_SIGN_IN_TIMESTAMP) {
                 throw new \Exception('未到签到时间');
             }
             if ($meeting->ended_at > Carbon::now()->timestamp) {
                 throw new \Exception('会议已结束');
             }
 
-            $Obj = $meeting->attendUsers()->where('user_id', User_::getMyId())
+            $Obj = $meeting
+                ->attendUsers()
+                ->where('user_id', $userId)
                 ->where('meeting_id', $meeting->id)
                 ->firstOrFail();
 
             if (!$Obj) {
-                throw new \Exception('未参会错误');
+                throw new \Exception('错误：您未参会');
             }
             if ($Obj->is_signed_in) {
                 throw new \Exception('您已签过到了');
@@ -484,6 +510,36 @@ class Meeting_ extends Meeting
 
             $Obj->is_signed_in = 1;
             $Obj->save();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+    }
+
+    static public function auditMeeting(int $meetingId, int $status, $reason = null)
+    {
+        try {
+            $row = MeetingAudit::where('meeting_id', $meetingId)->firstOrFail();
+            $userId = User_::getMyId();
+
+            if (empty($row)) {
+                throw new \Exception('获取审核信息失败');
+            }
+
+            if ($row->audit_user_id !== $userId) {
+                throw new \Exception('没有审核权限');
+            }
+
+            if ($row->status !== MeetingAudit::STATUS['未审核']) {
+                throw new \Exception('状态错误:状态为已审核');
+            }
+
+            $row->status = $status;
+            $row->reason = $reason;
+
+            $row->save();
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

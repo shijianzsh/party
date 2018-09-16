@@ -13,7 +13,7 @@ class Article extends Controller
     public function audit(Request $request, $id)
     {
         $result = PortalPost_::auditPost($id,
-            $request->input('status',''),
+            $request->input('status'),
             $request->input('reason',''));
         return response()->json($result);
     }

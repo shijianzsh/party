@@ -8,7 +8,7 @@ use DB;
 
 class User_ extends User
 {
-    public const UserTypeMap = [
+    public const USER_TYPE = [
         '超级管理员' => 0,
         '单位超级管理员' => 1,
         '单位领导' => 2,
@@ -23,14 +23,22 @@ class User_ extends User
         return $Obj->getUserId();
     }
 
-    static public function getUser(int $userId = 0, bool $getObject = false)
+    static public function getUser(int $userId = 0, bool $getObject = false, array $with = [])
     {
-        $Obj = User::findOrFail($userId ? $userId : User_::getMyId());
+        $Obj = User::with($with)->findOrFail($userId ? $userId : User_::getMyId());
         if ($getObject) {
             return $Obj;
         } else {
             return $Obj->toArray();
         }
+    }
+
+    static public function getUserWithPartyInfo(int $userId = 0)
+    {
+        $with = ['department', 'partyExperience', 'partyRelation' => function ($query) {
+            $query->orderBy('sort_order', 'asc');
+        }];
+        return self::getUser($userId, false, $with);
     }
 
     static public function getUserList(
@@ -46,7 +54,7 @@ class User_ extends User
         $departmentId =& $filter['department_id'];
         $type =& $filter['type'];
 
-        $Obj = User::with(array_merge($with,['department','partyInfo']));
+        $Obj = User::with(array_merge($with, ['department', 'partyInfo']));
 
         if ($departmentId !== null) {
             $Obj->where('department_id', $departmentId);

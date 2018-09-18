@@ -14,7 +14,15 @@ class PortalPost extends _BaseModel
         'more' => 'json',
         'category_ids' => 'array',
     ];
-    protected $appends = ['category_name', 'category_id', 'category_ids', 'audit_status_format', 'created_at_format', 'published_at_format'];
+    protected $appends = [
+        'category_name',
+        'category_id',
+        'category_ids',
+        'audit_status_format',
+        'created_at_format',
+        'published_at_format',
+        'thumbnail_format',
+    ];
 
     public function audit()
     {
@@ -72,17 +80,22 @@ class PortalPost extends _BaseModel
         $this->attributes['first_name'] = strtolower($value);
     }
 
-//    public function getMoreAttribute($value)
-//    {
-//        $value= json_decode($value, true);
-//        if (!$value) return (array)$value;
-//
-//        array_walk($value, function (&$value, $key) {
-//            if($value){
-//                $value = json_decode($value);
-//            }
-//        });
-//
-//        return $value;
-//    }
+
+    public function getThumbnailFormatAttribute()
+    {
+        $more = $this->more;
+        if ($more === null) {
+            return null;
+        }
+
+        if (!is_array($more)) {
+            return null;
+        }
+
+        if (!array_key_exists('thumbnail', $more)) {
+            return null;
+        }
+
+        return $more['thumbnail'];
+    }
 }

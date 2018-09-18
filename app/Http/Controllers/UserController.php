@@ -32,16 +32,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //TODO
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -49,7 +39,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        return response()->json(User_::createUser($request->all()));
+        return response()->json(User_::createUser($request->input('data')));
     }
 
     /**
@@ -61,19 +51,8 @@ class UserController extends Controller
     public function show($id)
     {
         $with = [];
-        $result = ['success' => 1, 'data' =>User_::getUser($id, $with)];
+        $result = ['success' => 1, 'data' => User_::getUser($id, $with)];
         return response()->json($result);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //TODO
     }
 
     /**
@@ -85,7 +64,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json(User_::editUser($id, $request->all()));
+        return response()->json(User_::editUser($id, $request->input('data')));
     }
 
     /**

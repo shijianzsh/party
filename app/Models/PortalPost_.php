@@ -71,6 +71,66 @@ class PortalPost_ extends PortalPost
         ];
     }
 
+    static public function getPublishedPostList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'category_id' => 0,
+            'keyword' => "",
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
+        ],
+        array $with = []
+    ): array
+    {
+        $categoryId =& $filter['category_id'];
+        $keyWord =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = PortalPost::with(array_merge(['categorys'], $with));
+
+        $Obj->where('post_status', 1);
+        $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+
+        if ($categoryId) {
+            $Obj->whereHas('categorys', function ($query) use ($categoryId) {
+                $query->where('portal_category.id', $categoryId);
+            });
+        }
+
+        if ($keyWord) {
+            $Obj->where('post_title', 'like', "%{$keyWord}%");
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('published_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('published_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(),
+            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+        ];
+    }
+
     static public function getPost(int $postId, array $with = []): array
     {
         return $Obj = PortalPost::with($with)->findOrFail($postId)->toArray();

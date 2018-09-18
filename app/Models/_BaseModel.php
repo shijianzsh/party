@@ -11,7 +11,7 @@ class _BaseModel extends Model
 
     protected $dateFormat = 'U';
     protected $appends = ['created_at_format'];
-    const PAGE_SIZE = 5;
+    const PAGE_SIZE = 6;
 
     public function getTable()
     {
@@ -37,5 +37,10 @@ class _BaseModel extends Model
     public function getPublishedAtFormatAttribute()
     {
         return $this->published_at ? date("Y-m-d H:i:s", $this->published_at) : '';
+    }
+
+    public function getFinishedAtFormatAttribute()
+    {
+        return $this->finished_at ? date("Y-m-d H:i:s", $this->finished_at) : '';
     }
 }

@@ -8,39 +8,6 @@ use DB;
 
 class User_ extends User
 {
-    public const USER_TYPE = [
-        '超级管理员' => 0,
-        '单位超级管理员' => 1,
-        '单位领导' => 2,
-        '单位党员' => 3,
-        '入党积极分子' => 4,
-        '群众' => 4,
-    ];
-
-    static public function getMyId(): int
-    {
-        $Obj = new AccessToken();
-        return $Obj->getUserId();
-    }
-
-    static public function getUser(int $userId = 0, bool $getObject = false, array $with = [])
-    {
-        $Obj = User::with($with)->findOrFail($userId ? $userId : User_::getMyId());
-        if ($getObject) {
-            return $Obj;
-        } else {
-            return $Obj->toArray();
-        }
-    }
-
-    static public function getUserWithPartyInfo(int $userId = 0)
-    {
-        $with = ['department', 'partyExperience', 'partyRelation' => function ($query) {
-            $query->orderBy('sort_order', 'asc');
-        }];
-        return self::getUser($userId, false, $with);
-    }
-
     static public function getUserList(
         int $currentPage = 0,
         int $pageSize = 0,
@@ -54,7 +21,7 @@ class User_ extends User
         $departmentId =& $filter['department_id'];
         $type =& $filter['type'];
 
-        $Obj = User::with(array_merge($with, ['department', 'partyInfo']));
+        $Obj = User::with(array_merge($with, ['department', 'partyExperience']));
 
         if ($departmentId !== null) {
             $Obj->where('department_id', $departmentId);
@@ -80,12 +47,43 @@ class User_ extends User
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
+    static public function getMyId(): int
+    {
+        $Obj = new AccessToken();
+        return $Obj->getUserId();
+    }
+
+    static public function getUser(int $userId = 0, bool $getObject = false, array $with = [])
+    {
+        $Obj = User::with($with)->findOrFail($userId ? $userId : User_::getMyId());
+        if ($getObject) {
+            return $Obj;
+        } else {
+            return $Obj->toArray();
+        }
+    }
+
+    static public function getUserWithPartyInfo(int $userId = 0)
+    {
+        $with = ['department', 'partyExperience', 'partyRelation' => function ($query) {
+            $query->orderBy('sort_order', 'asc');
+        }];
+        return self::getUser($userId, false, $with);
+    }
+
+    /**
+     * 新增人员.
+     *
+     * @param  $requestData
+     * @return array
+     */
     static public function createUser(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
             'type' => 'required',
             'department_id' => 'required',
             'name' => 'required',
+            'duty' => 'required',
             'user_login' => 'required',
             'user_password' => 'required',
         ]);
@@ -99,6 +97,7 @@ class User_ extends User
             $Obj->type = $requestData['type'];
             $Obj->department_id = $requestData['department_id'];
             $Obj->name = $requestData['name'];
+            $Obj->duty = $requestData['duty'];
             $Obj->user_login = $requestData['user_login'];
             $Obj->user_password = $requestData['user_password'];
             $success = $Obj->save();
@@ -113,13 +112,12 @@ class User_ extends User
 
     static public function editUser(int $userId, array $requestData): array
     {
-        return ['success' => 0, 'msg' => '功能未开放'];
-
         $validator = \Validator::make($requestData, [
-            'type' => 'required',
-            'department_id' => 'required',
-            'user_login' => 'required',
-            'user_password' => 'required',
+            'name' => '',
+            'sex' => '',
+            'cellphone' => '',
+            'duty' => '',
+            'borned_at' => '',
         ]);
 
         try {
@@ -127,13 +125,10 @@ class User_ extends User
                 throw new \Exception($validator->errors()->first());
             }
 
-            $Obj = new User;
-            $Obj->findOrFail($userId);
-            $Obj->type = $requestData['type'];
-            $Obj->department_id = $requestData['department_id'];
-            $Obj->user_login = $requestData['user_login'];
-            $Obj->user_password = $requestData['user_password'];
-            $success = $Obj->save();
+            $success = User
+                ::where('id', $userId)
+                ->update($requestData);
+
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

@@ -32,6 +32,7 @@ Route::group(['middleware' => [
 ]], function () {
     Route::post('upload', 'Upload');
 
+    Route::get('departments/{id}/department', 'Meeting@departmentDepartmentList');
     Route::resource('departments', 'DepartmentController');
 
     Route::resource('department_work_plans', 'DepartmentWorkPlanController');
@@ -43,6 +44,7 @@ Route::group(['middleware' => [
 
     Route::resource('user_payments', 'UserPaymentController');
 
+    Route::get('articles/published', 'Article@getPublishedList');
     Route::post('articles/{id}/audit', 'Article@audit');
     Route::resource('articles', 'ArticleController');
 

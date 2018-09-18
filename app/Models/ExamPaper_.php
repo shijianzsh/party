@@ -76,6 +76,7 @@ class ExamPaper_ extends ExamPaper
             'pass_score' => 'required',
             'published_at' => 'required',
             'finished_at' => 'required',
+            'more_thumbnail' => 'required',
         ]);
 
         try {
@@ -126,6 +127,9 @@ class ExamPaper_ extends ExamPaper
                 $Obj->questions_count = $questions_count;
                 $Obj->published_at = $published_at;
                 $Obj->finished_at = $finished_at;
+                $Obj->more = [
+                    'thumbnail' => $requestData['more_thumbnail'] ?? null,
+                ];
                 $Obj->save();
 
                 $saveMany = [];
@@ -163,6 +167,7 @@ class ExamPaper_ extends ExamPaper
             'pass_score' => 'required',
             'published_at' => 'required',
             'finished_at' => 'required',
+            'more_thumbnail' => 'required',
         ]);
 
         try {
@@ -202,6 +207,9 @@ class ExamPaper_ extends ExamPaper
                 $Obj->pass_score = $pass_score;
                 $Obj->published_at = $published_at;
                 $Obj->finished_at = $finished_at;
+                $Obj->more = [
+                    'thumbnail' => $requestData['more_thumbnail'] ?? null,
+                ];
                 $Obj->save();
 
                 $Obj->questions()->update(['question_score' => $per_question_score]);

@@ -8,7 +8,17 @@ class ExamPaper extends _BaseModel
 {
     public const IS_RESTRICT_USER = ['否' => 0, '是' => 1];
     public const TIME_STATUS = ['未知状态' => -1, '未开始' => 0, '进行中' => 1, '已结束' => 2];
-    protected $appends = ['time_status', 'time_status_format'];
+    protected $casts = [
+        'more' => 'json',
+    ];
+    protected $appends = [
+        'time_status',
+        'time_status_format',
+        'published_at_format',
+        'finished_at_format',
+        'created_at_format',
+        'updated_at_format',
+    ];
 
     public function questions()
     {

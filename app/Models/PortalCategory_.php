@@ -17,7 +17,7 @@ class PortalCategory_ extends PortalCategory
     ): array
     {
         $parentId =& $filter['parent_id'];
-        $keyWord =& $filter['keyword'];
+        $keyword =& $filter['keyword'];
 
         $Obj = PortalCategory::with($with);
 
@@ -25,8 +25,13 @@ class PortalCategory_ extends PortalCategory
             $Obj->where('parent_id', $parentId);
         }
 
-        if ($keyWord !== null) {
-            $Obj->where('name', 'like', "%{$keyWord}%");
+        if ($keyword !== null) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query->where('post_title', 'like', "%{$keyword}%")
+                    ->orWhere('post_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('post_source', 'like', "%{$keyword}%")
+                    ->orWhere('post_content', 'like', "%{$keyword}%");
+            });
         }
 
         $total = $Obj->count();

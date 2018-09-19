@@ -86,6 +86,7 @@ class User_ extends User
             'duty' => 'required',
             'user_login' => 'required',
             'user_password' => 'required',
+            'more_thumbnail' => 'required',
         ]);
 
         try {
@@ -100,6 +101,9 @@ class User_ extends User
             $Obj->duty = $requestData['duty'];
             $Obj->user_login = $requestData['user_login'];
             $Obj->user_password = $requestData['user_password'];
+            $Obj->more = [
+                'thumbnail' => $requestData['more_thumbnail'] ?? null,
+            ];
             $success = $Obj->save();
 
         } catch (\Exception $e) {
@@ -118,6 +122,7 @@ class User_ extends User
             'cellphone' => '',
             'duty' => '',
             'borned_at' => '',
+            'more_thumbnail' => '',
         ]);
 
         try {
@@ -125,9 +130,18 @@ class User_ extends User
                 throw new \Exception($validator->errors()->first());
             }
 
-            $success = User
-                ::where('id', $userId)
-                ->update($requestData);
+            foreach ($requestData as $key => $value) {
+                switch ($key) {
+                    default:
+                        break;
+                }
+                $updateData = [$key, $value];
+                $success = User
+                    ::where('id', $userId)
+                    ->update($updateData);
+                break;
+            }
+
 
         } catch (\Exception $e) {
             $success = 0;
@@ -145,7 +159,7 @@ class User_ extends User
         return ['success' => $delete];
     }
 
-    static public function changePassword(array $requestData): array
+    static public function changePassword(int $userId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
             'user_password_old' => 'required',
@@ -161,11 +175,11 @@ class User_ extends User
                 throw new \Exception('两次密码输入不一致');
             }
 
-            $Obj = User::findOrFail(User_::getMyId());
+            $Obj = User::findOrFail($userId);
             if (!$Obj) {
                 throw new \Exception('未查询到用户信息');
             }
-            if (Login::getPassword($requestData['user_password']) !== $Obj->user_password) {
+            if (Login::getPassword($requestData['user_password_old']) !== $Obj->user_password) {
                 throw new \Exception('当前密码输入有误');
             }
 
@@ -176,7 +190,7 @@ class User_ extends User
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null,'getMyId'=>User_::getMyId()];
     }
 
     static public function changeDepartment()

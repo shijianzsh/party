@@ -60,6 +60,67 @@ class UserComment_ extends UserComment
         ];
     }
 
+    static public function getAuditUserCommentList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'audit_user_id' => 0,
+            'user_id' => 0,
+            'to_user_id' => 0,
+        ],
+        array $with = []
+    ): array
+    {
+        $auditUserId =& $filter['audit_user_id'];
+        $userId =& $filter['user_id'];
+        $toUserId =& $filter['to_user_id'];
+
+        $Obj = UserComment::with($with);
+
+        $Obj->where('need_audit', 1)
+            ->whereHas('audit', function ($query) use ($auditUserId) {
+                $query->where('user_comment_audit.audit_user_id', $auditUserId);
+            });
+
+        if ($userId) {
+            $Obj->where('user_id', $userId);
+        }
+
+        if ($toUserId) {
+            $Obj->whereHas('commentUsersMiddle', function ($query) use ($toUserId) {
+                $query->where('user_comment_user.user_id', $toUserId);
+            });
+
+            $Obj->where(function ($query) {
+                $query->where('need_audit', 0)
+                    ->orWhere(function ($query) {
+                        $query->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('user_comment_audit.status', 1);
+                            });
+                    });
+            });
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(),
+            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+        ];
+    }
+
     static public function getComment(int $CommentId, array $with = []): array
     {
         return $Obj = UserComment::with($with)->findOrFail($CommentId)->toArray();

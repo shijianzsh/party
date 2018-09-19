@@ -18,14 +18,20 @@ class User extends Controller
     {
         $Obj = new User_();
         return $Obj->getAccessToken(
-            $request->input('token',''),
+            $request->input('token', ''),
             $request->input()
         );
     }
 
     public function getUserWithPartyInfo($id)
     {
-        $result = ['success' => 1, 'data' =>User_::getUserWithPartyInfo($id)];
+        $result = ['success' => 1, 'data' => User_::getUserWithPartyInfo($id)];
+        return response()->json($result);
+    }
+
+    public function changePassword(Request $request, $id)
+    {
+        $result = User_::changePassword($id, $request->input('data'));
         return response()->json($result);
     }
 }

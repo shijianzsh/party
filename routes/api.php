@@ -40,16 +40,21 @@ Route::group(['middleware' => [
     Route::resource('department_activity_plans', 'DepartmentActivityPlanController');
 
     Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
+    Route::post('users/{id}/change_password', 'User@changePassword');
     Route::resource('users', 'UserController');
 
     Route::resource('user_payments', 'UserPaymentController');
 
-    Route::get('articles/published', 'Article@getPublishedList');
+    Route::get('articles/published', 'Article@publishedArticleList');
+    Route::get('articles/user', 'Article@userArticleList');
+    Route::get('articles/audit_user', 'Article@auditUserArticleList');
+    Route::get('articles/{id}/check', 'Article@checkArticle');
     Route::post('articles/{id}/audit', 'Article@audit');
     Route::resource('articles', 'ArticleController');
 
     Route::resource('categories', 'CategoryController');
 
+    Route::get('comments/audit_user', 'Comment@auditUserCommentList');
     Route::resource('comments', 'CommentController');
 
     Route::get('meetings/department', 'Meeting@departmentMeetingList');

@@ -71,6 +71,146 @@ class PortalPost_ extends PortalPost
         ];
     }
 
+    static public function getAuditUserPostList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'audit_user_id' => null,
+            'category_id' => 0,
+            'is_published' => null,
+            'keyword' => "",
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
+        ],
+        array $with = []
+    ): array
+    {
+        $auditUserId =& $filter['audit_user_id'];
+        $categoryId =& $filter['category_id'];
+        $keyWord =& $filter['keyword'];
+        $isPublished =& $filter['is_published'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = PortalPost::with(array_merge(['categorys'], $with));
+
+        $Obj->where('need_audit', 1)
+            ->whereHas('audit', function ($query) use ($auditUserId) {
+                $query->where('portal_post_audit.audit_user_id', $auditUserId);
+            });
+
+        if ($categoryId) {
+            $Obj->whereHas('categorys', function ($query) use ($categoryId) {
+                $query->where('portal_category.id', $categoryId);
+            });
+        }
+
+        if ($isPublished) {
+            $Obj->where('post_status', 1);
+            $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+        }
+
+        if ($keyWord) {
+            $Obj->where('post_title', 'like', "%{$keyWord}%");
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('published_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('published_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(),
+            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+        ];
+    }
+
+    static public function getUserPostList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'audit_user_id' => null,
+            'category_id' => 0,
+            'is_published' => null,
+            'keyword' => "",
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
+        ],
+        array $with = []
+    ): array
+    {
+        $userId =& $filter['user_id'];
+        $categoryId =& $filter['category_id'];
+        $keyWord =& $filter['keyword'];
+        $isPublished =& $filter['is_published'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = PortalPost::with(array_merge(['categorys'], $with));
+
+        $Obj->where('user_id', $userId);
+
+        if ($categoryId) {
+            $Obj->whereHas('categorys', function ($query) use ($categoryId) {
+                $query->where('portal_category.id', $categoryId);
+            });
+        }
+
+        if ($isPublished) {
+            $Obj->where('post_status', 1);
+            $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+        }
+
+        if ($keyWord) {
+            $Obj->where('post_title', 'like', "%{$keyWord}%");
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('published_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('published_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(),
+            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+        ];
+    }
+
+
     static public function getPublishedPostList(
         int $currentPage = 0,
         int $pageSize = 0,
@@ -134,6 +274,13 @@ class PortalPost_ extends PortalPost
     static public function getPost(int $postId, array $with = []): array
     {
         return $Obj = PortalPost::with($with)->findOrFail($postId)->toArray();
+    }
+
+    static public function checkPost(int $postId, array $with = []): array
+    {
+        $Obj = PortalPost::with($with)->findOrFail($postId);
+        $Obj->increment('post_hits');
+        return $Obj->toArray();
     }
 
     static public function createPost(array $requestData): array

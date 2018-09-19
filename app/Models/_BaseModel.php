@@ -43,4 +43,22 @@ class _BaseModel extends Model
     {
         return $this->finished_at ? date("Y-m-d H:i:s", $this->finished_at) : '';
     }
+
+    public function getThumbnailFormatAttribute()
+    {
+        $more = $this->more;
+        if ($more === null) {
+            return null;
+        }
+
+        if (!is_array($more)) {
+            return null;
+        }
+
+        if (!array_key_exists('thumbnail', $more)) {
+            return null;
+        }
+
+        return $more['thumbnail'];
+    }
 }

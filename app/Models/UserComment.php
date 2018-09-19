@@ -8,7 +8,7 @@ class UserComment extends _BaseModel
         'more' => 'json',
     ];
 
-    protected $appends = ['to_user_ids'];
+    protected $appends = ['to_user_ids', 'user_name'];
 
     //发起人
     public function initiateUser()
@@ -39,6 +39,11 @@ class UserComment extends _BaseModel
         return $this->hasOne('App\Models\UserCommentAudit', 'comment_id', 'id');
     }
 
+    public function getUserNameAttribute()
+    {
+        return !$this->initiateUser ? null : $this->initiateUser->name;
+    }
+
     public function getToUserIdsAttribute()
     {
         if (!$this->comment_users) {
@@ -46,18 +51,4 @@ class UserComment extends _BaseModel
         }
         return array_column($this->comment_users, 'id');
     }
-
-//    public function getMoreAttribute($value)
-//    {
-//        $value = json_decode($value, true);
-//        if (!$value) return (array)$value;
-//
-//        array_walk($value, function (&$value, $key) {
-//            if ($value) {
-//                $value = json_decode($value);
-//            }
-//        });
-//
-//        return $value;
-//    }
 }

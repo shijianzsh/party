@@ -79,23 +79,4 @@ class PortalPost extends _BaseModel
     {
         $this->attributes['first_name'] = strtolower($value);
     }
-
-
-    public function getThumbnailFormatAttribute()
-    {
-        $more = $this->more;
-        if ($more === null) {
-            return null;
-        }
-
-        if (!is_array($more)) {
-            return null;
-        }
-
-        if (!array_key_exists('thumbnail', $more)) {
-            return null;
-        }
-
-        return $more['thumbnail'];
-    }
 }

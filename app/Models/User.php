@@ -6,7 +6,7 @@ class User extends _BaseModel
 {
     const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
 
-    protected $appends = ['type_format','borned_at_format'];
+    protected $appends = ['type_format', 'borned_at_format', 'thumbnail_format'];
     protected $casts = [
         'more' => 'json',
     ];

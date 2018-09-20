@@ -14,19 +14,10 @@ class ExamResult extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function start(Request $request, $paperId)
+    public function start(Request $request, $id)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
-        $list = ExamUserResult_::getCommentList(
-            $request->input('current_page', 0),
-            $request->input('page_size', 0),
-            [
-                'user_id' => &$filter['user_id'],
-                'to_user_id' => &$filter['to_user_id'],
-            ]
-        );
-
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+        $result = ExamUserResult_::startExam($id, $request->input('user_id'));
         return response()->json($result);
     }
 
@@ -36,9 +27,9 @@ class ExamResult extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function submit(Request $request,$id)
+    public function submit(Request $request, $id)
     {
-        $result = ExamUserResult_::createComment($request->input('data'));
+        $result = ExamUserResult_::submitExam($id, $request->input('data'));
         return response()->json($result);
     }
 }

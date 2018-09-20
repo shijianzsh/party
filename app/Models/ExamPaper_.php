@@ -22,12 +22,12 @@ class ExamPaper_ extends ExamPaper
 
         if ($attendUserId !== null) {
             //获取用户可以参加考试的列表，包含任意时间段
-            $Obj->where(function ($query) {
+            $Obj->where(function ($query) use ($attendUserId) {
                 $query->where('is_restrict_user', 0)
-                    ->orWhere(function ($query) {
+                    ->orWhere(function ($query) use ($attendUserId) {
                         $query->where('is_restrict_user', 1)
-                            ->whereHas('attendUsersMiddle', function ($query) {
-                                $query->where('exam_paper_user.user_id', 1);
+                            ->whereHas('attendUsersMiddle', function ($query) use ($attendUserId) {
+                                $query->where('exam_paper_user.user_id', $attendUserId);
                             });
                     });
             });

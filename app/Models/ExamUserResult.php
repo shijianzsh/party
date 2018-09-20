@@ -5,8 +5,8 @@ namespace App\Models;
 class ExamUserResult extends _BaseModel
 {
     protected $casts = [
-        'paper_snapshoot' => 'json',
-        'answers_snapshoot' => 'json',
+        'paper_snapshot' => 'json',
+        'answers_snapshot' => 'json',
     ];
 
     protected $appends = ['is_passed_format'];

@@ -57,7 +57,7 @@ class ExamUserResult_ extends ExamUserResult
         return $result;
     }
 
-    public function startExam(int $paperId, int $userId): array
+    static public function startExam(int $paperId, int $userId): array
     {
         try {
             $paper = ExamPaper_::getExamPaper($paperId, true);
@@ -75,70 +75,85 @@ class ExamUserResult_ extends ExamUserResult
                 $paperUser = ExamPaperUser
                     ::where('user_id', $userId)
                     ->where('paper_id', $paperId)
-                    ->firstOrFail();
+                    ->first();
 
                 if (!$paperUser) {
-                    throw new \Exception('没有考试资格');
-                }
-
-                $checkResult = ExamUserResult::where('user_id', $userId)
-                    ->where('paper_id', $paperId)
-                    ->firstOrFail();
-
-                if ($checkResult) {
-                    throw new \Exception('已经参加过该考试了');
+                    throw new \Exception('您没有考试资格');
                 }
             }
 
-            $Obj = new ExamPaperUser();
-            $Obj->user_id = $userId;
-            $Obj->paper_id = $paperId;
-            $Obj->paper_snapshot = $paper->toArray();
-            $success = $Obj->save();
+            $checkResult = ExamUserResult::where('user_id', $userId)
+                ->where('paper_id', $paperId)
+                ->first();
+
+            if (!$checkResult) {
+                $Obj = new ExamUserResult();
+                $Obj->user_id = $userId;
+                $Obj->paper_id = $paperId;
+                $Obj->paper_snapshot = $paper->toArray();
+                $success = $Obj->save();
+
+                $id = $Obj->id;
+            } else {
+                $id = $checkResult->id;
+            }
+
+            if ($checkResult && $checkResult->is_submitted) {
+                throw new \Exception('您已经参加过考试了');
+            }
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        end:
+        return ['success' => (int)($success ?? 1), 'data' => $id ?? 0, 'msg' => $msg ?? null];
     }
 
-    public function submitExam(int $examUserResultId, array $requestData): array
+    static public function submitExam(int $examUserResultId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
             'answers' => 'required',
             'is_auto_submit' => 'required',
         ]);
 
-        //整理考试结果
-        $questionsIdToIndex = [];
-        for ($i = 0; $i < count($requestData['answers']); $i++) {
-            $tempId = $requestData['answers'][$i]['question_id'];
-            $questionsIdToIndex[$tempId] = $i;
-        }
-
         try {
             if ($validator->fails()) {
                 throw new \Exception($validator->errors()->first());
             }
 
-            $Obj = ExamPaperUser::findOrFail($examUserResultId);
+            $answers = $requestData['answers'];
+            //整理考试结果
+            $questionsIdToIndex = [];
+            for ($i = 0; $i < count($answers); $i++) {
+                if (empty($answers[$i]['user_answers'])) {
+                    throw new \Exception('试卷存在未作答的题目');
+                }
+
+                $tempId = $answers[$i]['question_id'];
+                $questionsIdToIndex[$tempId] = $i;
+            }
+
+            $Obj = ExamUserResult::find($examUserResultId);
             if (!$Obj) {
                 throw new \Exception('查询考试记录错误');
             }
-
+            if ($Obj->is_submitted) {
+                throw new \Exception('您已经参加过考试了');
+            }
             $paper = ExamPaper_::getExamPaper($Obj->paper_id, true);
             if (!$paper) {
-                throw new \Exception('查询考试信息错误');
+                throw new \Exception('查询试卷信息错误');
             }
-            if (!$paper->questions_count) {
-                throw new \Exception('查询考试题目错误');
+            if ($paper->questions_count !== count($questionsIdToIndex)) {
+                throw new \Exception('答案数量错误');
             }
-            if ($Obj->created_at + $paper->duration < Carbon::now()->timestamp
+
+            if (($Obj->created_at->timestamp + $paper->duration * 60 < Carbon::now()->timestamp)
                 && !$requestData['is_auto_submit']) {
                 throw new \Exception('考试时间到，无法提交试卷。');
             }
-            if ($Obj->created_at + $paper->duration < Carbon::now()->timestamp + ExamUserResult_::SubmitDelayTimestamp
+            if ($Obj->created_at->timestamp + $paper->duration < Carbon::now()->timestamp + ExamUserResult_::SubmitDelayTimestamp
                 && $requestData['is_auto_submit']) {
                 throw new \Exception('自动提交失败');
             }
@@ -147,14 +162,14 @@ class ExamUserResult_ extends ExamUserResult
             $score = 0;
             foreach ($paper->questions as $question) {
                 if (array_key_exists($question['id'], $questionsIdToIndex)) {
-                    $tempAnswer1 = $requestData['answers'][$question['id']]['answer'];
-                    $tempAnswer2 = $question['answer'];
+                    $tempAnswer1 = $answers[$questionsIdToIndex[$question['id']]]['user_answers'];
+                    $tempAnswer2 = $question['answers'];
 
                     if (Exam::isSameAnswers($tempAnswer1, $tempAnswer2)) {
                         $score += $question['question_score'];
-                        $requestData['answers'][$question['id']]['is_correct'] = 1;
+                        $answers[$questionsIdToIndex[$question['id']]]['is_correct'] = 1;
                     } else {
-                        $requestData['answers'][$question['id']]['is_correct'] = 0;
+                        $answers[$questionsIdToIndex[$question['id']]]['is_correct'] = 0;
                     }
                 }
             }
@@ -165,7 +180,7 @@ class ExamUserResult_ extends ExamUserResult
             $Obj->is_submitted = 1;
             $Obj->score = $score;
             $Obj->is_passed = $isPassed;
-            $Obj->answers_snapshoot = $requestData['answers'];
+            $Obj->answers_snapshot = $answers;
             $success = $Obj->save();
             $data = $Obj->toArray();
         } catch (\Exception $e) {

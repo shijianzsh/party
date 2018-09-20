@@ -12,7 +12,7 @@ class Comment extends Controller
 {
     public function auditUserCommentList(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
         $list = UserComment_::getAuditUserCommentList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),

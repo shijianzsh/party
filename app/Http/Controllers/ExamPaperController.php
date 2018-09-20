@@ -16,7 +16,7 @@ class ExamPaperController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
         $list = ExamPaper_::getExamPaperList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
@@ -49,7 +49,7 @@ class ExamPaperController extends Controller
      */
     public function show($id)
     {
-        $row = ExamPaper_::getExamPaper($id, []);
+        $row = ExamPaper_::getExamPaper($id);
 
         $result = ['success' => 1, 'data' => $row];
         return response()->json($result);

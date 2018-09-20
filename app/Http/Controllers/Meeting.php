@@ -15,7 +15,7 @@ class Meeting extends Controller
     public function departmentMeetingList(Request $request)
     {
         try {
-            $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+            $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
             $list = Meeting_::getDepartmentMeetingList(
                 $request->input('current_page', 0),
                 $request->input('page_size', 0),
@@ -39,7 +39,7 @@ class Meeting extends Controller
     public function attendUserMeetingList(Request $request)
     {
         try {
-            $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+            $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
             $list = Meeting_::getAttendUserMeetingList(
                 $request->input('current_page', 0),
                 $request->input('page_size', 0),
@@ -63,7 +63,7 @@ class Meeting extends Controller
     public function auditUserMeetingList(Request $request)
     {
         try {
-            $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+            $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
             $list = Meeting_::getAuditUserMeetingList(
                 $request->input('current_page', 0),
                 $request->input('page_size', 0),

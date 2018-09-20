@@ -24,7 +24,7 @@ class Article extends Controller
 
     public function publishedArticleList(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
         $list = PortalPost_::getPublishedPostList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
@@ -44,7 +44,7 @@ class Article extends Controller
 
     public function userArticleList(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
         $list = PortalPost_::getUserPostList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
@@ -65,7 +65,7 @@ class Article extends Controller
 
     public function auditUserArticleList(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
         $list = PortalPost_::getAuditUserPostList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),

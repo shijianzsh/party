@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = json_decode($request->query('filter') ? $request->query('filter') : [], true);
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
 
         $list = User_::getUserList(
             $request->input('current_page', 0),

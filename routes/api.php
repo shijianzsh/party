@@ -23,12 +23,14 @@ Route::get('/', function (Request $request) {
 
 Route::get('/test', 'Test');
 
+Route::get('/pusher', 'Pusher');
+
 Route::get('/token', 'Token');
 Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::class);
 
 
 Route::group(['middleware' => [
-//    \App\Http\Middleware\CheckAccessToken::class,
+    \App\Http\Middleware\CheckAccessToken::class,
 ]], function () {
     Route::post('upload', 'Upload');
 
@@ -63,6 +65,9 @@ Route::group(['middleware' => [
     Route::post('meetings/{id}/audit', 'Meeting@audit');
     Route::post('meetings/{id}/sign_in', 'Meeting@signIn');
     Route::resource('meetings', 'MeetingController');
+
+    Route::resource('elections', 'ElectionController');
+    Route::resource('votes', 'VoteController');
 
     Route::resource('exam_categorys', 'ExamCategoryController');
 

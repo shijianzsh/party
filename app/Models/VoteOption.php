@@ -9,13 +9,8 @@ class VoteOption extends _BaseModel
         return $this->belongsTo('App\Models\Vote', 'vote_id');
     }
 
-    public function contentUser()
+    public function results()
     {
-        return $this->hasOne('App\Models\User', 'content_user_id', 'id');
-    }
-
-    public function voteUsers()
-    {
-        return $this->hasMany('App\Models\VoteUser', 'select_option_id');
+        return $this->hasMany('App\Models\VoteResult', 'option_id');
     }
 }

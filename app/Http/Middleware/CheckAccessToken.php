@@ -20,15 +20,13 @@ class CheckAccessToken
         $AccessTokenObj = new AccessToken();
 
         try {
-            $verify = $AccessTokenObj->verifyAndSetToSession($request->input('access_token', ''));
+            $verify = $AccessTokenObj->verifyAndSetToSession($request->input('access_token',''));
         } catch (\Exception $e) {
             $verify = ['success' => 0, 'msg' => $e->getMessage()];
             return response()->json($verify);
         }
         if (!$verify['success']) {
             return $next($request);
-
-            //TODO 跨域header为空
         }
 
         return $next($request);

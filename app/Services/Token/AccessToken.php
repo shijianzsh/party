@@ -32,7 +32,7 @@ class AccessToken extends TokenBase
     public function verifyAndSetToSession(string $accessToken): array
     {
         if (empty($accessToken)) {
-            throw new \Exception('接口错误：未登录');
+            throw new \Exception('access token null');
         }
 
         $TokenObj = new Token();
@@ -68,7 +68,7 @@ class AccessToken extends TokenBase
         }
 
         if ($user->access_token !== $accessToken) {
-            throw new \Exception('AccessToken verify access_token changed error');
+            throw new \Exception('access_token错误，请重新登录');
         }
 
         $this->setUserIdToSession($data['user_id']);
@@ -88,7 +88,7 @@ class AccessToken extends TokenBase
         }
 
         if (session()->get('user_id')) {
-            return session()->get('user_id', 0);
+            return session()->get('user_id');
         }
 
         return 0;

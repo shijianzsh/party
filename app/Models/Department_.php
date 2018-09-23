@@ -10,7 +10,7 @@ class Department_ extends Department
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-            'keyword' =>null,
+            'keyword' => null,
         ],
         array $with = []
     ): array
@@ -94,6 +94,18 @@ class Department_ extends Department
             'rows' => $get->toArray(),
             'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
         ];
+    }
+
+    /**
+     * 通过access_token获取当前user关联的department_id
+     *
+     * @return int
+     */
+    static public function getMyId(): int
+    {
+        $userId = User_::getMyId();
+        $get = User::findOrFail($userId);
+        return $get->department_id;
     }
 
     static public function getDepartment(int $departmentId, bool $getObject = false)

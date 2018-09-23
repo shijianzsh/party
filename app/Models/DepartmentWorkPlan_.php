@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use DB;
 
 class DepartmentWorkPlan_ extends DepartmentWorkPlan
@@ -9,13 +10,19 @@ class DepartmentWorkPlan_ extends DepartmentWorkPlan
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-//            'user_id' => 0,
+            'initiate_user_id' => 0,
 //            'to_user_id' => 0,
         ],
         array $with = []
     ): array
     {
-        $Obj = DepartmentWorkPlan::with(array_merge($with,['department','user']));
+        $initiate_user_id =& $filter['initiate_user_id'];
+
+        $Obj = DepartmentWorkPlan::with(array_merge($with, ['department', 'initiateUser']));
+
+        if ($initiate_user_id !== null) {
+            $Obj->where('initiate_user_id', $initiate_user_id);
+        }
 
         $total = $Obj->count();
 
@@ -44,7 +51,10 @@ class DepartmentWorkPlan_ extends DepartmentWorkPlan
     static public function createWorkPlan(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-            'name' => 'required',
+            'title' => 'required',
+            'content' => 'required',
+            'published_at' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -53,8 +63,15 @@ class DepartmentWorkPlan_ extends DepartmentWorkPlan
             }
 
             DB::transaction(function () use ($requestData) {
-                $Obj = new WorkPlan();
-                $Obj->name = $requestData['name'];
+                $Obj = new DepartmentWorkPlan();
+                $Obj->department_id = Department_::getMyId();
+                $Obj->initiate_user_id = User_::getMyId();
+                $Obj->title = $requestData['title'];
+                $Obj->content = $requestData['content'];
+                $Obj->published_at = $requestData['published_at'] ?? 0;
+                $Obj->more = [
+                    'files' => $requestData['more_files'] ?? null,
+                ];
                 $Obj->save();
             });
         } catch (\Exception $e) {
@@ -68,7 +85,10 @@ class DepartmentWorkPlan_ extends DepartmentWorkPlan
     static public function updateWorkPlan(int $WorkPlanId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-            'name' => 'required',
+            'title' => 'required',
+            'content' => 'required',
+            'published_at' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -78,7 +98,12 @@ class DepartmentWorkPlan_ extends DepartmentWorkPlan
 
             DB::transaction(function () use ($WorkPlanId, $requestData) {
                 $Obj = DepartmentWorkPlan::findOrFail($WorkPlanId);
-                $Obj->name = $requestData['name'];
+                $Obj->title = $requestData['title'];
+                $Obj->content = $requestData['content'];
+                $Obj->published_at = $requestData['published_at'] ?? 0;
+                $Obj->more = [
+                    'files' => $requestData['more_files'] ?? null,
+                ];
                 $Obj->save();
             });
         } catch (\Exception $e) {

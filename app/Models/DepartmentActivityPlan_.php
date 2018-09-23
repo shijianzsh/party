@@ -9,13 +9,19 @@ class DepartmentActivityPlan_ extends DepartmentActivityPlan
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-//            'user_id' => 0,
+            'initiate_user_id' => 0,
 //            'to_user_id' => 0,
         ],
         array $with = []
     ): array
     {
-        $Obj = DepartmentActivityPlan::with(array_merge($with,['department','user']));
+        $initiate_user_id =& $filter['initiate_user_id'];
+
+        $Obj = DepartmentActivityPlan::with(array_merge($with,['department','initiateUser']));
+
+        if ($initiate_user_id !== null) {
+            $Obj->where('initiate_user_id', $initiate_user_id);
+        }
 
         $total = $Obj->count();
 

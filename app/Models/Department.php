@@ -55,18 +55,4 @@ class Department extends _BaseModel
                 "{$this->parent->path}{$this->parent->id}-";
         }
     }
-
-//    public function getMoreAttribute($value)
-//    {
-//        $value = json_decode($value, true);
-//        if (!$value) return (array)$value;
-//
-//        array_walk($value, function (&$value, $key) {
-//            if ($value) {
-//                $value = json_decode($value);
-//            }
-//        });
-//
-//        return $value;
-//    }
 }

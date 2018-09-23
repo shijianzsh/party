@@ -19,7 +19,7 @@ class DepartmentActivityPlanController extends Controller
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-//                'user_id' => &$filter['user_id'],
+                'initiate_user_id' => &$filter['initiate_user_id'],
 //                'to_user_id' => &$filter['to_user_id'],
             ]
         );

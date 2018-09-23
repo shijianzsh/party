@@ -13,8 +13,8 @@ class DepartmentWorkPlan extends _BaseModel
         return $this->belongsTo('App\Models\Department', 'department_id');
     }
 
-    public function user()
+    public function initiateUser()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo('App\Models\User', 'initiate_user_id');
     }
 }

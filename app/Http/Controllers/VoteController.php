@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\DepartmentWorkPlan_, App\Models\PortalPost_;
+use App\Models\Vote_;
 
-class DepartmentWorkPlanController extends Controller
+class VoteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,16 +15,18 @@ class DepartmentWorkPlanController extends Controller
     public function index(Request $request)
     {
         $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
-        $list = DepartmentWorkPlan_::getWorkPlanList(
+        $list = Vote_::getVoteList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-                'initiate_user_id' => &$filter['initiate_user_id'],
-//                'to_user_id' => &$filter['to_user_id'],
+                'initiate_user_id' =>&$filter['initiate_user_id'],
+                'keyword' => &$filter['keyword'],
+                'start_timestamp' => &$filter['start_timestamp'],
+                'end_timestamp' =>&$filter['end_timestamp'],
             ]
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request];
+        $result = ['success' => 1, 'data' => $list, '$request' => $request, '$filter' => $filter];
         return response()->json($result);
     }
 
@@ -36,7 +38,7 @@ class DepartmentWorkPlanController extends Controller
      */
     public function store(Request $request)
     {
-        $result = DepartmentWorkPlan_::createWorkPlan($request->input('data'));
+        $result = Vote_::createVote($request->input('data'));
         return response()->json($result);
     }
 
@@ -48,9 +50,7 @@ class DepartmentWorkPlanController extends Controller
      */
     public function show($id)
     {
-        $list = DepartmentWorkPlan_::getWorkPlan(
-            $id, []
-        );
+        $list = Vote_::getVote($id);
 
         $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
@@ -65,7 +65,7 @@ class DepartmentWorkPlanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = DepartmentWorkPlan_::updateWorkPlan($id, $request->input('data'));
+        $result = Vote_::updateVote($id, $request->input('data'));
         return response()->json($result);
     }
 
@@ -77,6 +77,6 @@ class DepartmentWorkPlanController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json(DepartmentWorkPlan_::deleteWorkPlan($id));
+        return response()->json(Vote_::deleteVote($id));
     }
 }

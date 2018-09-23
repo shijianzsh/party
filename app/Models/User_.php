@@ -47,6 +47,11 @@ class User_ extends User
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
+    /**
+     * 通过access_token获取当前user_id
+     *
+     * @return int
+     */
     static public function getMyId(): int
     {
         $Obj = new AccessToken();
@@ -190,7 +195,7 @@ class User_ extends User
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null,'getMyId'=>User_::getMyId()];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'getMyId' => User_::getMyId()];
     }
 
     static public function changeDepartment()

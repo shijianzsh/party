@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use DB;
+use Carbon\Carbon;
+
 class Vote_ extends _BaseModel
 {
-    public const TYPE = ['未知类型' => 0, '选举' => 1, '表决' => 2];
-
     static public function getVoteList(
         int $currentPage = 0,
         int $pageSize = 0,
@@ -35,7 +36,6 @@ class Vote_ extends _BaseModel
             });
         }
 
-
         if ($startTimestamp) {
             $Obj->where('started_at', '>=', $startTimestamp);
         }
@@ -61,17 +61,14 @@ class Vote_ extends _BaseModel
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
-    static public function getVote(int $VoteId, bool $getObject = false)
+    static public function getVote(int $voteId, bool $getObject = false)
     {
         $Obj = Vote::with([
             'initiateUser',
-            'options' => function ($query) {
-                $query->with(['results']);
-            },
+            'attendUsersMiddle',
             'attendUsers',
-            'results',
         ])
-            ->findOrFail($VoteId);
+            ->findOrFail($voteId);
 
         if ($getObject) {
             $result = $Obj;
@@ -82,19 +79,76 @@ class Vote_ extends _BaseModel
         return $result;
     }
 
+    static public function getPublicizedVote(int $voteId): array
+    {
+        try {
+            $vote = self::getVote($voteId, true);
+
+            if ($vote->ended_at >= Carbon::now()->timestamp) {
+                throw new \Exception('表决未结束，不可以查看结果');
+            }
+
+            //未公示时
+            if (!$vote->is_publicized) {
+                //未参加投票的人员无权查看结果
+                if (!in_array(User_::getMyId(), $vote->attend_user_ids)) {
+                    throw new \Exception('没有查看表决结果的权限');
+                }
+            }
+            $success = 1;
+            $data = $vote->toArray();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data ?? null];
+    }
+
+    static public function getAttendVote(int $voteId, bool $getObject = false): array
+    {
+        try {
+            $vote = self::getVote($voteId, true);
+
+            if ($vote->started_at >= Carbon::now()->timestamp) {
+                throw new \Exception('表决未开始，不可以参加投票');
+            }
+
+            if ($vote->ended_at <= Carbon::now()->timestamp) {
+                throw new \Exception('表决已结束，不可以参加投票');
+            }
+
+            //未参加投票的人员无权查看结果
+            if (!in_array(User_::getMyId(), $vote->attend_user_ids)) {
+                throw new \Exception('没有投票的权限');
+            }
+
+            //查看当前用户是否已提交过结果
+            $userIdToIsSubmited = array_column($vote->attendUsersMiddle->toArray(), 'is_submited', 'user_id');
+            if ($userIdToIsSubmited[User_::getMyId()]) {
+                throw new \Exception('您已经投过票了，请勿重复投票');
+            }
+
+            $success = 1;
+            $data = $getObject ? $vote : $vote->toArray();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data ?? null];
+    }
+
     static public function createVote(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-//            'initiate_user_id' => 'initiate_user_id',//自动获取
-//            'need_audit' => 'required',
             'title' => 'required',
-            'type' => 'required',
-            'location' => 'required',
-            'opened_at' => 'required',
-//            'ended_at' => 'required',
-            'audit_user_id' => 'required',
-            'leader_ids' => 'required',
+            'initiate_content' => 'required',
+            'is_publicized' => 'required',
+            'started_at' => 'required',
+            'ended_at' => 'required',
             'attend_user_ids' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -102,79 +156,48 @@ class Vote_ extends _BaseModel
                 throw new \Exception($validator->errors()->first());
             }
 
-            if (array_key_exists('ended_at', $requestData)
-                && $requestData['opened_at']
-                && $requestData['ended_at']
-                && $requestData['opened_at'] >= $requestData['ended_at']) {
-                throw new \Exception('会议结束时间不能早于开始时间');
-            }
-            if ($requestData['opened_at'] <= Carbon::now()->timestamp) {
-                throw new \Exception('会议开始时间错误');
-            }
-
-            $Obj = null;
-            DB::transaction(function () use (&$Obj, $requestData) {
-                $Obj = new Vote;
-                $Obj->department_id = User::where('id', User_::getMyId())->first()->department->id;
+            DB::transaction(function () use ($requestData) {
+                $Obj = new Vote();
                 $Obj->initiate_user_id = User_::getMyId();
-                $Obj->need_audit = 1;
                 $Obj->title = $requestData['title'];
-                $Obj->type = $requestData['type'];
-                $Obj->location = $requestData['location'];
-                $Obj->opened_at = $requestData['opened_at'];
-//                $Obj->ended_at = $requestData['ended_at'];
+                $Obj->initiate_content = $requestData['initiate_content'];
+                $Obj->is_publicized = $requestData['is_publicized'];
+                $Obj->started_at = $requestData['started_at'] ?? 0;
+                $Obj->ended_at = $requestData['ended_at'] ?? 0;
+                $Obj->more = [
+                    'files' => $requestData['more_files'] ?? null,
+                ];
                 $Obj->save();
 
-                if ($Obj->need_audit) {
-                    $Obj->audit()
-                        ->create([
-                            'audit_user_id' => $requestData['audit_user_id'],
-                            'status' => VoteAudit::STATUS['未审核']
-                        ]);
-                }
-
-                $saveMany = [];
-                for ($i = 0; $i < count($requestData['leader_ids']); $i++) {
-                    $saveMany[] =
-                        new VoteUser([
-                            'user_id' => $requestData['leader_ids'][$i],
-                            'type' => VoteUser::TYPE['参会领导'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
-                }
+                $createMany = [];
                 for ($i = 0; $i < count($requestData['attend_user_ids']); $i++) {
-                    $saveMany[] =
-                        new VoteUser([
-                            'user_id' => $requestData['attend_user_ids'][$i],
-                            'type' => VoteUser::TYPE['参会人员'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
+                    $createMany[] = [
+                        'vote_id' => $Obj->id,
+                        'user_id' => $requestData['attend_user_ids'][$i],
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
                 }
-                $Obj->attendUsersMiddle()->saveMany($saveMany);
+                VoteUser::insert($createMany);
             });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function updateVote(int $VoteId, array $requestData): array
+    static public function updateVote(int $voteId, array $requestData): array
     {
-        //TODO
-        return [];
         $validator = \Validator::make($requestData, [
-//            'initiate_user_id' => 'initiate_user_id',//自动获取
-//            'need_audit' => 'required',
             'title' => 'required',
-            'type' => 'required',
-            'location' => 'required',
-            'opened_at' => 'required',
-//            'ended_at' => 'required',
-            'audit_user_id' => 'required',
-            'leader_ids' => 'required',
+            'initiate_content' => 'required',
+            'is_publicized' => 'required',
+            'started_at' => 'required',
+            'ended_at' => 'required',
             'attend_user_ids' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -182,78 +205,62 @@ class Vote_ extends _BaseModel
                 throw new \Exception($validator->errors()->first());
             }
 
-            if (array_key_exists('ended_at', $requestData)
-                && $requestData['opened_at']
-                && $requestData['ended_at']
-                && $requestData['opened_at'] >= $requestData['ended_at']) {
-                throw new \Exception('会议结束时间不能早于开始时间');
-            }
-            if ($requestData['opened_at'] <= Carbon::now()->timestamp) {
-                throw new \Exception('会议开始时间错误');
-            }
+            DB::transaction(function () use ($voteId, $requestData) {
+                $Obj = Vote::findOrFail($voteId);
 
-            $Obj = null;
-            DB::transaction(function () use (&$Obj, $requestData) {
-                $Obj = new Vote;
-                $Obj->department_id = User::where('id', User_::getMyId())->first()->department['id'];
+                if ($Obj->started_at < Carbon::now()->timestamp) {
+                    throw new \Exception('表决已经开始，禁止修改操作');
+                }
+                if ($Obj->ended_at < Carbon::now()->timestamp) {
+                    throw new \Exception('表决已经结束，禁止修改操作');
+                }
+
                 $Obj->initiate_user_id = User_::getMyId();
-                $Obj->need_audit = 1;
                 $Obj->title = $requestData['title'];
-                $Obj->type = $requestData['type'];
-                $Obj->location = $requestData['location'];
-                $Obj->opened_at = $requestData['opened_at'];
-//                $Obj->ended_at = $requestData['ended_at'];
+                $Obj->initiate_content = $requestData['initiate_content'];
+                $Obj->is_publicized = $requestData['is_publicized'];
+                $Obj->started_at = $requestData['started_at'] ?? 0;
+                $Obj->ended_at = $requestData['ended_at'] ?? 0;
+                $Obj->more = [
+                    'files' => $requestData['more_files'] ?? null,
+                ];
                 $Obj->save();
 
-                if ($Obj->need_audit) {
-                    $Obj->audit()
-                        ->create([
-                            'audit_user_id' => $requestData['audit_user_id'],
-                            'status' => VoteAudit::STATUS['未审核']
-                        ]);
-                }
-
-                $saveMany = [];
-                for ($i = 0; $i < count($requestData['leader_ids']); $i++) {
-                    $saveMany[] =
-                        new VoteUser([
-                            'user_id' => $requestData['leader_ids'][$i],
-                            'type' => VoteUser::TYPE['参会领导'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
-                }
+                $createMany = [];
                 for ($i = 0; $i < count($requestData['attend_user_ids']); $i++) {
-                    $saveMany[] =
-                        new VoteUser([
-                            'user_id' => $requestData['attend_user_ids'][$i],
-                            'type' => VoteUser::TYPE['参会人员'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
+                    $createMany[] = [
+                        'vote_id' => $Obj->id,
+                        'user_id' => $requestData['attend_user_ids'][$i],
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
                 }
-                $Obj->attendUsersMiddle()->saveMany($saveMany);
+                VoteUser::insert($createMany);
+                VoteUser
+                    ::where('vote_id', $Obj->id)
+                    ->whereNotIn('user_id', $requestData['attend_user_ids'])
+                    ->delete();
             });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function deleteVote(int $VoteId): array
+    static public function deleteVote(int $voteId): array
     {
         try {
-            $Vote = Vote_::getVote($VoteId, true);
+            $vote = self::getVote($voteId, true);
 
-            if ($Vote->started_at <= Carbon::now()->timestamp) {
-                throw new \Exception('选举表决已经开始，不允许删除');
+            if ($vote->started_at <= Carbon::now()->timestamp) {
+                throw new \Exception('表决表决已经开始，不允许删除');
             }
 
-            DB::transaction(function () use ($VoteId) {
-                $Obj = Vote::findOrFail($VoteId);
-                $Obj->options()->delete();
-                $Obj->attendUsers()->delete();
-                $Obj->results()->delete();
+            DB::transaction(function () use ($voteId) {
+                $Obj = Vote::findOrFail($voteId);
+                $Obj->attendUsersMiddle()->delete();
                 $Obj->delete();
             });
         } catch (\Exception $e) {
@@ -261,6 +268,41 @@ class Vote_ extends _BaseModel
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Vote];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $vote ?? null];
+    }
+
+    static public function AttendSubmit(int $voteId, array $requestData)
+    {
+        $validator = \Validator::make($requestData, [
+            'result' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            $getAttendVote = self::getAttendVote($voteId, true);
+            if (!$getAttendVote['success']) {
+                return $getAttendVote;
+            }
+
+            $myId = User_::getMyId();
+
+            DB::transaction(function () use ($myId, $voteId, $requestData) {
+                $voteUser = VoteUser::where('vote_id', $voteId)
+                    ->where('user_id', $myId)
+                    ->where('is_submited', 0)
+                    ->firstOrFail();
+                $voteUser->is_submited = 1;
+                $voteUser->vote_result = $requestData['result'];
+                $voteUser->save();
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 }

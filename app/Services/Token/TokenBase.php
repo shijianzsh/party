@@ -15,7 +15,7 @@ class TokenBase
 {
     private $baseData;
     protected $nowTimestamp;
-    protected $expirationTimestamp = 3600;
+    protected $expirationTimestamp = 3600*2;
     protected $clientIpAddress;
 
     public function __construct()

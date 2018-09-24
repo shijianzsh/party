@@ -37,7 +37,7 @@ class Token extends TokenBase
         }
 
         if ($this->nowTimestamp - (int)$data['timestamp'] > $this->expirationTimestamp) {
-            return ['success' => 0, 'msg' => 'Token verify expiration timestamp error'];
+            return ['success' => 0, 'msg' => 'token令牌过期'];
         }
 
         if ($data['ip'] !== $this->clientIpAddress) {

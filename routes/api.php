@@ -66,7 +66,14 @@ Route::group(['middleware' => [
     Route::post('meetings/{id}/sign_in', 'Meeting@signIn');
     Route::resource('meetings', 'MeetingController');
 
+    Route::get('elections/{id}/publicized', 'Election@getPublicizedElection');
+    Route::get('elections/{id}/attend', 'Election@getAttendElection');
+    Route::post('elections/{id}/attend_submit', 'Election@AttendSubmit');
     Route::resource('elections', 'ElectionController');
+
+    Route::get('votes/{id}/publicized', 'Vote@getPublicizedVote');
+    Route::get('votes/{id}/attend', 'Vote@getAttendVote');
+    Route::post('votes/{id}/attend_submit', 'Vote@AttendSubmit');
     Route::resource('votes', 'VoteController');
 
     Route::resource('exam_categorys', 'ExamCategoryController');

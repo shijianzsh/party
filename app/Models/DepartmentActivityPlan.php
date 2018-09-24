@@ -7,9 +7,9 @@ class DepartmentActivityPlan extends _BaseModel
     protected $casts = [
         'more' => 'json',
     ];
-    protected $appends = ['attend_type_format', 'attend_users_count'];
+    protected $appends = ['type_format', 'attend_users_count', 'attend_user_ids','attend_user_names_format', 'published_at_format'];
 
-    const ATTEND_TYPE = ['未知状态' => 0, '自愿报名' => 1, '下发通知' => 2];
+    const TYPE = ['未知状态' => 0, '自愿报名' => 1, '下发通知' => 2];
 
     public function department()
     {
@@ -38,13 +38,25 @@ class DepartmentActivityPlan extends _BaseModel
         );
     }
 
-    public function getAttendTypeFormatAttribute()
+    public function getTypeFormatAttribute()
     {
-        return array_flip(self::ATTEND_TYPE)[$this->attend_type];
+        return array_flip(self::TYPE)[$this->type];
     }
 
     public function getAttendUsersCountAttribute()
     {
         return $this->attendUsersMiddle()->count();
+    }
+
+    public function getAttendUserIdsAttribute()
+    {
+        $rows = $this->attendUsersMiddle;
+        return $rows ? array_column($rows->toArray(), 'user_id') : [];
+    }
+
+    public function getAttendUserNamesFormatAttribute()
+    {
+        $arr = $this->attendUsers->toArray();
+        return implode(",", array_column($arr, 'name'));
     }
 }

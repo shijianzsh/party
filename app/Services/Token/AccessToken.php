@@ -37,8 +37,15 @@ class AccessToken extends TokenBase
 
         $TokenObj = new Token();
         $verifyAccessToken = $TokenObj->verify($accessToken);
+
         if (!$verifyAccessToken['success']) {
-            $verifyAccessToken['msg'] = 'AccessToken ' . $verifyAccessToken['msg'];
+            switch ($verifyAccessToken['msg']){
+                case 'token令牌过期':
+                    break;
+                default:
+                    $verifyAccessToken['msg'] = 'AccessToken ' . $verifyAccessToken['msg'];
+                    break;
+            }
             return $verifyAccessToken;
         }
         $data = $verifyAccessToken['data'];
@@ -50,6 +57,9 @@ class AccessToken extends TokenBase
         if (!array_key_exists('user_id', $data)) {
             throw new \Exception('AccessToken verify error,code 3');
         }
+
+
+
         $this->userId = $data['user_id'];
 
         $verifyToken = $TokenObj->verify($data['token']);

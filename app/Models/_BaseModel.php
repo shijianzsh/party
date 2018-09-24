@@ -44,6 +44,16 @@ class _BaseModel extends Model
         return $this->finished_at ? date("Y-m-d H:i:s", $this->finished_at) : '';
     }
 
+    public function getStartedAtFormatAttribute()
+    {
+        return $this->started_at ? date("Y-m-d H:i:s", $this->started_at) : '';
+    }
+
+    public function getEndedAtFormatAttribute()
+    {
+        return $this->ended_at ? date("Y-m-d H:i:s", $this->ended_at) : '';
+    }
+
     public function getThumbnailFormatAttribute()
     {
         $more = $this->more;

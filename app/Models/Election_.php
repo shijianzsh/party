@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-class Election_ extends _BaseModel
+use DB;
+use Carbon\Carbon;
+
+class Election_ extends Election
 {
     static public function getElectionList(
         int $currentPage = 0,
@@ -20,7 +23,7 @@ class Election_ extends _BaseModel
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
 
-        $Obj = Election::with(['initiateUser']);
+        $Obj = Election::with(['initiateUser', 'options', 'attendUsersMiddle']);
 
         if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);
@@ -59,17 +62,17 @@ class Election_ extends _BaseModel
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
-    static public function getElection(int $ElectionId, bool $getObject = false)
+    static public function getElection(int $electionId, bool $getObject = false)
     {
         $Obj = Election::with([
             'initiateUser',
             'options' => function ($query) {
-                $query->with(['results']);
+                $query->with(['results', 'contentUser']);
             },
-            'attendUsers',
+            'attendUsersMiddle',
             'results',
         ])
-            ->findOrFail($ElectionId);
+            ->findOrFail($electionId);
 
         if ($getObject) {
             $result = $Obj;
@@ -80,19 +83,76 @@ class Election_ extends _BaseModel
         return $result;
     }
 
+    static public function getPublicizedElection(int $electionId): array
+    {
+        try {
+            $election = self::getElection($electionId, true);
+
+            if ($election->ended_at >= Carbon::now()->timestamp) {
+                throw new \Exception('选举未结束，不可以查看结果');
+            }
+
+            //未公示时
+            if (!$election->is_publicized) {
+                //未参加投票的人员无权查看结果
+                if (!in_array(User_::getMyId(), $election->result_user_ids)) {
+                    throw new \Exception('没有查看选举结果的权限');
+                }
+            }
+            $success = 1;
+            $data = $election->toArray();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data ?? null];
+    }
+
+    static public function getAttendElection(int $electionId, bool $getObject = false): array
+    {
+        try {
+            $election = self::getElection($electionId, true);
+
+            if ($election->started_at >= Carbon::now()->timestamp) {
+                throw new \Exception('选举未开始，不可以参加投票');
+            }
+
+            if ($election->ended_at <= Carbon::now()->timestamp) {
+                throw new \Exception('选举已结束，不可以参加投票');
+            }
+
+            //未参加投票的人员无权查看结果
+            if (!in_array(User_::getMyId(), $election->attend_user_ids)) {
+                throw new \Exception('没有投票的权限');
+            }
+
+            if (in_array(User_::getMyId(), $election->result_user_ids)) {
+                throw new \Exception('您已经投过票了，请勿重复投票');
+            }
+
+            $success = 1;
+            $data = $getObject ? $election : $election->toArray();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data ?? null];
+    }
+
     static public function createElection(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-//            'initiate_user_id' => 'initiate_user_id',//自动获取
-//            'need_audit' => 'required',
             'title' => 'required',
-            'type' => 'required',
-            'location' => 'required',
-            'opened_at' => 'required',
-//            'ended_at' => 'required',
-            'audit_user_id' => 'required',
-            'leader_ids' => 'required',
+            'option_select_count' => 'required',
+            'initiate_content' => 'required',
+            'is_publicized' => 'required',
+            'started_at' => 'required',
+            'ended_at' => 'required',
+            'election_user_ids' => 'required',
             'attend_user_ids' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -100,79 +160,61 @@ class Election_ extends _BaseModel
                 throw new \Exception($validator->errors()->first());
             }
 
-            if (array_key_exists('ended_at', $requestData)
-                && $requestData['opened_at']
-                && $requestData['ended_at']
-                && $requestData['opened_at'] >= $requestData['ended_at']) {
-                throw new \Exception('会议结束时间不能早于开始时间');
-            }
-            if ($requestData['opened_at'] <= Carbon::now()->timestamp) {
-                throw new \Exception('会议开始时间错误');
-            }
-
-            $Obj = null;
-            DB::transaction(function () use (&$Obj, $requestData) {
-                $Obj = new Election;
-                $Obj->department_id = User::where('id', User_::getMyId())->first()->department->id;
+            DB::transaction(function () use ($requestData) {
+                $Obj = new Election();
                 $Obj->initiate_user_id = User_::getMyId();
-                $Obj->need_audit = 1;
                 $Obj->title = $requestData['title'];
-                $Obj->type = $requestData['type'];
-                $Obj->location = $requestData['location'];
-                $Obj->opened_at = $requestData['opened_at'];
-//                $Obj->ended_at = $requestData['ended_at'];
+                $Obj->option_select_count = $requestData['option_select_count'];
+                $Obj->initiate_content = $requestData['initiate_content'];
+                $Obj->is_publicized = $requestData['is_publicized'];
+                $Obj->started_at = $requestData['started_at'] ?? 0;
+                $Obj->ended_at = $requestData['ended_at'] ?? 0;
+                $Obj->more = [
+                    'files' => $requestData['more_files'] ?? null,
+                ];
                 $Obj->save();
 
-                if ($Obj->need_audit) {
-                    $Obj->audit()
-                        ->create([
-                            'audit_user_id' => $requestData['audit_user_id'],
-                            'status' => ElectionAudit::STATUS['未审核']
-                        ]);
+                $createMany = [];
+                for ($i = 0; $i < count($requestData['election_user_ids']); $i++) {
+                    $createMany[] = [
+                        'election_id' => $Obj->id,
+                        'content_user_id' => $requestData['election_user_ids'][$i],
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
                 }
+                ElectionOption::insert($createMany);
 
-                $saveMany = [];
-                for ($i = 0; $i < count($requestData['leader_ids']); $i++) {
-                    $saveMany[] =
-                        new ElectionUser([
-                            'user_id' => $requestData['leader_ids'][$i],
-                            'type' => ElectionUser::TYPE['参会领导'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
-                }
+                $createMany = [];
                 for ($i = 0; $i < count($requestData['attend_user_ids']); $i++) {
-                    $saveMany[] =
-                        new ElectionUser([
-                            'user_id' => $requestData['attend_user_ids'][$i],
-                            'type' => ElectionUser::TYPE['参会人员'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
+                    $createMany[] = [
+                        'election_id' => $Obj->id,
+                        'user_id' => $requestData['attend_user_ids'][$i],
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
                 }
-                $Obj->attendUsersMiddle()->saveMany($saveMany);
+                ElectionUser::insert($createMany);
             });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function updateElection(int $ElectionId, array $requestData): array
+    static public function updateElection(int $electionId, array $requestData): array
     {
-        //TODO
-        return [];
         $validator = \Validator::make($requestData, [
-//            'initiate_user_id' => 'initiate_user_id',//自动获取
-//            'need_audit' => 'required',
             'title' => 'required',
-            'type' => 'required',
-            'location' => 'required',
-            'opened_at' => 'required',
-//            'ended_at' => 'required',
-            'audit_user_id' => 'required',
-            'leader_ids' => 'required',
+            'initiate_content' => 'required',
+            'is_publicized' => 'required',
+            'started_at' => 'required',
+            'ended_at' => 'required',
+            'election_user_ids' => 'required',
             'attend_user_ids' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -180,77 +222,79 @@ class Election_ extends _BaseModel
                 throw new \Exception($validator->errors()->first());
             }
 
-            if (array_key_exists('ended_at', $requestData)
-                && $requestData['opened_at']
-                && $requestData['ended_at']
-                && $requestData['opened_at'] >= $requestData['ended_at']) {
-                throw new \Exception('会议结束时间不能早于开始时间');
-            }
-            if ($requestData['opened_at'] <= Carbon::now()->timestamp) {
-                throw new \Exception('会议开始时间错误');
-            }
+            DB::transaction(function () use ($electionId, $requestData) {
+                $Obj = Election::findOrFail($electionId);
 
-            $Obj = null;
-            DB::transaction(function () use (&$Obj, $requestData) {
-                $Obj = new Election;
-                $Obj->department_id = User::where('id', User_::getMyId())->first()->department['id'];
+                if ($Obj->started_at < Carbon::now()->timestamp) {
+                    throw new \Exception('选举已经开始，禁止修改操作');
+                }
+                if ($Obj->ended_at < Carbon::now()->timestamp) {
+                    throw new \Exception('选举已经结束，禁止修改操作');
+                }
+
                 $Obj->initiate_user_id = User_::getMyId();
-                $Obj->need_audit = 1;
                 $Obj->title = $requestData['title'];
-                $Obj->type = $requestData['type'];
-                $Obj->location = $requestData['location'];
-                $Obj->opened_at = $requestData['opened_at'];
-//                $Obj->ended_at = $requestData['ended_at'];
+                $Obj->option_select_count = $requestData['option_select_count'];
+                $Obj->initiate_content = $requestData['initiate_content'];
+                $Obj->is_publicized = $requestData['is_publicized'];
+                $Obj->started_at = $requestData['started_at'] ?? 0;
+                $Obj->ended_at = $requestData['ended_at'] ?? 0;
+                $Obj->more = [
+                    'files' => $requestData['more_files'] ?? null,
+                ];
                 $Obj->save();
 
-                if ($Obj->need_audit) {
-                    $Obj->audit()
-                        ->create([
-                            'audit_user_id' => $requestData['audit_user_id'],
-                            'status' => ElectionAudit::STATUS['未审核']
-                        ]);
+                $createMany = [];
+                for ($i = 0; $i < count($requestData['election_user_ids']); $i++) {
+                    $createMany[] = [
+                        'election_id' => $Obj->id,
+                        'content_user_id' => $requestData['election_user_ids'][$i],
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
                 }
+                ElectionOption::insert($createMany);
+                ElectionOption
+                    ::where('election_id', $Obj->id)
+                    ->whereNotIn('content_user_id', $requestData['election_user_ids'])
+                    ->delete();
 
-                $saveMany = [];
-                for ($i = 0; $i < count($requestData['leader_ids']); $i++) {
-                    $saveMany[] =
-                        new ElectionUser([
-                            'user_id' => $requestData['leader_ids'][$i],
-                            'type' => ElectionUser::TYPE['参会领导'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
-                }
+                $createMany = [];
                 for ($i = 0; $i < count($requestData['attend_user_ids']); $i++) {
-                    $saveMany[] =
-                        new ElectionUser([
-                            'user_id' => $requestData['attend_user_ids'][$i],
-                            'type' => ElectionUser::TYPE['参会人员'],
-                            'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
-                        ]);
+                    $createMany[] = [
+                        'election_id' => $Obj->id,
+                        'user_id' => $requestData['attend_user_ids'][$i],
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
                 }
-                $Obj->attendUsersMiddle()->saveMany($saveMany);
+                ElectionUser::insert($createMany);
+                ElectionUser
+                    ::where('election_id', $Obj->id)
+                    ->whereNotIn('user_id', $requestData['attend_user_ids'])
+                    ->delete();
             });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function deleteElection(int $ElectionId): array
+    static public function deleteElection(int $electionId): array
     {
         try {
-            $Election = Election_::getElection($ElectionId, true);
+            $Election = Election_::getElection($electionId, true);
 
             if ($Election->started_at <= Carbon::now()->timestamp) {
-                throw new \Exception('选举表决已经开始，不允许删除');
+                throw new \Exception('选举已经开始，不允许删除');
             }
 
-            DB::transaction(function () use ($ElectionId) {
-                $Obj = Election::findOrFail($ElectionId);
+            DB::transaction(function () use ($electionId) {
+                $Obj = Election::findOrFail($electionId);
                 $Obj->options()->delete();
-                $Obj->attendUsers()->delete();
+                $Obj->attendUsersMiddle()->delete();
                 $Obj->results()->delete();
                 $Obj->delete();
             });
@@ -259,6 +303,45 @@ class Election_ extends _BaseModel
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Election];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Election ?? null];
+    }
+
+    static public function AttendSubmit(int $electionId, array $requestData)
+    {
+        $validator = \Validator::make($requestData, [
+            'option_ids' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            $getAttendElection = self::getAttendElection($electionId, true);
+            if (!$getAttendElection['success']) {
+                return $getAttendElection;
+            }
+
+            $myId = User_::getMyId();
+
+            DB::transaction(function () use ($myId, $electionId, $requestData) {
+                $createMany = [];
+                for ($i = 0; $i < count($requestData['option_ids']); $i++) {
+                    $createMany[] = [
+                        'election_id' => $electionId,
+                        'user_id' => $myId,
+                        'option_id' => $requestData['option_ids'][$i],
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
+                }
+                ElectionResult::insert($createMany);
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 }

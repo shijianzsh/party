@@ -4,14 +4,14 @@ namespace App\Models;
 
 class ElectionOption extends _BaseModel
 {
-    public function Election()
+    public function election()
     {
-        return $this->belongsTo('App\Models\Election', 'Election_id');
+        return $this->belongsTo('App\Models\Election', 'election_id');
     }
 
     public function contentUser()
     {
-        return $this->hasOne('App\Models\User', 'content_user_id', 'id');
+        return $this->hasOne('App\Models\User', 'id', 'content_user_id');
     }
 
     public function results()

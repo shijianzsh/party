@@ -51,7 +51,7 @@ class UserController extends Controller
     public function show($id)
     {
         $with = [];
-        $result = ['success' => 1, 'data' => User_::getUser($id, $with)];
+        $result = ['success' => 1, 'data' => User_::getUser($id)];
         return response()->json($result);
     }
 

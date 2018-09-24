@@ -7,6 +7,7 @@ class DepartmentWorkPlan extends _BaseModel
     protected $casts = [
         'more' => 'json',
     ];
+    protected $appends = ['published_at_format'];
 
     public function department()
     {

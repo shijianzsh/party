@@ -17,73 +17,72 @@ use Illuminate\Http\Request;
 //})->middleware(\App\Http\Middleware\Cors::class);
 
 
-Route::get('/', function (Request $request) {
-    return '非法访问';
-});
+Route::namespace('Api')->group(function () {
+    Route::get('/', function (Request $request) {
+        return '非法访问';
+    });
 
-Route::get('/test', 'Test');
-
-Route::get('/pusher', 'Pusher');
-
-Route::get('/token', 'Token');
-Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::class);
-
-
-Route::group(['middleware' => [
-    \App\Http\Middleware\CheckAccessToken::class,
-]], function () {
+    Route::get('/token', 'Token');
+    Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::class);
     Route::post('upload', 'Upload');
 
-    Route::get('departments/{id}/department', 'Meeting@departmentDepartmentList');
-    Route::resource('departments', 'DepartmentController');
+    Route::group(['middleware' => [
+        \App\Http\Middleware\CheckAccessToken::class,
+    ]], function () {
 
-    Route::resource('department_work_plans', 'DepartmentWorkPlanController');
+        Route::get('departments/{id}/department', 'Meeting@departmentDepartmentList');
+        Route::resource('departments', 'DepartmentController');
 
-    Route::resource('department_activity_plans', 'DepartmentActivityPlanController');
+        Route::resource('department_work_plans', 'DepartmentWorkPlanController');
 
-    Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
-    Route::post('users/{id}/change_password', 'User@changePassword');
-    Route::resource('users', 'UserController');
+        Route::resource('department_activity_plans', 'DepartmentActivityPlanController');
 
-    Route::resource('user_payments', 'UserPaymentController');
+        Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
+        Route::post('users/{id}/change_password', 'User@changePassword');
+        Route::resource('users', 'UserController');
 
-    Route::get('articles/published', 'Article@publishedArticleList');
-    Route::get('articles/user', 'Article@userArticleList');
-    Route::get('articles/audit_user', 'Article@auditUserArticleList');
-    Route::get('articles/{id}/check', 'Article@checkArticle');
-    Route::post('articles/{id}/audit', 'Article@audit');
-    Route::resource('articles', 'ArticleController');
+        Route::resource('user_payments', 'UserPaymentController');
 
-    Route::resource('categories', 'CategoryController');
+        Route::get('articles/published', 'Article@publishedArticleList');
+        Route::get('articles/user', 'Article@userArticleList');
+        Route::get('articles/audit_user', 'Article@auditUserArticleList');
+        Route::get('articles/{id}/check', 'Article@checkArticle');
+        Route::post('articles/{id}/audit', 'Article@audit');
+        Route::resource('articles', 'ArticleController');
 
-    Route::get('comments/audit_user', 'Comment@auditUserCommentList');
-    Route::resource('comments', 'CommentController');
+        Route::resource('categories', 'CategoryController');
 
-    Route::get('meetings/department', 'Meeting@departmentMeetingList');
-    Route::get('meetings/attend_user', 'Meeting@attendUserMeetingList');
-    Route::get('meetings/audit_user', 'Meeting@auditUserMeetingList');
-    Route::post('meetings/{id}/audit', 'Meeting@audit');
-    Route::post('meetings/{id}/sign_in', 'Meeting@signIn');
-    Route::resource('meetings', 'MeetingController');
+        Route::get('comments/audit_user', 'Comment@auditUserCommentList');
+        Route::resource('comments', 'CommentController');
 
-    Route::get('elections/{id}/publicized', 'Election@getPublicizedElection');
-    Route::get('elections/{id}/attend', 'Election@getAttendElection');
-    Route::post('elections/{id}/attend_submit', 'Election@AttendSubmit');
-    Route::resource('elections', 'ElectionController');
+        Route::get('meetings/department', 'Meeting@departmentMeetingList');
+        Route::get('meetings/attend_user', 'Meeting@attendUserMeetingList');
+        Route::get('meetings/audit_user', 'Meeting@auditUserMeetingList');
+        Route::post('meetings/{id}/audit', 'Meeting@audit');
+        Route::post('meetings/{id}/sign_in', 'Meeting@signIn');
+        Route::resource('meetings', 'MeetingController');
 
-    Route::get('votes/{id}/publicized', 'Vote@getPublicizedVote');
-    Route::get('votes/{id}/attend', 'Vote@getAttendVote');
-    Route::post('votes/{id}/attend_submit', 'Vote@AttendSubmit');
-    Route::resource('votes', 'VoteController');
+        Route::get('elections/{id}/publicized', 'Election@getPublicizedElection');
+        Route::get('elections/{id}/attend', 'Election@getAttendElection');
+        Route::post('elections/{id}/attend_submit', 'Election@AttendSubmit');
+        Route::resource('elections', 'ElectionController');
 
-    Route::resource('exam_categorys', 'ExamCategoryController');
+        Route::get('votes/{id}/publicized', 'Vote@getPublicizedVote');
+        Route::get('votes/{id}/attend', 'Vote@getAttendVote');
+        Route::post('votes/{id}/attend_submit', 'Vote@AttendSubmit');
+        Route::resource('votes', 'VoteController');
 
-    Route::resource('exam_excels', 'ExamExcelController');
+        Route::resource('exam_categorys', 'ExamCategoryController');
 
-    Route::resource('exam_papers', 'ExamPaperController');
+        Route::resource('exam_excels', 'ExamExcelController');
 
-    Route::post('exam_results/{paperId}/start', 'ExamResult@start');
-    Route::post('exam_results/{id}/submit', 'ExamResult@submit');
-    Route::resource('exam_results', 'ExamResultController');
+        Route::resource('exam_papers', 'ExamPaperController');
+
+        Route::post('exam_results/{paperId}/start', 'ExamResult@start');
+        Route::post('exam_results/{id}/submit', 'ExamResult@submit');
+        Route::resource('exam_results', 'ExamResultController');
+    });
+
+
 });
 

@@ -12,12 +12,15 @@
 */
 
 
-Route::get('/', function () {
-    $flight = new App\Models\PortalPost();
-    $a=$flight->with('audit')->get();
+Route::namespace('Web')->group(function () {
+    Route::get('/index/{is_iframe?}', 'Index@index')->where('is_iframe', '[0-1]+');
+    Route::get('/index/category/{id}', 'Index@category');
+    Route::get('/index/post/{id}', 'Index@post');
 
-    $flight = new App\Models\PortalPostAudit();
-    $b=$flight->with('post')->get();
-
-    return [$a??[],$b];
+    Route::get('/monitor/index', 'Monitor@index');
+    Route::get('/monitor/department', 'Monitor@department');
+    Route::get('/monitor/party_member', 'Monitor@partyMember');
+    Route::get('/monitor/party_business', 'Monitor@partyBusiness');
+    Route::get('/monitor/meeting', 'Monitor@meeting');
+    Route::get('/monitor/learning', 'Monitor@learning');
 });

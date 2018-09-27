@@ -278,9 +278,81 @@ class PortalPost_ extends PortalPost
 
     static public function checkPost(int $postId, array $with = []): array
     {
-        $Obj = PortalPost::with($with)->findOrFail($postId);
+        $Obj = PortalPost
+            ::with($with)
+            //发布约束
+            ->where('is_published', 1)
+            //发布时间约束
+            ->where('published_at', '<', \Carbon\Carbon::now()->timestamp)
+            //审核约束
+            ->where(function ($query) {
+                $query
+                    ->where('need_audit', 0)//不需要审核
+                    ->orWhere(function ($query) {//需要审核同时通过审核
+                        $query
+                            ->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                            });
+                    });
+            })
+            ->findOrFail($postId);
         $Obj->increment('post_hits');
         return $Obj->toArray();
+    }
+
+    /**
+     * 获取相邻的两篇可以浏览的文章（已发表&&通过审核）
+     *
+     * @param  $postId
+     * @return array
+     */
+    static public function getNearPosts(int $postId): array
+    {
+        $last = PortalPost
+            //发布约束
+            ::where('is_published', 1)
+            //发布时间约束
+            ->where('published_at', '<', \Carbon\Carbon::now()->timestamp)
+            //审核约束
+            ->where(function ($query) {
+                $query
+                    ->where('need_audit', 0)//不需要审核
+                    ->orWhere(function ($query) {//需要审核同时通过审核
+                        $query
+                            ->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                            });
+                    });
+            })
+            ->where('id', '<', $postId)
+            ->orderBy('id', 'desc')
+            ->first();
+
+
+        $next = PortalPost
+            //发布约束
+            ::where('is_published', 1)
+            //发布时间约束
+            ->where('published_at', '<', \Carbon\Carbon::now()->timestamp)
+            //审核约束
+            ->where(function ($query) {
+                $query
+                    ->where('need_audit', 0)//不需要审核
+                    ->orWhere(function ($query) {//需要审核同时通过审核
+                        $query
+                            ->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                            });
+                    });
+            })
+            ->where('id', '>', $postId)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        return ['last' => $last ? $last->toArray() : null, 'next' => $next ? $next->toArray() : null];
     }
 
     static public function createPost(array $requestData): array

@@ -119,6 +119,7 @@ class ExamPaper_ extends ExamPaper
                 $finished_at =& $requestData['finished_at'];
 
                 $Obj = new ExamPaper();
+                $Obj->initiate_user_id = User_::getMyId();
                 $Obj->name = $name;
                 $Obj->duration = $duration;
                 $Obj->is_restrict_user = $is_restrict_user;

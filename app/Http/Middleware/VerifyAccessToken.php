@@ -7,7 +7,7 @@ use App\Services\Token\AccessToken;
 use Illuminate\Support\Facades\Response;
 use App\Models\User_;
 
-class CheckAccessToken
+class VerifyAccessToken
 {
     /**
      * Handle an incoming request.

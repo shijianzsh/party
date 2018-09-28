@@ -23,13 +23,13 @@ Route::namespace('Api')->group(function () {
     });
 
     Route::get('/token', 'Token');
-    Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\CheckToken::class);
     Route::post('upload', 'Upload');
 
-    Route::group(['middleware' => [
-        \App\Http\Middleware\CheckAccessToken::class,
-    ]], function () {
+    Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\VerifyToken::class);
 
+    Route::group(['middleware' => [
+        \App\Http\Middleware\VerifyAccessToken::class,
+    ]], function () {
         Route::get('departments/{id}/department', 'Meeting@departmentDepartmentList');
         Route::resource('departments', 'DepartmentController');
 

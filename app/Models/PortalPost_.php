@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\PortalCategory_;
-use DB;
+use DB, Cache;
 
 class PortalPost_ extends PortalPost
 {
@@ -21,7 +21,7 @@ class PortalPost_ extends PortalPost
     ): array
     {
         $categoryId =& $filter['category_id'];
-        $keyWord =& $filter['keyword'];
+        $keyword =& $filter['keyword'];
         $isPublished =& $filter['is_published'];
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
@@ -37,10 +37,26 @@ class PortalPost_ extends PortalPost
         if ($isPublished) {
             $Obj->where('post_status', 1);
             $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+            $Obj->where(function ($query) {//审核约束
+                $query
+                    ->where('need_audit', 0)//不需要审核
+                    ->orWhere(function ($query) {//需要审核同时通过审核
+                        $query
+                            ->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                            });
+                    });
+            });
         }
 
-        if ($keyWord) {
-            $Obj->where('post_title', 'like', "%{$keyWord}%");
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('post_title', 'like', "%{$keyword}%")
+                    ->orWhere('post_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('post_content', 'like', "%{$keyword}%");
+            });
         }
 
         if ($startTimestamp) {
@@ -71,6 +87,12 @@ class PortalPost_ extends PortalPost
         ];
     }
 
+    /**
+     * 获取需要user审核的post列表
+     *
+     * @param  $filter $audit_user_id必须
+     * @return array
+     */
     static public function getAuditUserPostList(
         int $currentPage = 0,
         int $pageSize = 0,
@@ -87,7 +109,7 @@ class PortalPost_ extends PortalPost
     {
         $auditUserId =& $filter['audit_user_id'];
         $categoryId =& $filter['category_id'];
-        $keyWord =& $filter['keyword'];
+        $keyword =& $filter['keyword'];
         $isPublished =& $filter['is_published'];
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
@@ -108,10 +130,26 @@ class PortalPost_ extends PortalPost
         if ($isPublished) {
             $Obj->where('post_status', 1);
             $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+            $Obj->where(function ($query) {//审核约束
+                $query
+                    ->where('need_audit', 0)//不需要审核
+                    ->orWhere(function ($query) {//需要审核同时通过审核
+                        $query
+                            ->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                            });
+                    });
+            });
         }
 
-        if ($keyWord) {
-            $Obj->where('post_title', 'like', "%{$keyWord}%");
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('post_title', 'like', "%{$keyword}%")
+                    ->orWhere('post_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('post_content', 'like', "%{$keyword}%");
+            });
         }
 
         if ($startTimestamp) {
@@ -123,7 +161,6 @@ class PortalPost_ extends PortalPost
         }
 
         $total = $Obj->count();
-
 
         if ($currentPage) {
             $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
@@ -142,11 +179,17 @@ class PortalPost_ extends PortalPost
         ];
     }
 
+    /**
+     * 获取user发布的post列表
+     *
+     * @param  $filter $user_id必须
+     * @return array
+     */
     static public function getUserPostList(
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-            'audit_user_id' => null,
+            'user_id' => null,
             'category_id' => 0,
             'is_published' => null,
             'keyword' => "",
@@ -158,8 +201,8 @@ class PortalPost_ extends PortalPost
     {
         $userId =& $filter['user_id'];
         $categoryId =& $filter['category_id'];
-        $keyWord =& $filter['keyword'];
         $isPublished =& $filter['is_published'];
+        $keyword =& $filter['keyword'];
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
 
@@ -176,10 +219,26 @@ class PortalPost_ extends PortalPost
         if ($isPublished) {
             $Obj->where('post_status', 1);
             $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+            $Obj->where(function ($query) {//审核约束
+                $query
+                    ->where('need_audit', 0)//不需要审核
+                    ->orWhere(function ($query) {//需要审核同时通过审核
+                        $query
+                            ->where('need_audit', 1)
+                            ->whereHas('audit', function ($query) {
+                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                            });
+                    });
+            });
         }
 
-        if ($keyWord) {
-            $Obj->where('post_title', 'like', "%{$keyWord}%");
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('post_title', 'like', "%{$keyword}%")
+                    ->orWhere('post_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('post_content', 'like', "%{$keyword}%");
+            });
         }
 
         if ($startTimestamp) {
@@ -210,7 +269,12 @@ class PortalPost_ extends PortalPost
         ];
     }
 
-
+    /**
+     * 获取发布的且通过审核逻辑的文章 根据发布日期 置顶 排序
+     *
+     * @param
+     * @return array
+     */
     static public function getPublishedPostList(
         int $currentPage = 0,
         int $pageSize = 0,
@@ -224,7 +288,7 @@ class PortalPost_ extends PortalPost
     ): array
     {
         $categoryId =& $filter['category_id'];
-        $keyWord =& $filter['keyword'];
+        $keyword =& $filter['keyword'];
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
 
@@ -232,6 +296,19 @@ class PortalPost_ extends PortalPost
 
         $Obj->where('post_status', 1);
         $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+        $Obj->orderBy('published_at', 'desc');//根据发布日期排序
+        $Obj->orderBy('is_top', 'desc');//根据是否置顶排序
+        $Obj->where(function ($query) {//审核约束
+            $query
+                ->where('need_audit', 0)//不需要审核
+                ->orWhere(function ($query) {//需要审核同时通过审核
+                    $query
+                        ->where('need_audit', 1)
+                        ->whereHas('audit', function ($query) {
+                            $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                        });
+                });
+        });
 
         if ($categoryId) {
             $Obj->whereHas('categorys', function ($query) use ($categoryId) {
@@ -239,8 +316,13 @@ class PortalPost_ extends PortalPost
             });
         }
 
-        if ($keyWord) {
-            $Obj->where('post_title', 'like', "%{$keyWord}%");
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('post_title', 'like', "%{$keyword}%")
+                    ->orWhere('post_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('post_content', 'like', "%{$keyword}%");
+            });
         }
 
         if ($startTimestamp) {
@@ -252,7 +334,6 @@ class PortalPost_ extends PortalPost
         }
 
         $total = $Obj->count();
-
 
         if ($currentPage) {
             $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
@@ -266,9 +347,41 @@ class PortalPost_ extends PortalPost
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(),
+        return [
+            'rows' => $get->toArray(),
             'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
         ];
+    }
+
+    /**
+     * 通过category_id获取发布的且通过审核逻辑的文章
+     * 增加了缓存
+     *
+     * @param
+     * @return array
+     */
+    static public function getCategoryPublishedPostList(int $categoryId, int $postNumber = 0): array
+    {
+        //数量不传的情况下获取所有文章
+        $postNumber = !$postNumber ? 9999 : $postNumber;
+
+        $cacheName = "CategoryPublishedPostList_{$categoryId}_$postNumber";
+        $cacheMinutes = 1;
+
+        if (env('APP_USE_CACHE')) {
+            $result = array_merge(
+                ['category' => PortalCategory_::getCategory($categoryId)],
+                self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
+            );
+        } else {
+            $result = Cache::remember($cacheName, $cacheMinutes, function () use ($categoryId, $postNumber) {
+                return array_merge(
+                    ['category' => PortalCategory_::getCategory($categoryId)],
+                    self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
+                );
+            });
+        }
+        return $result;
     }
 
     static public function getPost(int $postId, array $with = []): array
@@ -281,7 +394,7 @@ class PortalPost_ extends PortalPost
         $Obj = PortalPost
             ::with($with)
             //发布约束
-            ->where('is_published', 1)
+            ->where('post_status', 1)
             //发布时间约束
             ->where('published_at', '<', \Carbon\Carbon::now()->timestamp)
             //审核约束
@@ -311,7 +424,7 @@ class PortalPost_ extends PortalPost
     {
         $last = PortalPost
             //发布约束
-            ::where('is_published', 1)
+            ::where('post_status', 1)
             //发布时间约束
             ->where('published_at', '<', \Carbon\Carbon::now()->timestamp)
             //审核约束
@@ -333,7 +446,7 @@ class PortalPost_ extends PortalPost
 
         $next = PortalPost
             //发布约束
-            ::where('is_published', 1)
+            ::where('post_status', 1)
             //发布时间约束
             ->where('published_at', '<', \Carbon\Carbon::now()->timestamp)
             //审核约束

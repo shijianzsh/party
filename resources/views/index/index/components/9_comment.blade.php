@@ -11,17 +11,17 @@
             <!--单选框-->
             <div class="RadioStyle">
                 <div class="Block PaddingL">
-                    <input type="radio" name="Storage" id="model1" checked/>
+                    <input type="radio" name="Storage" id="model1" checked />
                     <label for="model1">上级党组织</label>
-                    <input type="radio" name="Storage" id="model2"/>
+                    <input type="radio" name="Storage" id="model2" />
                     <label for="model2">党员信箱</label>
-                    <input type="radio" name="Storage" id="model3"/>
+                    <input type="radio" name="Storage" id="model3" />
                     <label for="model3">顶层党组织</label>
-                    <input type="radio" name="Storage" id="model4"/>
+                    <input type="radio" name="Storage" id="model4" />
                     <label for="model4">公开所有党员</label>
-                    <input type="radio" name="Storage" id="model5"/>
+                    <input type="radio" name="Storage" id="model5" />
                     <label for="model5">同组织成员</label>
-                    <input type="radio" name="Storage" id="model6"/>
+                    <input type="radio" name="Storage" id="model6" />
                     <label for="model6">下级党组织</label>
                 </div>
                 <!--复选框-->
@@ -45,13 +45,7 @@
             <div class="clearfix"></div>
             <input style="margin: 5px 5px; width: 508px;" class="form-input" type="file">
             <div class="clearfix"></div>
-            <div style="margin-top: 145px; padding: 0 5px; width: 522px;"><a href="#"><img
-                            style="float: left;"
-                            src="/static/index/images/zxly_ann01.png"
-                            alt=""/></a><a
-                        href="#"><img style="float: right;" src="/static/index/images/zxly_ann02.png"
-                                      alt=""/></a>
-            </div>
+            <div style="margin-top: 145px; padding: 0 5px; width: 522px;"><a href="#"><img style="float: left;" src="static/images/zxly_ann01.png" alt=""/></a><a href="#"><img style="float: right;" src="static/images/zxly_ann02.png" alt=""/></a></div>
         </div>
     </div>
 </div>

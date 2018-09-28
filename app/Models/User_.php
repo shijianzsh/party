@@ -48,7 +48,8 @@ class User_ extends User
     }
 
     /**
-     * 通过access_token获取当前user_id
+     * 获取当前user_id
+     * user_id来源于 VerifyAccessToken中间件验证成功后写入session
      *
      * @return int
      */

@@ -5,6 +5,12 @@
     <title>智慧党建网站</title>
     <link rel="stylesheet" href="/static/index/css/public.css"/>
     <link rel="stylesheet" href="/static/index/css/style.css"/>
+
+    <script type="text/javascript" src="/static/common/lib/vue/vue.min.js"></script>
+    <script type="text/javascript" src="/static/index/js/jquery1.42.min.js"></script>
+
+    <link rel="stylesheet" href="http://unpkg.com/iview/dist/styles/iview.css">
+    <script src="http://unpkg.com/iview/dist/iview.min.js"></script>
 </head>
 <body>
 
@@ -12,16 +18,13 @@
     <strong>Whoops!</strong> Something went wrong!
 @endcomponent
 
-<div class="top_bg"></div>
-
 @yield('content')
 
-<!--footer-->
 @component('index.layout.components.footer')
     <strong>Whoops!</strong> Something went wrong!
 @endcomponent
 
-<script type="text/javascript" src="/static/index/js/jquery1.42.min.js"></script>
+
 <script type="text/javascript" src="/static/index/js/jquery.superslide.2.1.1.js"></script>
 <script src="/static/index/js/jquery_flexslider.js"></script>
 
@@ -45,5 +48,15 @@
     });
     jQuery(".slideGroup").slide({titCell: ".parHd li", mainCell: ".parBd"});
 </script>
+
+<script>
+    function jumpToPost(id) {
+        window.location.href = "/index/post/" + id;
+    }
+    function jumpToCategory(id) {
+        window.location.href = "/index/category/" + id;
+    }
+</script>
+
 </body>
 </html>

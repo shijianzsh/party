@@ -47,3 +47,14 @@ function getCategoryUrl($category): string
 
     return "/index/category/{$id}";
 }
+
+/**
+ * 通过category_id获取发布的且通过审核逻辑的文章
+ *
+ * @param
+ * @return array
+ */
+function getCategoryPublishedPostList(int $categoryId, int $postNumber = 0): array
+{
+    return \App\Models\PortalPost_::getCategoryPublishedPostList($categoryId, $postNumber);
+}

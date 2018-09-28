@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use App\Services\Token\Token;
 
-class CheckToken
+class VerifyToken
 {
     /**
      * Handle an incoming request.

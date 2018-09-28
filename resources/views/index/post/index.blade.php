@@ -7,28 +7,28 @@
                 <div class="content_tp">
                     <div class="shouye">
                         <img src="/static/index/picture/ico5.png"/>
-                        <a href="#">首页</a> <em>></em>
-                        <a href="#" class="cur">代表委员之声</a>
+                        <a href="/index">首页</a> <em>></em>
+                        <a href="{{getCategoryUrl($post['category_id'])}}" class="cur">{{$post['category_name']}}</a>
                     </div>
                 </div>
                 <div class="content_com">
-                    <h2>{{$data['post_title']}}</h2>
+                    <h2>{{$post['post_title']}}</h2>
 
-                    @if (!empty($data['post_excerpt']))
-                        <h3>{{$data['post_excerpt']}}</h3>
+                    @if (!empty($post['post_excerpt']))
+                        <h3>{{$post['post_excerpt']}}</h3>
                     @endif
 
                     <div class="con_xx">
-                        <span>发布日期：{{$data['published_at_format']}}</span>
+                        <span>发布日期：{{$post['published_at_format']}}</span>
 
-                        @if (!empty($data['post_source']))
-                            <span>来源：{{$data['post_source']}}</span>
+                        @if (!empty($post['post_source']))
+                            <span>来源：{{$post['post_source']}}</span>
                         @endif
 
-                        <span>浏览量: {{$data['post_hits']}}</span>
+                        <span>浏览量: {{$post['post_hits']}}</span>
                     </div>
 
-                    {{$data['post_content']}}
+                    {{$post['post_content']}}
 
                     <div class="con_bm cleafix">
                         <a href="javascript:goTop();" class="gotop">顶部</a>

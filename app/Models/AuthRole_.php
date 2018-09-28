@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class UserRole extends _BaseModel
+class AuthRole_ extends AuthRole
 {
     //TODO
 }

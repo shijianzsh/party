@@ -67,9 +67,10 @@ class PortalPost extends _BaseModel
     {
         switch ($this->need_audit) {
             case 1:
-                return (bool)$this->audit
-                    ? $this->audit->status === PortalPostAudit::STATUS['通过'] ? '通过' : '未通过'
-                    : '未审核';
+                if (empty($this->audit)) {
+                    return '获取审核信息失败';
+                }
+                return array_flip(PortalPostAudit::STATUS)[$this->audit->status];
             default:
                 return '无需审核';
         }

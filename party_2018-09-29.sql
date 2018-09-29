@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 8.0.12)
 # Database: party
-# Generation Time: 2018-09-28 16:09:01 +0000
+# Generation Time: 2018-09-29 04:09:49 +0000
 # ************************************************************
 
 
@@ -28,17 +28,131 @@ DROP TABLE IF EXISTS `par_auth_map`;
 
 CREATE TABLE `par_auth_map` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '权限map表',
-  `request_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'required.请求类型:get;post等',
+  `method` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'required.route类型:resource;get;post等',
   `namespace` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'required.命名空间:api;web.',
   `entrance` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'required.route中主要的参数，resource路由中的唯一参数。',
   `param_1` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'required.主参数后第一个参数，为变量时填写"?"',
   `param_2` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'not required.主参数后第一个参数，为变量时填写"?"',
+  `param_3` varchar(255) DEFAULT NULL,
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'not required.描述',
   `created_at` int(11) unsigned NOT NULL,
   `updated_at` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `par_auth_map` WRITE;
+/*!40000 ALTER TABLE `par_auth_map` DISABLE KEYS */;
+
+INSERT INTO `par_auth_map` (`id`, `method`, `namespace`, `entrance`, `param_1`, `param_2`, `param_3`, `description`, `created_at`, `updated_at`)
+VALUES
+	(1,'get','api','token',NULL,NULL,NULL,NULL,0,0),
+	(2,'post','api','upload',NULL,NULL,NULL,NULL,0,0),
+	(3,'post','api','login',NULL,NULL,NULL,NULL,0,0),
+	(4,'post','api','departments','?','department',NULL,'Department@departmentDepartmentList',0,0),
+	(5,'get','api','departments',NULL,NULL,NULL,'resource index',0,0),
+	(6,'get','api','departments','?',NULL,NULL,'resource show',0,0),
+	(7,'post','api','departments','?',NULL,NULL,'resource store',0,0),
+	(8,'put','api','departments','?',NULL,NULL,'resource update',0,0),
+	(9,'delete','api','departments','?',NULL,NULL,'resource destroy',0,0),
+	(11,'get','api','department_work_plans',NULL,NULL,NULL,'resource index',0,0),
+	(12,'get','api','department_work_plans','?',NULL,NULL,'resource show',0,0),
+	(13,'post','api','department_work_plans','?',NULL,NULL,'resource store',0,0),
+	(14,'put','api','department_work_plans','?',NULL,NULL,'resource update',0,0),
+	(15,'delete','api','department_work_plans','?',NULL,NULL,'resource destroy',0,0),
+	(16,'get','api','department_activity_plans',NULL,NULL,NULL,'resource index',0,0),
+	(17,'get','api','department_activity_plans','?',NULL,NULL,'resource show',0,0),
+	(18,'post','api','department_activity_plans','?',NULL,NULL,'resource store',0,0),
+	(19,'put','api','department_activity_plans','?',NULL,NULL,'resource update',0,0),
+	(20,'delete','api','department_activity_plans','?',NULL,NULL,'resource destroy',0,0),
+	(21,'get','api','user_payments',NULL,NULL,NULL,'resource index',0,0),
+	(22,'get','api','user_payments','?',NULL,NULL,'resource show',0,0),
+	(23,'post','api','user_payments','?',NULL,NULL,'resource store',0,0),
+	(24,'put','api','user_payments','?',NULL,NULL,'resource update',0,0),
+	(25,'delete','api','user_payments','?',NULL,NULL,'resource destroy',0,0),
+	(26,'get','api','articles',NULL,NULL,NULL,'resource index',0,0),
+	(27,'get','api','articles','?',NULL,NULL,'resource show',0,0),
+	(28,'post','api','articles','?',NULL,NULL,'resource store',0,0),
+	(29,'put','api','articles','?',NULL,NULL,'resource update',0,0),
+	(30,'delete','api','articles','?',NULL,NULL,'resource destroy',0,0),
+	(31,'get','api','categories',NULL,NULL,NULL,'resource index',0,0),
+	(32,'get','api','categories','?',NULL,NULL,'resource show',0,0),
+	(33,'post','api','categories','?',NULL,NULL,'resource store',0,0),
+	(34,'put','api','categories','?',NULL,NULL,'resource update',0,0),
+	(35,'delete','api','categories','?',NULL,NULL,'resource destroy',0,0),
+	(36,'get','api','comments',NULL,NULL,NULL,'resource index',0,0),
+	(37,'get','api','comments','?',NULL,NULL,'resource show',0,0),
+	(38,'post','api','comments','?',NULL,NULL,'resource store',0,0),
+	(39,'put','api','comments','?',NULL,NULL,'resource update',0,0),
+	(40,'delete','api','comments','?',NULL,NULL,'resource destroy',0,0),
+	(41,'get','api','meetings',NULL,NULL,NULL,'resource index',0,0),
+	(42,'get','api','meetings','?',NULL,NULL,'resource show',0,0),
+	(43,'post','api','meetings','?',NULL,NULL,'resource store',0,0),
+	(44,'put','api','meetings','?',NULL,NULL,'resource update',0,0),
+	(45,'delete','api','meetings','?',NULL,NULL,'resource destroy',0,0),
+	(46,'get','api','elections',NULL,NULL,NULL,'resource index',0,0),
+	(47,'get','api','elections','?',NULL,NULL,'resource show',0,0),
+	(48,'post','api','elections','?',NULL,NULL,'resource store',0,0),
+	(49,'put','api','elections','?',NULL,NULL,'resource update',0,0),
+	(50,'delete','api','elections','?',NULL,NULL,'resource destroy',0,0),
+	(51,'get','api','votes',NULL,NULL,NULL,'resource index',0,0),
+	(52,'get','api','votes','?',NULL,NULL,'resource show',0,0),
+	(53,'post','api','votes','?',NULL,NULL,'resource store',0,0),
+	(54,'put','api','votes','?',NULL,NULL,'resource update',0,0),
+	(55,'delete','api','votes','?',NULL,NULL,'resource destroy',0,0),
+	(56,'get','api','exam_categorys',NULL,NULL,NULL,'resource index',0,0),
+	(57,'get','api','exam_categorys','?',NULL,NULL,'resource show',0,0),
+	(58,'post','api','exam_categorys','?',NULL,NULL,'resource store',0,0),
+	(59,'put','api','exam_categorys','?',NULL,NULL,'resource update',0,0),
+	(60,'delete','api','exam_categorys','?',NULL,NULL,'resource destroy',0,0),
+	(61,'get','api','exam_excels',NULL,NULL,NULL,'resource index',0,0),
+	(62,'get','api','exam_excels','?',NULL,NULL,'resource show',0,0),
+	(63,'post','api','exam_excels','?',NULL,NULL,'resource store',0,0),
+	(64,'put','api','exam_excels','?',NULL,NULL,'resource update',0,0),
+	(65,'delete','api','exam_excels','?',NULL,NULL,'resource destroy',0,0),
+	(66,'get','api','exam_papers',NULL,NULL,NULL,'resource index',0,0),
+	(67,'get','api','exam_papers','?',NULL,NULL,'resource show',0,0),
+	(68,'post','api','exam_papers','?',NULL,NULL,'resource store',0,0),
+	(69,'put','api','exam_papers','?',NULL,NULL,'resource update',0,0),
+	(70,'delete','api','exam_papers','?',NULL,NULL,'resource destroy',0,0),
+	(71,'get','api','exam_results',NULL,NULL,NULL,'resource index',0,0),
+	(72,'get','api','exam_results','?',NULL,NULL,'resource show',0,0),
+	(73,'post','api','exam_results','?',NULL,NULL,'resource store',0,0),
+	(74,'put','api','exam_results','?',NULL,NULL,'resource update',0,0),
+	(75,'delete','api','exam_results','?',NULL,NULL,'resource destroy',0,0),
+	(76,'get','api','auth_map',NULL,NULL,NULL,'resource index',0,0),
+	(77,'get','api','auth_map','?',NULL,NULL,'resource show',0,0),
+	(78,'post','api','auth_map','?',NULL,NULL,'resource store',0,0),
+	(79,'put','api','auth_map','?',NULL,NULL,'resource update',0,0),
+	(80,'delete','api','auth_map','?',NULL,NULL,'resource destroy',0,0),
+	(81,'get','api','auth_role',NULL,NULL,NULL,'resource index',0,0),
+	(82,'get','api','auth_role','?',NULL,NULL,'resource show',0,0),
+	(83,'post','api','auth_role','?',NULL,NULL,'resource store',0,0),
+	(84,'put','api','auth_role','?',NULL,NULL,'resource update',0,0),
+	(85,'delete','api','auth_role','?',NULL,NULL,'resource destroy',0,0),
+	(86,'get','api','users','?','party_info',NULL,'User@getUserWithPartyInfo',0,0),
+	(87,'post','api','users','?','change_password',NULL,'User@changePassword',0,0),
+	(88,'get','api','articles','published',NULL,NULL,'Article@publishedArticleList',0,0),
+	(89,'get','api','articles','user',NULL,NULL,'Article@userArticleList',0,0),
+	(90,'get','api','articles','audit_user',NULL,NULL,'Article@auditUserArticleList',0,0),
+	(91,'get','api','articles','?','check',NULL,'Article@checkArticle',0,0),
+	(92,'post','api','articles','?','audit',NULL,'Article@audit',0,0),
+	(93,'get','api','comments','audit_user',NULL,NULL,'Comment@auditUserCommentList',0,0),
+	(94,'get','api','meetings','department',NULL,NULL,'Meeting@departmentMeetingList',0,0),
+	(95,'get','api','meetings','attend_user',NULL,NULL,'Meeting@attendUserMeetingList',0,0),
+	(96,'get','api','meetings','audit_user',NULL,NULL,'Meeting@auditUserMeetingList',0,0),
+	(97,'post','api','meetings','?','audit',NULL,'Meeting@audit',0,0),
+	(98,'post','api','meetings','?','sign_in',NULL,'Meeting@signIn',0,0),
+	(99,'get','api','elections','?','publicized',NULL,'Election@getPublicizedElection',0,0),
+	(100,'get','api','elections','?','attend',NULL,'Election@getAttendElection',0,0),
+	(101,'post','api','elections','?','attend_submit',NULL,'Election@AttendSubmit',0,0),
+	(102,'get','api','votes','?','publicized',NULL,'Vote@getPublicizedVote',0,0),
+	(103,'get','api','votes','?','attend',NULL,'Vote@getAttendVote',0,0),
+	(104,'post','api','votes','?','attend_submit',NULL,'Vote@AttendSubmit',0,0),
+	(105,'post','api','exam_results','?','start',NULL,'ExamResult@start',0,0),
+	(106,'post','api','exam_results','?','submit',NULL,'ExamResult@submit',0,0);
+
+/*!40000 ALTER TABLE `par_auth_map` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table par_auth_role
@@ -54,6 +168,16 @@ CREATE TABLE `par_auth_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `par_auth_role` WRITE;
+/*!40000 ALTER TABLE `par_auth_role` DISABLE KEYS */;
+
+INSERT INTO `par_auth_role` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+	(1,'测试role1',1,1),
+	(2,'测试role2',1,1);
+
+/*!40000 ALTER TABLE `par_auth_role` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table par_auth_role_map
@@ -70,6 +194,18 @@ CREATE TABLE `par_auth_role_map` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `par_auth_role_map` WRITE;
+/*!40000 ALTER TABLE `par_auth_role_map` DISABLE KEYS */;
+
+INSERT INTO `par_auth_role_map` (`id`, `auth_role_id`, `auth_map_id`, `created_at`, `updated_at`)
+VALUES
+	(1,1,1,0,0),
+	(2,1,2,0,0),
+	(3,2,2,0,0),
+	(4,2,3,0,0);
+
+/*!40000 ALTER TABLE `par_auth_role_map` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table par_auth_role_user
@@ -86,6 +222,16 @@ CREATE TABLE `par_auth_role_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `par_auth_role_user` WRITE;
+/*!40000 ALTER TABLE `par_auth_role_user` DISABLE KEYS */;
+
+INSERT INTO `par_auth_role_user` (`id`, `auth_role_id`, `user_id`, `created_at`, `updated_at`)
+VALUES
+	(1,1,1,1,1),
+	(2,2,1,1,1);
+
+/*!40000 ALTER TABLE `par_auth_role_user` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table par_department

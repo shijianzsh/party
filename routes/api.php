@@ -30,7 +30,11 @@ Route::namespace('Api')->group(function () {
     Route::group(['middleware' => [
         \App\Http\Middleware\VerifyAccessToken::class,
     ]], function () {
-        Route::get('departments/{id}/department', 'Meeting@departmentDepartmentList');
+        Route::resource('auth_map', 'AuthMapController');
+
+        Route::resource('auth_role', 'AuthRoleController');
+
+        Route::get('departments/{id}/department', 'Department@departmentDepartmentList');
         Route::resource('departments', 'DepartmentController');
 
         Route::resource('department_work_plans', 'DepartmentWorkPlanController');

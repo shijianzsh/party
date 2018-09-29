@@ -11,6 +11,7 @@
 |
 */
 
+Route::get('/test', 'Test@index');
 
 Route::namespace('Web')->group(function () {
     Route::get('/index/{is_iframe?}', 'Index@index')->where('is_iframe', '[0-1]+');

@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\UserComment;
+use App\Models\UserAuthMap;
 use Illuminate\Http\Request;
-use  App\Models\UserComment_;
+use  App\Models\AuthMap_;
 use Illuminate\Support\Facades\Crypt;
 use Gate;
 
 class AuthMapController extends \App\Http\Controllers\Controller
 {
-    //TODO
     /**
      * Display a listing of the resource.
      *
@@ -19,12 +18,11 @@ class AuthMapController extends \App\Http\Controllers\Controller
     public function index(Request $request)
     {
         $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
-        $list = UserComment_::getCommentList(
+        $list = AuthMap_::getAuthMapList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-                'user_id' => &$filter['user_id'],
-                'to_user_id' => &$filter['to_user_id'],
+                'keyword' => &$filter['keyword'],
             ]
         );
 
@@ -40,7 +38,7 @@ class AuthMapController extends \App\Http\Controllers\Controller
      */
     public function store(Request $request)
     {
-        $result = UserComment_::createComment($request->input('data'));
+        $result = AuthMap_::createAuthMap($request->input('data'));
         return response()->json($result);
     }
 
@@ -52,7 +50,7 @@ class AuthMapController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $row = UserComment_::getComment($id, []);
+        $row = AuthMap_::getAuthMap($id, []);
 
         $result = ['success' => 1, 'data' => $row];
         return response()->json($result);
@@ -66,7 +64,7 @@ class AuthMapController extends \App\Http\Controllers\Controller
      */
     public function update(Request $request, $id)
     {
-        $result = UserComment_::updateComment($id, $request->input('data'));
+        $result = AuthMap_::updateAuthMap($id, $request->input('data'));
         return response()->json($result);
     }
 
@@ -78,6 +76,6 @@ class AuthMapController extends \App\Http\Controllers\Controller
      */
     public function destroy($id)
     {
-        return response()->json(UserComment_::deleteComment($id));
+        return response()->json(AuthMap_::deleteAuthMap($id));
     }
 }

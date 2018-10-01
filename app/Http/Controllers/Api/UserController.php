@@ -22,7 +22,9 @@ class UserController extends \App\Http\Controllers\Controller
             $request->input('page_size', 0),
             [
                 'department_id' => &$filter['department_id'],
-                'type' => &$filter['type'],
+                'keyword' => &$filter['keyword'],
+                'start_timestamp' => &$filter['start_timestamp'],
+                'end_timestamp' => &$filter['end_timestamp'],
             ],
             []
         );

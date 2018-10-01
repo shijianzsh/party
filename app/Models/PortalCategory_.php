@@ -21,11 +21,11 @@ class PortalCategory_ extends PortalCategory
 
         $Obj = PortalCategory::with($with);
 
-        if ($parentId !== null) {
+        if (!empty($parentId)) {
             $Obj->where('parent_id', $parentId);
         }
 
-        if ($keyword !== null) {
+        if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
                 $query->where('post_title', 'like', "%{$keyword}%")
                     ->orWhere('post_excerpt', 'like', "%{$keyword}%")
@@ -57,6 +57,37 @@ class PortalCategory_ extends PortalCategory
         $get = $Obj->findOrFail($categoryId);
 
         return $getObject ? $get : $get->toArray();
+    }
+
+    static public function getCategoryChildrenAndPublishedArticleList(int $categoryId): array
+    {
+        try {
+            $data = self::getCategory($categoryId, false, ['children' => function ($query) {
+                $query->with(['posts' => function ($query) {
+                    $query->where('post_status', 1);
+                    $query->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+                    $query->orderBy('published_at', 'desc');//根据发布日期排序
+                    $query->orderBy('is_top', 'desc');//根据是否置顶排序
+                    $query->where(function ($query) {//审核约束
+                        $query
+                            ->where('need_audit', 0)//不需要审核
+                            ->orWhere(function ($query) {//需要审核同时通过审核
+                                $query
+                                    ->where('need_audit', 1)
+                                    ->whereHas('audit', function ($query) {
+                                        $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                    });
+                            });
+                    });
+                }]);
+            }]);
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data ?? null];
+
     }
 
     static public function createCategory(array $requestData): array

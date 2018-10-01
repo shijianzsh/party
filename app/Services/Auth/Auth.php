@@ -10,6 +10,7 @@ namespace App\Services\Auth;
 
 use App\Models\User_, App\Models\AuthMap_, App\Models\AuthRole_;
 use Illuminate\Http\Request;
+use DB, Cache;
 
 class Auth
 {
@@ -35,16 +36,28 @@ class Auth
         return $this->userId ? $this->userId : User_::getMyId();
     }
 
-    public function get(): array
+    public function getAuths(): array
     {
         $userId = $this->getUserId();
-        return AuthMap_::getUserAuth($userId);
+
+        if (!env('APP_USE_CACHE')) {
+            $result = AuthMap_::getUserAuth($userId);
+        } else {
+            $cacheName = "getAuths_{$userId}";
+            $cacheMinutes = 120;
+
+            $result = Cache::tags(['auth', 'getAuths'])
+                ->remember($cacheName, $cacheMinutes, function () use ($userId) {
+                    return AuthMap_::getUserAuth($userId);
+                });
+        }
+        return $result;
     }
 
-    public function verify(string $method, string $path)
+    public function verify(string $method, string $path): bool
     {
         $requestMethod = strtolower($this->request->method());
 
-        return $this->verifyAuths($requestMethod, $path, $this->get());
+        return $this->verifyAuths($requestMethod, $path, $this->getAuths());
     }
 }

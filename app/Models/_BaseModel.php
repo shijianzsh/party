@@ -11,7 +11,7 @@ class _BaseModel extends Model
 
     protected $dateFormat = 'U';
     protected $appends = ['created_at_format'];
-    const PAGE_SIZE = 6;
+    const PAGE_SIZE = 10;
 
     public function getTable()
     {

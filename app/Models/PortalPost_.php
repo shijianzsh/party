@@ -365,21 +365,22 @@ class PortalPost_ extends PortalPost
         //数量不传的情况下获取所有文章
         $postNumber = !$postNumber ? 9999 : $postNumber;
 
-        $cacheName = "CategoryPublishedPostList_{$categoryId}_$postNumber";
-        $cacheMinutes = 1;
-
-        if (env('APP_USE_CACHE')) {
+        if (!env('APP_USE_CACHE')) {
             $result = array_merge(
                 ['category' => PortalCategory_::getCategory($categoryId)],
                 self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
             );
         } else {
-            $result = Cache::remember($cacheName, $cacheMinutes, function () use ($categoryId, $postNumber) {
-                return array_merge(
-                    ['category' => PortalCategory_::getCategory($categoryId)],
-                    self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
-                );
-            });
+            $cacheName = "CategoryPublishedPostList_{$categoryId}_$postNumber";
+            $cacheMinutes = 1;
+
+            $result = Cache::tags(['category', 'published'])
+                ->remember($cacheName, $cacheMinutes, function () use ($categoryId, $postNumber) {
+                    return array_merge(
+                        ['category' => PortalCategory_::getCategory($categoryId)],
+                        self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
+                    );
+                });
         }
         return $result;
     }
@@ -483,6 +484,7 @@ class PortalPost_ extends PortalPost
 //            'post_excerpt' => 'required',
 //            'post_source' => 'required',
 //            'published_at' => 'required',
+//            'template' => 'required',
 //            'more_thumbnail' => 'required',
 //            'more_photos' => 'required',
 //            'more_videos' => 'required',
@@ -506,6 +508,7 @@ class PortalPost_ extends PortalPost
                 $Obj->post_source = $requestData['post_source'] ?? '';
                 $Obj->post_content = $requestData['post_content'] ?? '';
                 $Obj->published_at = $requestData['published_at'] ?? 0;
+                $Obj->template = $requestData['template'] ?? '';
                 $Obj->more = [
                     'thumbnail' => $requestData['more_thumbnail'] ?? null,
                     'photos' => $requestData['more_photos'] ?? null,
@@ -557,6 +560,7 @@ class PortalPost_ extends PortalPost
 //            'post_excerpt' => 'required',
 //            'post_source' => 'required',
 //            'published_at' => 'required',
+//            'template' => 'required',
 //            'more_thumbnail' => 'required',
 //            'more_photos' => 'required',
 //            'more_videos' => 'required',
@@ -580,6 +584,7 @@ class PortalPost_ extends PortalPost
                 $Obj->post_source = $requestData['post_source'] ?? '';
                 $Obj->post_content = $requestData['post_content'] ?? '';
                 $Obj->published_at = $requestData['published_at'] ?? 0;
+                $Obj->template = $requestData['template'] ?? '';
                 $Obj->more = [
                     'thumbnail' => $requestData['more_thumbnail'] ?? null,
                     'photos' => $requestData['more_photos'] ?? null,

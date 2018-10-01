@@ -13,21 +13,43 @@ class User_ extends User
         int $pageSize = 0,
         array $filter = [
             'department_id' => 0,
-            'type' => null,
+            'keyword' => null,
+            'start_timestamp' => null,
+            'end_timestamp' => null,
         ],
         array $with = []
     )
     {
         $departmentId =& $filter['department_id'];
-        $type =& $filter['type'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = User::with(array_merge($with, ['department', 'partyExperience']));
 
-        if ($departmentId !== null) {
+        if (!empty($departmentId)) {
             $Obj->where('department_id', $departmentId);
         }
-        if ($type !== null) {
-            $Obj->where('type', $type);
+
+        if (!empty($keyword)) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('sex', 'like', "%{$keyword}%")
+                    ->orWhere('cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($startTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '<=', $endTimestamp);
         }
 
         $total = $Obj->count();

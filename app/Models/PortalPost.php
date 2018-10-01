@@ -22,6 +22,7 @@ class PortalPost extends _BaseModel
         'created_at_format',
         'published_at_format',
         'thumbnail_format',
+        'video_format',
     ];
 
     public function audit()
@@ -79,5 +80,33 @@ class PortalPost extends _BaseModel
     public function setCategoryIdsAttribute($value)
     {
         $this->attributes['first_name'] = strtolower($value);
+    }
+
+    public function getVideoFormatAttribute()
+    {
+        $more = $this->more;
+        if (empty($more)) {
+            return null;
+        }
+
+        if (!is_array($more)) {
+            return null;
+        }
+
+        if (!array_key_exists('videos', $more)) {
+            return null;
+        }
+
+        if (!is_array($more['videos'])) {
+            return null;
+        }
+
+        if (empty($more['videos'])) {
+            return null;
+        }
+
+        $video = $more['videos'][0];
+
+        return array_key_exists('url', $video) ? $video['url'] : null;
     }
 }

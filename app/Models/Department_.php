@@ -10,22 +10,40 @@ class Department_ extends Department
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
+            'department_id' => null,
             'keyword' => null,
+            'start_timestamp' => null,
+            'end_timestamp' => null,
         ],
         array $with = []
     ): array
     {
+        $departmentId =& $filter['department_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
         $Obj = Department::with($with);
 
-        $keyword =& $filter['keyword'];
+        if (!empty($departmentId)) {
+            $Obj->where('parent_id', $departmentId);
+        }
 
-        if ($keyword !== null) {
+        if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
                 $query
                     ->where('name', 'like', "%{$keyword}%")
                     ->orWhere('location', 'like', "%{$keyword}%")
                     ->orWhere('secretary', 'like', "%{$keyword}%");
             });
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('established_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('established_at', '<=', $endTimestamp);
         }
 
         $total = $Obj->count();
@@ -54,6 +72,8 @@ class Department_ extends Department
         array $filter = [
             'department_id' => null,
             'keyword' => null,
+            'start_timestamp' => null,
+            'end_timestamp' => null,
         ],
         array $with = []
     ): array
@@ -62,18 +82,28 @@ class Department_ extends Department
 
         $departmentId =& $filter['department_id'];
         $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
 
-        if ($departmentId !== null) {
+        if (!empty($departmentId)) {
             $Obj->where('path', 'like', "%-{$departmentId}-%");
         }
 
-        if ($keyword !== null) {
+        if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
                 $query
                     ->where('name', 'like', "%{$keyword}%")
                     ->orWhere('location', 'like', "%{$keyword}%")
                     ->orWhere('secretary', 'like', "%{$keyword}%");
             });
+        }
+
+        if (!empty($startTimestamp)) {
+            $Obj->where('established_at', '>=', $startTimestamp);
+        }
+
+        if (!empty($endTimestamp)) {
+            $Obj->where('established_at', '<=', $endTimestamp);
         }
 
         $total = $Obj->count();
@@ -94,6 +124,27 @@ class Department_ extends Department
             'rows' => $get->toArray(),
             'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
         ];
+    }
+
+    static public function getDepartmentCoordinateList(int $departmentId): array
+    {
+        $me = self::getDepartment($departmentId);
+        $children = self::getDepartmentDepartmentList(0, 0, ['department_id' => $departmentId]);
+        $temp = array_merge([$me], $children['rows']);
+        $result = [];
+
+        for ($i = 0; $i < count($temp); $i++) {
+            $x = $temp[$i]['coordinate_x'];
+            $y = $temp[$i]['coordinate_y'];
+
+            if ($x > self::COORDINATES_RANGE['x']['max'] || $x < self::COORDINATES_RANGE['x']['min'] || $y > self::COORDINATES_RANGE['y']['max'] || $y < self::COORDINATES_RANGE['x']['min']) {
+                continue;
+            }
+
+            $result[] = $temp[$i];
+        }
+
+        return ['success' => 1, 'data' => $result];
     }
 
     /**
@@ -128,7 +179,8 @@ class Department_ extends Department
             'name' => 'required',
             'introduce' => '',
             'location' => '',
-            'coordinate' => '',
+            'coordinate_x' => '',
+            'coordinate_y' => '',
             'telphone' => '',
             'cellphone' => '',
             'secretary' => '',
@@ -146,7 +198,8 @@ class Department_ extends Department
             $Obj->name = $requestData['name'];
             $Obj->introduce = $requestData['introduce'] ?? '';
             $Obj->location = $requestData['location'] ?? '';
-            $Obj->coordinate = $requestData['coordinate'] ?? '';
+            $Obj->coordinate_x = $requestData['coordinate_x'] ?? '';
+            $Obj->coordinate_y = $requestData['coordinate_y'] ?? '';
             $Obj->telphone = $requestData['telphone'] ?? '';
             $Obj->cellphone = $requestData['cellphone'] ?? '';
             $Obj->secretary = $requestData['secretary'] ?? '';
@@ -169,7 +222,8 @@ class Department_ extends Department
             'name' => 'required',
             'introduce' => '',
             'location' => '',
-            'coordinate' => '',
+            'coordinate_x' => '',
+            'coordinate_y' => '',
             'telphone' => '',
             'cellphone' => '',
             'secretary' => '',
@@ -187,7 +241,8 @@ class Department_ extends Department
             $Obj->name = $requestData['name'];
             $Obj->introduce = $requestData['introduce'] ?? '';
             $Obj->location = $requestData['location'] ?? '';
-            $Obj->coordinate = $requestData['coordinate'] ?? '';
+            $Obj->coordinate_x = $requestData['coordinate_x'] ?? '';
+            $Obj->coordinate_y = $requestData['coordinate_y'] ?? '';
             $Obj->telphone = $requestData['telphone'] ?? '';
             $Obj->cellphone = $requestData['cellphone'] ?? '';
             $Obj->secretary = $requestData['secretary'] ?? '';

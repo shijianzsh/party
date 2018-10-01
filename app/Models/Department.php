@@ -4,10 +4,12 @@ namespace App\Models;
 
 class Department extends _BaseModel
 {
+    const COORDINATES_RANGE=['x'=>['min'=>73,'max'=>135],'y'=>['min'=>17,'max'=>53]];
+
     protected $casts = [
         'more' => 'json',
     ];
-    protected $appends = ['level', 'users_count'];
+    protected $appends = ['level', 'users_count', 'coordinates_format'];
 
     public function parent()
     {
@@ -54,5 +56,30 @@ class Department extends _BaseModel
             $this->attributes['path'] =
                 "{$this->parent->path}{$this->parent->id}-";
         }
+    }
+
+    public function setCoordinateXAttribute($value)
+    {
+        $this->attributes['coordinate_x'] = $value * 1000000;
+    }
+
+    public function getCoordinateXAttribute($value)
+    {
+        return $value / 1000000;
+    }
+
+    public function setCoordinateYAttribute($value)
+    {
+        $this->attributes['coordinate_y'] = $value * 1000000;
+    }
+
+    public function getCoordinateYAttribute($value)
+    {
+        return $value / 1000000;
+    }
+
+    public function getCoordinatesFormatAttribute()
+    {
+        return [$this->coordinate_x, $this->coordinate_y];
     }
 }

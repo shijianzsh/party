@@ -11,6 +11,10 @@ namespace App\Services\Auth;
 
 trait Verify
 {
+    /**
+     * 验证请求类型的合法性
+     * @return string 小写的method
+     */
     private function verifyMethod(string $method): string
     {
         $method = strtolower($method);
@@ -21,6 +25,10 @@ trait Verify
         return $method;
     }
 
+    /**
+     * 格式化path
+     * @return string 格式化后的path
+     */
     private function formatPath(string $path): string
     {
         if (empty($path)) {
@@ -40,6 +48,9 @@ trait Verify
         return implode("|", $temp);
     }
 
+    /**
+     * 验证单个auth verifyAuths的子方法
+     */
     private function verifyAuth(string $method, string $path, array $auth): bool
     {
         $method = $this->verifyMethod($method);
@@ -56,7 +67,10 @@ trait Verify
         return true;
     }
 
-    public function verifyAuths(string $method, string $path, array $auths)
+    /**
+     * 验证auths中是否包含当前传入的path
+     */
+    public function verifyAuths(string $method, string $path, array $auths):bool
     {
         if (empty($auths)) return false;
 

@@ -19,7 +19,7 @@ Route::namespace('Web')->group(function () {
     Route::get('/index/post/{id}', 'Index@post');
 
     Route::get('/monitor/index', 'Monitor@index');
-    Route::get('/monitor/department', 'Monitor@department');
+    Route::get('/monitor/department/{id?}', 'Monitor@department');
     Route::get('/monitor/party_member', 'Monitor@partyMember');
     Route::get('/monitor/party_business', 'Monitor@partyBusiness');
     Route::get('/monitor/meeting', 'Monitor@meeting');

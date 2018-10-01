@@ -11,17 +11,37 @@ class DepartmentActivityPlan_ extends DepartmentActivityPlan
         int $pageSize = 0,
         array $filter = [
             'initiate_user_id' => 0,
-//            'to_user_id' => 0,
+            'keyword' => null,
+            'start_timestamp' =>null,
+            'end_timestamp' => null,
         ],
         array $with = ['attendUsersMiddle']
     ): array
     {
         $initiate_user_id =& $filter['initiate_user_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = DepartmentActivityPlan::with(array_merge($with, ['department', 'initiateUser']));
 
-        if ($initiate_user_id !== null) {
+        if ( !empty($initiate_user_id)) {
             $Obj->where('initiate_user_id', $initiate_user_id);
+        }
+        if (!empty($keyword)) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('content', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('published_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('published_at', '<=', $endTimestamp);
         }
 
         $total = $Obj->count();

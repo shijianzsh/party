@@ -14,11 +14,19 @@ class DepartmentController extends \App\Http\Controllers\Controller
      */
     public function index(Request $request)
     {
-//        return Department::with('users')->get();
-        $list = Department_::getDepartmentList(0, 0, [],
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+        $list = Department_::getDepartmentList(
+            $request->input('current_page', 0),
+            $request->input('page_size', 0),
+            [
+                'department_id' => &$filter['department_id'],
+                'keyword' => &$filter['keyword'],
+                'start_timestamp' => &$filter['start_timestamp'],
+                'end_timestamp' => &$filter['end_timestamp'],
+            ],
             $request->query('with', []) ? $request->query('with', []) : []
         );
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query()];
+        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
         return response()->json($result);
     }
 

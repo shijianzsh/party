@@ -22,7 +22,6 @@ class ElectionController extends Controller
             $request->input('page_size', 0),
             [
                 'initiate_user_id' => &$filter['initiate_user_id'],
-                'type' => &$filter['type'],
                 'keyword' => &$filter['keyword'],
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],

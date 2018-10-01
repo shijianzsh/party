@@ -29,12 +29,14 @@ Route::namespace('Api')->group(function () {
 
     Route::group(['middleware' => [
         \App\Http\Middleware\VerifyAccessToken::class,
+//        \App\Http\Middleware\VerifyAuth::class,
     ]], function () {
-        Route::resource('auth_map', 'AuthMapController');
+        Route::resource('auth_maps', 'AuthMapController');
 
-        Route::resource('auth_role', 'AuthRoleController');
+        Route::resource('auth_roles', 'AuthRoleController');
 
         Route::get('departments/{id}/department', 'Department@departmentDepartmentList');
+        Route::get('departments/{id}/coordinate', 'Department@getDepartmentCoordinateList');
         Route::resource('departments', 'DepartmentController');
 
         Route::resource('department_work_plans', 'DepartmentWorkPlanController');
@@ -54,6 +56,7 @@ Route::namespace('Api')->group(function () {
         Route::post('articles/{id}/audit', 'Article@audit');
         Route::resource('articles', 'ArticleController');
 
+        Route::get('categories/{id}/children_and_published_article', 'Category@getCategoryChildrenAndPublishedArticleList');
         Route::resource('categories', 'CategoryController');
 
         Route::get('comments/audit_user', 'Comment@auditUserCommentList');
@@ -86,7 +89,5 @@ Route::namespace('Api')->group(function () {
         Route::post('exam_results/{id}/submit', 'ExamResult@submit');
         Route::resource('exam_results', 'ExamResultController');
     });
-
-
 });
 

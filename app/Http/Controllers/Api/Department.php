@@ -17,11 +17,23 @@ class Department extends \App\Http\Controllers\Controller
     {
         $list = Department_::getDepartmentDepartmentList(0, 0,
             [
-                'department_id',$id
+                'department_id', $id
             ],
             $request->query('with', []) ? $request->query('with', []) : []
         );
         $result = ['success' => 1, 'data' => $list, '$request' => $request->query()];
+        return response()->json($result);
+    }
+
+    /**
+     * 获取当前单位旗下所有单位的坐标信息
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getDepartmentCoordinateList(Request $request, $id)
+    {
+        $result = Department_::getDepartmentCoordinateList($id);
         return response()->json($result);
     }
 }

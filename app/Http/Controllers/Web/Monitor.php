@@ -15,7 +15,7 @@ class Monitor extends \App\Http\Controllers\Controller
         return view("monitor.index.index");
     }
 
-    public function department()
+    public function department($id=0)
     {
         return view("monitor.department.index");
     }

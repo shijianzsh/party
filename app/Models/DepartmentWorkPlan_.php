@@ -11,17 +11,38 @@ class DepartmentWorkPlan_ extends DepartmentWorkPlan
         int $pageSize = 0,
         array $filter = [
             'initiate_user_id' => 0,
-//            'to_user_id' => 0,
+            'keyword' => null,
+            'start_timestamp' =>null,
+            'end_timestamp' => null,
         ],
         array $with = []
     ): array
     {
         $initiate_user_id =& $filter['initiate_user_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = DepartmentWorkPlan::with(array_merge($with, ['department', 'initiateUser']));
 
         if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);
+        }
+
+        if (!empty($keyword)) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('content', 'like', "%{$keyword}%");
+            });
+        }
+
+        if (!empty($startTimestamp)) {
+            $Obj->where('published_at', '>=', $startTimestamp);
+        }
+
+        if (!empty($endTimestamp)) {
+            $Obj->where('published_at', '<=', $endTimestamp);
         }
 
         $total = $Obj->count();

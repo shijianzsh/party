@@ -47,6 +47,11 @@ class PortalPost extends _BaseModel
         );
     }
 
+    public function comments()
+    {
+        return $this->hasMany('App\Models\PortalPostComment', 'post_id');
+    }
+
     public function getCategoryIdsAttribute()
     {
         $categorys = $this->categorys->toArray();

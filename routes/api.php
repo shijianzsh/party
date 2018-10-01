@@ -56,6 +56,8 @@ Route::namespace('Api')->group(function () {
         Route::post('articles/{id}/audit', 'Article@audit');
         Route::resource('articles', 'ArticleController');
 
+        Route::resource('article_comments', 'ArticleCommentController');
+
         Route::get('categories/{id}/children_and_published_article', 'Category@getCategoryChildrenAndPublishedArticleList');
         Route::resource('categories', 'CategoryController');
 

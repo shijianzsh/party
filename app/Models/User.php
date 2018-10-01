@@ -125,6 +125,14 @@ class User extends _BaseModel
     }
 
     /**
+     * 文章留言
+     */
+    public function postComments()
+    {
+        return $this->hasMany('App\Models\PortalPostComment', 'user_id');
+    }
+
+    /**
      * 用户发起的会议
      */
     public function initiateMeetings()

@@ -23,7 +23,6 @@ Config::load();
  */
 class SmsDemo
 {
-
     static $acsClient = null;
 
     /**
@@ -184,7 +183,6 @@ class SmsDemo
 
         return $acsResponse;
     }
-
 }
 
 // 调用示例：

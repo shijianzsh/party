@@ -8,13 +8,12 @@
 
 namespace App\Services\Socket;
 
-
 class Helper
 {
     static public function setUid(&$connection, int $uid)
     {
         $connection->uid = $uid;
-        $connection->real_ip = $_SERVER['HTTP_X_REAL_IP'];
+        $connection->real_ip = array_key_exists('HTTP_X_REAL_IP', $_SERVER) ? $_SERVER['HTTP_X_REAL_IP'] : null;
     }
 
     static public function getUid(&$connection): int
@@ -55,12 +54,25 @@ class Helper
         return true;
     }
 
-    static public function sendToUid(&$worker, int $uid, $msg): bool
+    static public function sendToUid(&$worker, int $uid, $data): bool
     {
         $isSend = false;
         foreach ($worker->connections as $connection) {
             if (isset($connection->uid) && (int)$connection->uid === $uid) {
-                self::sendToClient($connection, $msg);
+                self::send($connection, $data);
+                $isSend = true;
+            }
+        }
+        return $isSend;
+    }
+
+    static public function sendToAdmin(&$worker, $data): bool
+    {
+        $uid = 1;
+        $isSend = false;
+        foreach ($worker->connections as $connection) {
+            if (isset($connection->uid) && (int)$connection->uid === $uid) {
+                self::send($connection, $data);
                 $isSend = true;
             }
         }

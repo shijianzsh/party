@@ -10,6 +10,7 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
+        "mrgoon/aliyun-sms": "dev-master",
         "pfinal/excel": "^1.1",
         "php-curl-class/php-curl-class": "^8.1",
         "predis/predis": "^1.1",

@@ -150,6 +150,8 @@ return [
         /*
          * Package Service Providers...
          */
+        //阿里云短信
+        Mrgoon\AliSms\ServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -208,7 +210,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'AliSms' => Mrgoon\AliSms\ServiceProvider::class,//阿里云短信
     ],
 
 ];

@@ -4,12 +4,13 @@ namespace App\Models;
 
 class Department extends _BaseModel
 {
-    const COORDINATES_RANGE=['x'=>['min'=>73,'max'=>135],'y'=>['min'=>17,'max'=>53]];
+    //坐标的范围
+    const COORDINATES_RANGE = ['x' => ['min' => 73, 'max' => 135], 'y' => ['min' => 17, 'max' => 53]];
 
     protected $casts = [
         'more' => 'json',
     ];
-    protected $appends = ['level', 'users_count', 'coordinates_format'];
+    protected $appends = ['level', 'users_count', 'coordinates_format', 'thumbnail_format', 'monitor_map_format'];
 
     public function parent()
     {
@@ -24,6 +25,11 @@ class Department extends _BaseModel
     public function users()
     {
         return $this->hasMany('App\Models\User', 'department_id');
+    }
+
+    public function meetings()
+    {
+        return $this->hasMany('App\Models\Meeting', 'department_id');
     }
 
     public function workPlans()
@@ -81,5 +87,23 @@ class Department extends _BaseModel
     public function getCoordinatesFormatAttribute()
     {
         return [$this->coordinate_x, $this->coordinate_y];
+    }
+
+    public function getMonitorMapFormatAttribute()
+    {
+        $more = $this->more;
+        if ($more === null) {
+            return null;
+        }
+
+        if (!is_array($more)) {
+            return null;
+        }
+
+        if (!array_key_exists('monitor_map', $more)) {
+            return null;
+        }
+
+        return $more['monitor_map'];
     }
 }

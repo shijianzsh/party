@@ -159,9 +159,9 @@ class Department_ extends Department
         return $get->department_id;
     }
 
-    static public function getDepartment(int $departmentId, bool $getObject = false)
+    static public function getDepartment(int $departmentId, bool $getObject = false, array $with = [])
     {
-        $Obj = Department::with([])->findOrFail($departmentId);
+        $Obj = Department::with($with)->findOrFail($departmentId);
 
         if ($getObject) {
             $result = $Obj;
@@ -179,13 +179,14 @@ class Department_ extends Department
             'name' => 'required',
             'introduce' => '',
             'location' => '',
-            'coordinate_x' => '',
-            'coordinate_y' => '',
+            'coordinate_x' => 'required',
+            'coordinate_y' => 'required',
             'telphone' => '',
             'cellphone' => '',
             'secretary' => '',
             'established_at' => '',
-            'thumbnail' => '',
+            'more_thumbnail' => 'required',
+            'more_monitor_map' => 'required',
         ]);
 
         try {
@@ -205,7 +206,10 @@ class Department_ extends Department
             $Obj->secretary = $requestData['secretary'] ?? '';
             $Obj->established_at = $requestData['established_at'] ?? '';
             $Obj->path = null;
-            $Obj->more = ['thumbnail' => $requestData['thumbnail'] ?? ''];
+            $Obj->more = [
+                'thumbnail' => $requestData['more_thumbnail'] ?? '',
+                'monitor_map' => $requestData['more_monitor_map'] ?? ''
+            ];
             $success = $Obj->save();
         } catch (\Exception $e) {
             $success = 0;
@@ -228,7 +232,8 @@ class Department_ extends Department
             'cellphone' => '',
             'secretary' => '',
             'established_at' => '',
-            'thumbnail' => '',
+            'more_thumbnail' => '',
+            'more_monitor_map' => 'required',
         ]);
 
         try {
@@ -248,7 +253,10 @@ class Department_ extends Department
             $Obj->secretary = $requestData['secretary'] ?? '';
             $Obj->established_at = $requestData['established_at'] ?? '';
             $Obj->path = null;
-            $Obj->more = ['thumbnail' => $requestData['thumbnail'] ?? ''];
+            $Obj->more = [
+                'thumbnail' => $requestData['more_thumbnail'] ?? '',
+                'monitor_map' => $requestData['more_monitor_map'] ?? ''
+            ];
             $success = $Obj->save();
         } catch (\Exception $e) {
             $success = 0;
@@ -311,5 +319,10 @@ class Department_ extends Department
         unset($array);
 
         return ['rows' => $result, 'ids' => array_unique($ids)];
+    }
+
+    static public function getDepartmentMeetingStatistics(int $departmentId): array
+    {
+        self::getDepartment($departmentId, true, ['meeting']);
     }
 }

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\UserAuthMap;
 use Illuminate\Http\Request;
 use  App\Models\AuthMap_;
 use Illuminate\Support\Facades\Crypt;
-use Gate;
+use Gate, Cache;
 
 class AuthMapController extends \App\Http\Controllers\Controller
 {
@@ -17,7 +16,8 @@ class AuthMapController extends \App\Http\Controllers\Controller
      */
     public function index(Request $request)
     {
-        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+
         $list = AuthMap_::getAuthMapList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),

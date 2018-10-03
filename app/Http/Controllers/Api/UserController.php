@@ -15,12 +15,13 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function index(Request $request)
     {
-        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
 
         $list = User_::getUserList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
+                'ids' => &$filter['ids'],
                 'department_id' => &$filter['department_id'],
                 'keyword' => &$filter['keyword'],
                 'start_timestamp' => &$filter['start_timestamp'],
@@ -66,7 +67,7 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json(User_::editUser($id, $request->input('data')));
+        return response()->json(User_::updateUser($id, $request->input('data')));
     }
 
     /**

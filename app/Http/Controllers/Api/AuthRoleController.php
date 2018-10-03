@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\UserComment;
 use Illuminate\Http\Request;
-use  App\Models\UserComment_;
+use  App\Models\AuthRole_;
 use Illuminate\Support\Facades\Crypt;
 use Gate;
 
 class AuthRoleController extends \App\Http\Controllers\Controller
 {
-    //TODO
     /**
      * Display a listing of the resource.
      *
@@ -19,12 +17,11 @@ class AuthRoleController extends \App\Http\Controllers\Controller
     public function index(Request $request)
     {
         $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
-        $list = UserComment_::getCommentList(
+        $list = AuthRole_::getAuthRoleList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-                'user_id' => &$filter['user_id'],
-                'to_user_id' => &$filter['to_user_id'],
+                'keyword' => &$filter['keyword'],
             ]
         );
 
@@ -40,7 +37,7 @@ class AuthRoleController extends \App\Http\Controllers\Controller
      */
     public function store(Request $request)
     {
-        $result = UserComment_::createComment($request->input('data'));
+        $result = AuthRole_::createAuthRole($request->input('data'));
         return response()->json($result);
     }
 
@@ -52,7 +49,7 @@ class AuthRoleController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $row = UserComment_::getComment($id, []);
+        $row = AuthRole_::getAuthRole($id, []);
 
         $result = ['success' => 1, 'data' => $row];
         return response()->json($result);
@@ -66,7 +63,7 @@ class AuthRoleController extends \App\Http\Controllers\Controller
      */
     public function update(Request $request, $id)
     {
-        $result = UserComment_::updateComment($id, $request->input('data'));
+        $result = AuthRole_::updateAuthRole($id, $request->input('data'));
         return response()->json($result);
     }
 
@@ -78,6 +75,6 @@ class AuthRoleController extends \App\Http\Controllers\Controller
      */
     public function destroy($id)
     {
-        return response()->json(UserComment_::deleteComment($id));
+        return response()->json(AuthRole_::deleteAuthRole($id));
     }
 }

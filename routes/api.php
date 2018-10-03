@@ -45,7 +45,10 @@ Route::namespace('Api')->group(function () {
 
         Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
         Route::post('users/{id}/change_password', 'User@changePassword');
+        Route::post('users/{id}/update_one_field', 'User@updateOneField');
         Route::resource('users', 'UserController');
+
+        Route::resource('user_notifications', 'UserNotificationController');
 
         Route::resource('user_payments', 'UserPaymentController');
 

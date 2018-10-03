@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use DB;
+
 class AuthMap_ extends AuthMap
 {
     static public function getAuthMapList(
@@ -16,6 +18,8 @@ class AuthMap_ extends AuthMap
         $keyword =& $filter['keyword'];
 
         $Obj = AuthMap::with($with);
+
+        $Obj->orderBy('namespace', 'asc');
 
         if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
@@ -150,5 +154,4 @@ class AuthMap_ extends AuthMap
     {
         return ['success' => AuthMap::destroy($AuthMapId)];
     }
-
 }

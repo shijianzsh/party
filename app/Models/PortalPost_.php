@@ -374,8 +374,7 @@ class PortalPost_ extends PortalPost
             $cacheName = "CategoryPublishedPostList_{$categoryId}_$postNumber";
             $cacheMinutes = 1;
 
-            $result = Cache::tags(['category', 'published'])
-                ->remember($cacheName, $cacheMinutes, function () use ($categoryId, $postNumber) {
+            $result = Cache::remember($cacheName, $cacheMinutes, function () use ($categoryId, $postNumber) {
                     return array_merge(
                         ['category' => PortalCategory_::getCategory($categoryId)],
                         self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])

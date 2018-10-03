@@ -7,6 +7,8 @@ namespace App\Models;
  */
 class AuthMap extends _BaseModel
 {
+    const PAGE_SIZE = 9999;
+
     protected $appends = ['path_format'];
 
     public function setMethodAttribute($value)
@@ -22,7 +24,7 @@ class AuthMap extends _BaseModel
         $result .= $this->namespace;
 
         if (empty($this->entrance)) return $result;
-        $result .= '|' .$this->entrance;
+        $result .= '|' . $this->entrance;
 
         if (empty($this->param_1)) return $result;
         $result .= '|' . $this->param_1;

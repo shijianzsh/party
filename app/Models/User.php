@@ -6,7 +6,7 @@ class User extends _BaseModel
 {
     const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
 
-    protected $appends = ['type_format', 'borned_at_format', 'thumbnail_format'];
+    protected $appends = ['type_format', 'borned_at_format', 'thumbnail_format', 'role_ids', 'roles_format'];
     protected $casts = [
         'more' => 'json',
     ];
@@ -14,6 +14,11 @@ class User extends _BaseModel
     /**
      * 拥有的角色
      */
+    public function rolesMiddle()
+    {
+        return $this->hasMany('App\Models\AuthRoleUser', 'user_id');
+    }
+
     public function roles()
     {
         return $this->hasManyThrough(
@@ -263,5 +268,16 @@ class User extends _BaseModel
     public function getBornedAtFormatAttribute()
     {
         return $this->borned_at ? date("Y-m-d", $this->borned_at) : '';
+    }
+
+    public function getRoleIdsAttribute()
+    {
+        return array_column($this->roles->toArray(), 'id');
+    }
+
+    public function getRolesFormatAttribute()
+    {
+        $names = array_column($this->roles->toArray(), 'name');
+        return implode('，', $names);
     }
 }

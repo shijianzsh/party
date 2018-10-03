@@ -20,12 +20,17 @@ class User_ extends User
         array $with = []
     )
     {
+        $ids =& $filter['ids'];
         $departmentId =& $filter['department_id'];
         $keyword =& $filter['keyword'];
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = User::with(array_merge($with, ['department', 'partyExperience']));
+
+        if (!empty($ids)) {
+            $Obj->whereIn('id', $ids);
+        }
 
         if (!empty($departmentId)) {
             $Obj->where('department_id', $departmentId);
@@ -109,8 +114,10 @@ class User_ extends User
     {
         $validator = \Validator::make($requestData, [
             'type' => 'required',
+            'role_ids' => 'required',
             'department_id' => 'required',
             'name' => 'required',
+            'sex' => 'required',
             'duty' => 'required',
             'user_login' => 'required',
             'user_password' => 'required',
@@ -122,18 +129,76 @@ class User_ extends User
                 throw new \Exception($validator->errors()->first());
             }
 
-            $Obj = new User;
-            $Obj->type = $requestData['type'];
-            $Obj->department_id = $requestData['department_id'];
-            $Obj->name = $requestData['name'];
-            $Obj->duty = $requestData['duty'];
-            $Obj->user_login = $requestData['user_login'];
-            $Obj->user_password = $requestData['user_password'];
-            $Obj->more = [
-                'thumbnail' => $requestData['more_thumbnail'] ?? null,
-            ];
-            $success = $Obj->save();
+            DB::transaction(function () use ($requestData) {
+                $Obj = new User;
+                $Obj->type = $requestData['type'];
+                $Obj->department_id = $requestData['department_id'];
+                $Obj->name = $requestData['name'];
+                $Obj->duty = $requestData['duty'];
+                $Obj->user_login = $requestData['user_login'];
+                $Obj->user_password = Login::getPassword($requestData['user_password']);
+                $Obj->more = [
+                    'thumbnail' => $requestData['more_thumbnail'] ?? null,
+                ];
+                $Obj->save();
 
+                $role_ids = $requestData['role_ids'];
+                $saveMany = [];
+                for ($i = 0; $i < count($role_ids); $i++) {
+                    $saveMany[] = new AuthRoleUser(['auth_role_id' => $role_ids[$i]]);
+                }
+                $Obj->rolesMiddle()->saveMany($saveMany);
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+    }
+
+    static public function updateUser(int $userId, array $requestData): array
+    {
+        $validator = \Validator::make($requestData, [
+            'type' => 'required',
+            'role_ids' => 'required',
+            'department_id' => 'required',
+            'name' => 'required',
+            'sex' => 'required',
+            'duty' => 'required',
+            'user_login' => 'required',
+            'user_password' => 'required',
+            'more_thumbnail' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            DB::transaction(function () use ($userId, $requestData) {
+                $Obj = User::findOrFail($userId);
+
+                $Obj->type = $requestData['type'];
+                $Obj->department_id = $requestData['department_id'];
+                $Obj->name = $requestData['name'];
+                $Obj->duty = $requestData['duty'];
+                //$Obj->user_login = $requestData['user_login'];
+                $Obj->user_password = Login::getPassword($requestData['user_password']);
+                $Obj->more = [
+                    'thumbnail' => $requestData['more_thumbnail'] ?? null,
+                ];
+                $Obj->save();
+
+                $Obj->rolesMiddle()->delete();
+
+                $role_ids = $requestData['role_ids'];
+                $saveMany = [];
+                for ($i = 0; $i < count($role_ids); $i++) {
+                    $saveMany[] = new AuthRoleUser(['auth_role_id' => $role_ids[$i]]);
+                }
+                $Obj->rolesMiddle()->saveMany($saveMany);
+            });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

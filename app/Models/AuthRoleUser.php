@@ -7,5 +7,5 @@ namespace App\Models;
  */
 class AuthRoleUser extends _BaseModel
 {
-
+    protected $fillable = ['auth_role_id', 'user_id'];
 }

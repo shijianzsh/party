@@ -7,6 +7,8 @@ namespace App\Models;
  */
 class AuthRole extends _BaseModel
 {
+    protected $appends = ['auth_count', 'auth_map_ids'];
+
     /**
      * 中间表-拥有的权限
      */
@@ -51,5 +53,15 @@ class AuthRole extends _BaseModel
             'id',
             'user_id'
         );
+    }
+
+    public function getAuthCountAttribute()
+    {
+        return count($this->authMiddle);
+    }
+
+    public function getAuthMapIdsAttribute()
+    {
+        return array_column($this->authMiddle->toArray(), 'auth_map_id');
     }
 }

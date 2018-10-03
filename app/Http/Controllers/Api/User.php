@@ -34,4 +34,16 @@ class User extends \App\Http\Controllers\Controller
         $result = User_::changePassword($id, $request->input('data'));
         return response()->json($result);
     }
+
+    /**
+     * 用户更改个人信息单个字段内容
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateOneField(Request $request, $id)
+    {
+        return response()->json(User_::editUser($id, $request->input('data')));
+    }
 }

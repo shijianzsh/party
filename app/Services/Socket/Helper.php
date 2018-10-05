@@ -10,8 +10,13 @@ namespace App\Services\Socket;
 
 class Helper
 {
-    static public function setUid(&$connection, int $uid)
+    static public function setUid(&$worker, &$connection, int $uid)
     {
+        foreach ($worker->connections as $connection) {
+            if (isset($connection->uid) && (int)$connection->uid === $uid) {
+                $connection->uid = null;
+            }
+        }
         $connection->uid = $uid;
         $connection->real_ip = array_key_exists('HTTP_X_REAL_IP', $_SERVER) ? $_SERVER['HTTP_X_REAL_IP'] : null;
     }
@@ -72,6 +77,18 @@ class Helper
         $isSend = false;
         foreach ($worker->connections as $connection) {
             if (isset($connection->uid) && (int)$connection->uid === $uid) {
+                self::send($connection, $data);
+                $isSend = true;
+            }
+        }
+        return $isSend;
+    }
+
+    static public function sendToAll(&$worker, $data): bool
+    {
+        $isSend = false;
+        foreach ($worker->connections as $connection) {
+            if (isset($connection->uid)) {
                 self::send($connection, $data);
                 $isSend = true;
             }

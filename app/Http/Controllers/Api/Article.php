@@ -12,10 +12,6 @@ class Article extends \App\Http\Controllers\Controller
 {
     public function audit(Request $request, $id)
     {
-        //TODO 留言信息增加审核人 增加敏感字段筛选 维护map
-        //TODO 在线考试增加自测功能 模拟开始
-        //TODO 支付参数按照单位来设置
-        //TODO 没做的模块先放ui
         $result = PortalPost_::auditPost($id,
             $request->input('status'),
             $request->input('reason', ''));

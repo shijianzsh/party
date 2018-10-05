@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use DB;
-use App\Services\Push\Notification;
+use App\Services\Pusher\Notification;
 
 class UserNotification_ extends UserNotification
 {

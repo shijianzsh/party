@@ -22,7 +22,10 @@ Route::namespace('Api')->group(function () {
         return '非法访问';
     });
 
+    Route::get('/test', 'Test');
+
     Route::get('/token', 'Token');
+
     Route::post('upload', 'Upload');
 
     Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\VerifyToken::class);
@@ -93,6 +96,9 @@ Route::namespace('Api')->group(function () {
         Route::post('exam_results/{paperId}/start', 'ExamResult@start');
         Route::post('exam_results/{id}/submit', 'ExamResult@submit');
         Route::resource('exam_results', 'ExamResultController');
+
+        Route::post('pusher/{user_id}/socket/{send_key}', 'Pusher@Socket');
+        Route::post('pusher/{user_id}/sms', 'Pusher@Sms');
     });
 });
 

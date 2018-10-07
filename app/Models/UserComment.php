@@ -8,7 +8,14 @@ class UserComment extends _BaseModel
         'more' => 'json',
     ];
 
-    protected $appends = ['to_user_ids', 'user_name'];
+    protected $appends = [
+        'to_user_ids',
+        'to_user_names_format',
+        'user_name',
+        'audit_status',
+        'audit_status_format',
+        'leave_at_format',
+    ];
 
     //发起人
     public function initiateUser()
@@ -46,9 +53,36 @@ class UserComment extends _BaseModel
 
     public function getToUserIdsAttribute()
     {
-        if (!$this->comment_users) {
+        if (!$this->commentUsers) {
             return [];
         }
-        return array_column($this->comment_users, 'id');
+        return array_column($this->commentUsers->toArray(), 'id');
+    }
+
+    public function getToUserNamesFormatAttribute()
+    {
+        if (!$this->commentUsers) {
+            return [];
+        }
+        $toUserNamesArray = array_column($this->commentUsers->toArray(), 'name');
+        return implode(",", $toUserNamesArray);
+    }
+
+    public function getAuditStatusAttribute()
+    {
+        if (!$this->audit) {
+            return null;
+        }
+
+        return $this->audit->status;
+    }
+
+    public function getAuditStatusFormatAttribute()
+    {
+        if (!$this->audit) {
+            return '无需审核';
+        }
+
+        return array_flip(UserCommentAudit::STATUS)[$this->audit->status];
     }
 }

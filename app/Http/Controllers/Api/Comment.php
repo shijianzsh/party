@@ -26,4 +26,12 @@ class Comment extends \App\Http\Controllers\Controller
         $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
         return response()->json($result);
     }
+
+    public function audit(Request $request, $id)
+    {
+        $result = UserComment_::auditComment($id,
+            $request->input('status'),
+            $request->input('reason'));
+        return response()->json($result);
+    }
 }

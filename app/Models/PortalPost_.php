@@ -497,7 +497,7 @@ class PortalPost_ extends PortalPost
 
             DB::transaction(function () use ($requestData) {
                 $Obj = new PortalPost();
-                $Obj->user_id = $requestData['user_id'] ?? 0;
+                $Obj->user_id = User_::getMyId();
                 $Obj->need_audit = $requestData['need_audit'] ?? 0;
                 $Obj->post_status = $requestData['post_status'] ?? 0;
                 $Obj->comment_status = $requestData['comment_status'] ?? 0;
@@ -573,8 +573,8 @@ class PortalPost_ extends PortalPost
 
             DB::transaction(function () use ($postId, $requestData) {
                 $Obj = PortalPost::findOrFail($postId);
-                $Obj->user_id = $requestData['user_id'] ?? 0;
-                $Obj->need_audit = $requestData['need_audit'] ?? 0;
+//                $Obj->user_id = User_::getMyId();
+//                $Obj->need_audit = $requestData['need_audit'] ?? 0;
                 $Obj->post_status = $requestData['post_status'] ?? 0;
                 $Obj->comment_status = $requestData['comment_status'] ?? 0;
                 $Obj->is_top = $requestData['is_top'] ?? 0;

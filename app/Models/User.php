@@ -6,7 +6,14 @@ class User extends _BaseModel
 {
     const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
 
-    protected $appends = ['type_format', 'borned_at_format', 'thumbnail_format', 'role_ids', 'roles_format'];
+    protected $appends = [
+        'type_format',
+        'borned_at_format',
+        'thumbnail_format',
+        'role_ids',
+        'roles_format',
+//        'auths_format',//数据库访问太多了 被动加载
+    ];
     protected $casts = [
         'more' => 'json',
     ];
@@ -279,5 +286,33 @@ class User extends _BaseModel
     {
         $names = array_column($this->roles->toArray(), 'name');
         return implode('，', $names);
+    }
+
+    public function getAuthsFormatAttribute()
+    {
+        $temp = [];
+        $roles = $this->roles;
+        foreach ($roles as $role) {
+            $temp = array_merge($temp,$role->auths->toArray());
+        }
+
+        if (!count($temp)) {
+            return [];
+        }
+
+        $ids = [];
+        $result = [];
+
+        for ($i = 0; $i < count($temp); $i++) {
+            $row = $temp[$i];
+            $id = $row['id'];
+            if (in_array($id, $ids)) {
+                continue;
+            }
+            $ids[] = $id;
+            $result[] = $row;
+        }
+
+        return array_column($result,'auth_format');
     }
 }

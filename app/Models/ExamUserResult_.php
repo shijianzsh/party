@@ -93,9 +93,9 @@ class ExamUserResult_ extends ExamUserResult
                 $Obj->paper_snapshot = $paper->toArray();
                 $success = $Obj->save();
 
-                $id = $Obj->id;
+                $data = $Obj;
             } else {
-                $id = $checkResult->id;
+                $data = $checkResult;
             }
 
             if ($checkResult && $checkResult->is_submitted) {
@@ -107,7 +107,7 @@ class ExamUserResult_ extends ExamUserResult
         }
 
         end:
-        return ['success' => (int)($success ?? 1), 'data' => $id ?? 0, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'data' => $data ?? null, 'msg' => $msg ?? null];
     }
 
     static public function submitExam(int $examUserResultId, array $requestData): array
@@ -125,6 +125,7 @@ class ExamUserResult_ extends ExamUserResult
             $answers = $requestData['answers'];
             //整理考试结果
             $questionsIdToIndex = [];
+
             for ($i = 0; $i < count($answers); $i++) {
                 if (empty($answers[$i]['user_answers'])) {
                     throw new \Exception('试卷存在未作答的题目');
@@ -161,21 +162,21 @@ class ExamUserResult_ extends ExamUserResult
             //评分
             $score = 0;
             foreach ($paper->questions as $question) {
-                if (array_key_exists($question['id'], $questionsIdToIndex)) {
-                    $tempAnswer1 = $answers[$questionsIdToIndex[$question['id']]]['user_answers'];
+                $key = $question['question_id'];
+                if (array_key_exists($key, $questionsIdToIndex)) {
+                    $tempAnswer1 = $answers[$questionsIdToIndex[$key]]['user_answers'];
                     $tempAnswer2 = $question['answers'];
 
                     if (Exam::isSameAnswers($tempAnswer1, $tempAnswer2)) {
                         $score += $question['question_score'];
-                        $answers[$questionsIdToIndex[$question['id']]]['is_correct'] = 1;
+                        $answers[$questionsIdToIndex[$key]]['is_correct'] = 1;
                     } else {
-                        $answers[$questionsIdToIndex[$question['id']]]['is_correct'] = 0;
+                        $answers[$questionsIdToIndex[$key]]['is_correct'] = 0;
                     }
                 }
             }
             $isPassed = $score >= $paper->pass_score ? 1 : 0;
             $msg = $isPassed ? '恭喜您！考试通过！' : '很遗憾，没有通过考试，请再接再厉！';
-
             //更新记录
             $Obj->is_submitted = 1;
             $Obj->score = $score;

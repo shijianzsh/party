@@ -119,8 +119,9 @@ class User_ extends User
             'name' => 'required',
             'sex' => 'required',
             'duty' => 'required',
-            'user_login' => 'required',
-            'user_password' => 'required',
+            'user_excerpt' => 'required',
+//            'user_login' => 'required',
+//            'user_password' => 'required',
             'more_thumbnail' => 'required',
         ]);
 
@@ -135,8 +136,9 @@ class User_ extends User
                 $Obj->department_id = $requestData['department_id'];
                 $Obj->name = $requestData['name'];
                 $Obj->duty = $requestData['duty'];
-                $Obj->user_login = $requestData['user_login'];
-                $Obj->user_password = Login::getPassword($requestData['user_password']);
+                $Obj->user_excerpt = $requestData['user_excerpt'];
+//                $Obj->user_login = $requestData['user_login'];
+//                $Obj->user_password = Login::getPassword($requestData['user_password']);
                 $Obj->more = [
                     'thumbnail' => $requestData['more_thumbnail'] ?? null,
                 ];
@@ -166,6 +168,7 @@ class User_ extends User
             'name' => 'required',
             'sex' => 'required',
             'duty' => 'required',
+            'user_excerpt' => 'required',
             'user_login' => 'required',
             'user_password' => 'required',
             'more_thumbnail' => 'required',
@@ -183,6 +186,7 @@ class User_ extends User
                 $Obj->department_id = $requestData['department_id'];
                 $Obj->name = $requestData['name'];
                 $Obj->duty = $requestData['duty'];
+                $Obj->user_excerpt = $requestData['user_excerpt'];
                 //$Obj->user_login = $requestData['user_login'];
                 $Obj->user_password = Login::getPassword($requestData['user_password']);
                 $Obj->more = [
@@ -314,7 +318,16 @@ class User_ extends User
                 return $verify;
             }
 
-            $user = User::where('user_login', $user_login)->first();
+            $user = User
+                ::with(['roles' => function ($query) {
+                    $query->with(['auths']);
+                }])
+                ->where('user_login', $user_login)
+                ->firstOrFail();
+            if (empty($user)) {
+                throw new \Exception('用户不存在或密码错误');
+            }
+
             if (empty($user)) {
                 throw new \Exception('用户不存在或密码错误');
             }
@@ -327,7 +340,11 @@ class User_ extends User
             $AccessTokenObj = new AccessToken();
             $getAccessToken = $AccessTokenObj->create($token, (int)$user['id']);
 
-            $data = array_merge($getAccessToken['data'], ['user' => $user->toArray()]);
+            $data = array_merge(
+                $getAccessToken['data'],
+                ['user' => $user->toArray()],
+                ['auths_format' => $user->auths_format]
+            );
 
             $user->access_token = $getAccessToken['data']['access_token'];
             $success = $user->save();

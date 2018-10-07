@@ -30,4 +30,9 @@ class Election extends \App\Http\Controllers\Controller
         $result = Election_::AttendSubmit($id, $request->input('data'));
         return response()->json($result);
     }
+
+    public function UpdatePublicityContent(Request $request, $id){
+        $result = Election_::updateElectionPublicityContent($id, $request->input('data'));
+        return response()->json($result);
+    }
 }

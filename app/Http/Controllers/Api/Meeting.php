@@ -15,7 +15,7 @@ class Meeting extends \App\Http\Controllers\Controller
     public function departmentMeetingList(Request $request)
     {
         try {
-            $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+            $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
             $list = Meeting_::getDepartmentMeetingList(
                 $request->input('current_page', 0),
                 $request->input('page_size', 0),
@@ -32,14 +32,15 @@ class Meeting extends \App\Http\Controllers\Controller
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
-            return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+            $result = ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+            return response()->json($result);
         }
     }
 
     public function attendUserMeetingList(Request $request)
     {
         try {
-            $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+            $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
             $list = Meeting_::getAttendUserMeetingList(
                 $request->input('current_page', 0),
                 $request->input('page_size', 0),
@@ -63,7 +64,7 @@ class Meeting extends \App\Http\Controllers\Controller
     public function auditUserMeetingList(Request $request)
     {
         try {
-            $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+            $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
             $list = Meeting_::getAuditUserMeetingList(
                 $request->input('current_page', 0),
                 $request->input('page_size', 0),
@@ -85,7 +86,7 @@ class Meeting extends \App\Http\Controllers\Controller
 
     public function signIn(Request $request, $id)
     {
-        $result = Meeting_::signIn($id,$request->input('user_id'));
+        $result = Meeting_::signIn($id, $request->input('user_id'));
         return response()->json($result);
     }
 

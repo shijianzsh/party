@@ -29,7 +29,8 @@ class AuthMap_ extends AuthMap
                     ->orWhere('param_1', 'like', "%{$keyword}%")
                     ->orWhere('param_2', 'like', "%{$keyword}%")
                     ->orWhere('param_3', 'like', "%{$keyword}%")
-                    ->orWhere('description', 'like', "%{$keyword}%");
+                    ->orWhere('description_1', 'like', "%{$keyword}%")
+                    ->orWhere('description_2', 'like', "%{$keyword}%");
             });
         }
 

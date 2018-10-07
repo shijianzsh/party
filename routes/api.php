@@ -68,6 +68,7 @@ Route::namespace('Api')->group(function () {
         Route::resource('categories', 'CategoryController');
 
         Route::get('comments/audit_user', 'Comment@auditUserCommentList');
+        Route::post('comments/{id}/audit', 'Comment@audit');
         Route::resource('comments', 'CommentController');
 
         Route::get('meetings/department', 'Meeting@departmentMeetingList');
@@ -80,11 +81,13 @@ Route::namespace('Api')->group(function () {
         Route::get('elections/{id}/publicized', 'Election@getPublicizedElection');
         Route::get('elections/{id}/attend', 'Election@getAttendElection');
         Route::post('elections/{id}/attend_submit', 'Election@AttendSubmit');
+        Route::post('elections/{id}/update_publicity_content', 'Election@UpdatePublicityContent');
         Route::resource('elections', 'ElectionController');
 
         Route::get('votes/{id}/publicized', 'Vote@getPublicizedVote');
         Route::get('votes/{id}/attend', 'Vote@getAttendVote');
         Route::post('votes/{id}/attend_submit', 'Vote@AttendSubmit');
+        Route::post('votes/{id}/update_publicity_content', 'Vote@UpdatePublicityContent');
         Route::resource('votes', 'VoteController');
 
         Route::resource('exam_categorys', 'ExamCategoryController');

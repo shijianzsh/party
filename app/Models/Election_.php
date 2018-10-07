@@ -152,7 +152,7 @@ class Election_ extends Election
             'ended_at' => 'required',
             'election_user_ids' => 'required',
             'attend_user_ids' => 'required',
-            'more_files' => 'required',
+//            'more_files' => 'required',
         ]);
 
         try {
@@ -273,6 +273,39 @@ class Election_ extends Election
                     ::where('election_id', $Obj->id)
                     ->whereNotIn('user_id', $requestData['attend_user_ids'])
                     ->delete();
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+    }
+
+    static public function updateElectionPublicityContent(int $electionId, array $requestData): array
+    {
+        $validator = \Validator::make($requestData, [
+            'publicity_content' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            DB::transaction(function () use ($electionId, $requestData) {
+                $Obj = self::getElection($electionId, true);
+
+                if ($Obj->ended_at >= Carbon::now()->timestamp) {
+                    throw new \Exception('选举尚未结束');
+                }
+                if ($Obj->initiate_user_id !== User_::getMyId()) {
+                    throw new \Exception('您没有该权限');
+                }
+
+                $Obj->publicity_content = $requestData['publicity_content'];
+                $Obj->published_at = Carbon::now()->timestamp;
+                $Obj->save();
             });
         } catch (\Exception $e) {
             $success = 0;

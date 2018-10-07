@@ -121,23 +121,20 @@ class UserComment_ extends UserComment
         ];
     }
 
-    static public function getComment(int $CommentId, array $with = []): array
+    static public function getComment(int $commentId, array $with = []): array
     {
-        return $Obj = UserComment::with($with)->findOrFail($CommentId)->toArray();
+        return $Obj = UserComment::with($with)->findOrFail($commentId)->toArray();
     }
 
     static public function createComment(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-//            'user_id' => 'required',
-//            'to_user_ids' => 'required',
-//            'audit_user_id' => 'required',
+            'to_user_ids' => 'required',
+            'audit_user_id' => 'required',
 //            'need_audit' => 'required',
-//            'comment_title' => 'required',
-//            'comment_content' => 'required',
-//            'more_thumbnail' => 'required',
-//            'more_photos' => 'required',
-//            'more_videos' => 'required',
+            'comment_title' => 'required',
+            'comment_content' => 'required',
+            'leave_at' => 'required',
 //            'more_files' => 'required',
         ]);
 
@@ -148,11 +145,11 @@ class UserComment_ extends UserComment
 
             DB::transaction(function () use ($requestData) {
                 $Obj = new UserComment();
-                $Obj->user_id = $requestData['user_id'] ?? 0;
+                $Obj->user_id = User_::getMyId();
                 $Obj->need_audit = $requestData['need_audit'] ?? 1;//默认需要审核
-                $Obj->comment_title = $requestData['comment_title'] ?? '';
-                $Obj->comment_content = $requestData['comment_content'] ?? '';
-                $Obj->leave_at = $requestData['leave_at'] ?? 0;
+                $Obj->comment_title = $requestData['comment_title'];
+                $Obj->comment_content = $requestData['comment_content'];
+                $Obj->leave_at = $requestData['leave_at'];
                 $Obj->more = [
                     'files' => $requestData['more_files'] ?? null,
                 ];
@@ -181,18 +178,14 @@ class UserComment_ extends UserComment
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function updateComment(int $CommentId, array $requestData): array
+    static public function updateComment(int $commentId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-//            'user_id' => 'required',
-//            'to_user_ids' => 'required',
-//            'audit_user_id' => 'required',
-//            'need_audit' => 'required',
-//            'comment_title' => 'required',
-//            'comment_content' => 'required',
-//            'more_thumbnail' => 'required',
-//            'more_photos' => 'required',
-//            'more_videos' => 'required',
+            'to_user_ids' => 'required',
+            'audit_user_id' => 'required',
+            'comment_title' => 'required',
+            'comment_content' => 'required',
+            'leave_at' => 'required',
 //            'more_files' => 'required',
         ]);
 
@@ -201,24 +194,22 @@ class UserComment_ extends UserComment
                 throw new \Exception($validator->errors()->first());
             }
 
-            DB::transaction(function () use ($CommentId, $requestData) {
-                $Obj = UserComment::findOrFail($CommentId);
-//                $Obj->user_id = $requestData['user_id'] ?? 0;
-//                $Obj->need_audit = $requestData['need_audit'] ?? 1;//默认需要审核
-                $Obj->comment_title = $requestData['comment_title'] ?? '';
-                $Obj->comment_content = $requestData['comment_content'] ?? '';
-                $Obj->leave_at = $requestData['leave_at'] ?? 0;
+            DB::transaction(function () use ($commentId, $requestData) {
+                $Obj = UserComment::findOrFail($commentId);
+                $Obj->comment_title = $requestData['comment_title'];
+                $Obj->comment_content = $requestData['comment_content'];
+                $Obj->leave_at = $requestData['leave_at'];
                 $Obj->more = [
                     'files' => $requestData['more_files'] ?? null,
                 ];
                 $Obj->save();
 
                 if ($Obj->need_audit) {
-                    UserCommentAudit::where('comment_id', $CommentId)->delete();
+                    UserCommentAudit::where('comment_id', $commentId)->delete();
 
                     $Obj->audit()->save(new UserCommentAudit(['audit_user_id' => $requestData['audit_user_id'] ?? 0]));
                 } else {
-                    UserCommentAudit::where('comment_id', $CommentId)->delete();
+                    UserCommentAudit::where('comment_id', $commentId)->delete();
                 }
 
                 for ($i = 0; $i < count($requestData['to_user_ids']); $i++) {
@@ -243,25 +234,43 @@ class UserComment_ extends UserComment
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function deleteComment(int $CommentId): array
+    static public function deleteComment(int $commentId): array
     {
-        return ['success' => UserComment::destroy($CommentId)];
-    }
+        try {
+            $comment = self::getComment($commentId);
+            if ($comment['audit_status'] === UserCommentAudit::STATUS['通过']) {
+                throw new \Exception('禁止删除已通过审核的留言');
+            }
 
-    static public function auditComment(int $CommentId, int $status, string $reason)
-    {
-        $row = UserCommentAudit::where('comment_id', $CommentId)
-            ->where('audit_user_id', User_::getMyId())
-            ->firstOrFail();
-
-        if ($row->status !== UserCommentAudit::STATUS['待审核']) {
-            $statusNow = array_flip(UserCommentAudit::STATUS)[$row->status];
-            throw new \Exception('操作失败，已经审核过了。当前状态为 ' . $statusNow);
+            $success = UserComment::destroy($commentId);
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
         }
 
-        $row->status = $status;
-        $row->reason = $reason;
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+    }
 
-        return ['success' => (int)$row->save()];
+    static public function auditComment(int $commentId, int $status,$reason)
+    {
+        try {
+            $row = UserCommentAudit::where('comment_id', $commentId)
+                ->where('audit_user_id', User_::getMyId())
+                ->firstOrFail();
+
+            if ($row->status !== UserCommentAudit::STATUS['待审核']) {
+                $statusNow = array_flip(UserCommentAudit::STATUS)[$row->status];
+                throw new \Exception('操作失败，已经审核过了。当前状态为 ' . $statusNow);
+            }
+
+            $row->status = $status;
+            $row->reason = $reason;
+            $success = $row->save();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 }

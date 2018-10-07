@@ -16,8 +16,7 @@ class User extends \App\Http\Controllers\Controller
 {
     public function login(Request $request)
     {
-        $Obj = new User_();
-        return $Obj->getAccessToken(
+        return User_::getAccessToken(
             $request->input('token', ''),
             $request->input()
         );

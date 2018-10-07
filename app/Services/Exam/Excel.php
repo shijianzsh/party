@@ -68,7 +68,8 @@ class Excel
             $length = count($data[$i]['options']);
 
             if (!$length) {
-                throw new \Exception('Excel analyzeDataOptions options length error');
+                $msg="解析选项错误1：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                throw new \Exception($msg);
             }
 
             $tempArr = [];
@@ -77,12 +78,14 @@ class Excel
                 $tempLength = count($temp);
 
                 if ($tempLength !== 2) {
-                    throw new \Exception('Excel analyzeDataOptions option length error');
+                    $msg="解析选项错误2：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                    throw new \Exception($msg);
                 }
                 $tempArr[$temp[0]] = $temp[1];
             }
             if (count($tempArr) !== $length) {
-                throw new \Exception('Excel analyzeDataOptions length error');
+                $msg="解析选项错误3：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                throw new \Exception($msg);
             }
 
             $data[$i]['options'] = $tempArr;
@@ -101,7 +104,8 @@ class Excel
 
             for ($j = 0; $j < count($data[$i]['answers']); $j++) {
                 if (strlen($data[$i]['answers'][$j]) !== 1) {
-                    throw new \Exception('Excel analyzeDataAnswers answer length error');
+                    $msg="解析答案错误：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                    throw new \Exception($msg);
                 }
             }
         }

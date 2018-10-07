@@ -6,11 +6,11 @@ class MeetingAudit extends _BaseModel
 {
     public const STATUS = [
         '未审核' => 0,
-        '初审失败' => -2,
-        '初审成功' => 2,
-        '预约失败' => -3,
+        '初审成功' => 1,
+        '初审失败' => 2,
         '预约成功' => 3,
-        '通过审核' => 4
+        '预约失败' => 4,
+        '通过审核' => 5,
     ];
 
     protected $fillable = ['audit_user_id', 'status'];
@@ -29,6 +29,10 @@ class MeetingAudit extends _BaseModel
 
     public function getStatusFormatAttribute()
     {
+        $arr = array_flip(self::STATUS);
+        if (!in_array($this->status, $arr)) {
+            return '未知状态';
+        }
         return array_flip(self::STATUS)[$this->status];
     }
 }

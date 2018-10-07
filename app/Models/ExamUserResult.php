@@ -9,7 +9,7 @@ class ExamUserResult extends _BaseModel
         'answers_snapshot' => 'json',
     ];
 
-    protected $appends = ['is_passed_format'];
+    protected $appends = ['is_passed_format', 'submitted_at'];
 
     public function user()
     {
@@ -24,5 +24,10 @@ class ExamUserResult extends _BaseModel
     public function getIsPassedFormatAttribute()
     {
         return (bool)$this->is_passed ? '通过' : '未通过';
+    }
+
+    public function getSubmittedAtAttribute()
+    {
+        return $this->created_at->timestamp + $this->paper->duration * 60;
     }
 }

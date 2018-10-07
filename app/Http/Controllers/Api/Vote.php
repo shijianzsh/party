@@ -30,4 +30,9 @@ class Vote extends \App\Http\Controllers\Controller
         $result = Vote_::AttendSubmit($id, $request->input('data'));
         return response()->json($result);
     }
+
+    public function UpdatePublicityContent(Request $request, $id){
+        $result = Vote_::updateVotePublicityContent($id, $request->input('data'));
+        return response()->json($result);
+    }
 }

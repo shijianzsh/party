@@ -10,15 +10,42 @@ class UserPayment_ extends UserPayment
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-//            'user_id' => 0,
-//            'to_user_id' => 0,
+            'user_id' => 0,
+            'department_id' => 0,
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
         ],
         array $with = []
     ): array
     {
-        $Obj = UserPayment::with(array_merge($with,['user'=>function($query){
+        $userId =& $filter['user_id'];
+        $departmentId =& $filter['department_id'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = UserPayment::with(array_merge($with, ['user' => function ($query) {
             $query->with(['department']);
         }]));
+
+        if (!empty($userId)) {
+            $Obj->whereHas('user', function ($query) use ($userId) {
+                $query->where('user.id', $userId);
+            });
+        }
+
+        if (!empty($departmentId)) {
+            $Obj->whereHas('user', function ($query) use ($departmentId) {
+                $query->where('user.department_id', $departmentId);
+            });
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('finished_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('finished_at', '<=', $endTimestamp);
+        }
 
         $total = $Obj->count();
 

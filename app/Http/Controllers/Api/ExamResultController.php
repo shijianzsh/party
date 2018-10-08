@@ -20,7 +20,11 @@ class ExamResultController extends \App\Http\Controllers\Controller
         $list = ExamUserResult_::getExamUserResultList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
-            ['user_id' => &$filter['user_id']],
+            [
+                'user_id' => &$filter['user_id'],
+                'start_timestamp' => &$filter['start_timestamp'],
+                'end_timestamp' => &$filter['end_timestamp'],
+            ],
             ['user', 'paper']
         );
 

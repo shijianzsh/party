@@ -51,7 +51,10 @@ Route::namespace('Api')->group(function () {
         Route::post('users/{id}/update_one_field', 'User@updateOneField');
         Route::resource('users', 'UserController');
 
+        Route::get('user_notifications/{user_id}/unread_badge_count', 'UserNotification@getUserUnreadNotificationBadgeCount');
         Route::resource('user_notifications', 'UserNotificationController');
+
+        Route::resource('user_info_party_relations', 'UserInfoPartyRelationController');
 
         Route::resource('user_payments', 'UserPaymentController');
 
@@ -96,6 +99,7 @@ Route::namespace('Api')->group(function () {
 
         Route::resource('exam_papers', 'ExamPaperController');
 
+        Route::get('exam_results/{user_id}/user_submitted', 'ExamResult@getSubmittedList');
         Route::post('exam_results/{paperId}/start', 'ExamResult@start');
         Route::post('exam_results/{id}/submit', 'ExamResult@submit');
         Route::resource('exam_results', 'ExamResultController');

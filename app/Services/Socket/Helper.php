@@ -68,6 +68,9 @@ class Helper
                 $isSend = true;
             }
         }
+        if (!$isSend) {
+            throw new \Exception('警告:用户不在线');
+        }
         return $isSend;
     }
 

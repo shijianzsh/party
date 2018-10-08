@@ -1,13 +1,13 @@
 # ************************************************************
 # Sequel Pro SQL dump
-# Version 4541
+# Version 5224
 #
 # http://www.sequelpro.com/
 # https://github.com/sequelpro/sequelpro
 #
 # Host: 127.0.0.1 (MySQL 5.7.23)
 # Database: party
-# Generation Time: 2018-10-07 16:28:55 +0000
+# Generation Time: 2018-10-08 18:20:56 +0000
 # ************************************************************
 
 
@@ -15,6 +15,7 @@
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
+SET NAMES utf8mb4;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
@@ -168,11 +169,18 @@ VALUES
 	(122,'post','api','user_notifications','?',NULL,NULL,'resource store',NULL,0,0),
 	(123,'put','api','user_notifications','?',NULL,NULL,'resource update',NULL,0,0),
 	(124,'delete','api','user_notifications','?',NULL,NULL,'resource destroy',NULL,0,0),
-	(125,'post','api','pusher','?','index','?','Pusher@Socket',NULL,0,0),
+	(125,'post','api','pusher','?','socket','?','Pusher@Socket',NULL,0,0),
 	(126,'post','api','pusher','?','sms',NULL,'Pusher@Sms',NULL,0,0),
 	(127,'post','api','comments','?','audit',NULL,'Comment@audit',NULL,0,0),
 	(128,'post','api','elections','?','update_publicity_content',NULL,'Election@UpdatePublicityContent',NULL,0,0),
-	(129,'post','api','votes','?','update_publicity_content',NULL,'Vote@UpdatePublicityContent',NULL,0,0);
+	(129,'post','api','votes','?','update_publicity_content',NULL,'Vote@UpdatePublicityContent',NULL,0,0),
+	(130,'get','api','exam_results','?','user_submitted',NULL,'ExamResult@getSubmittedList',NULL,0,0),
+	(131,'get','api','user_notifications','?','unread_badge_count',NULL,'UserNotification@getUserUnreadNotificationBadgeCount',NULL,0,0),
+	(132,'get','api','user_info_party_relations',NULL,NULL,NULL,'resource index',NULL,0,0),
+	(133,'get','api','user_info_party_relations','?',NULL,NULL,'resource show',NULL,0,0),
+	(134,'post','api','user_info_party_relations','?',NULL,NULL,'resource store',NULL,0,0),
+	(135,'put','api','user_info_party_relations','?',NULL,NULL,'resource update',NULL,0,0),
+	(136,'delete','api','user_info_party_relations','?',NULL,NULL,'resource destroy',NULL,0,0);
 
 /*!40000 ALTER TABLE `par_auth_map` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -1516,7 +1524,8 @@ VALUES
 	(229,0,'/upload/20181007/题.xlsx',1538907404),
 	(230,0,'/upload/20181007/题.xlsx',1538907597),
 	(231,0,'/upload/20181007/IMG_0069.JPG',1538908423),
-	(232,0,'/upload/20181007/IMG_0003.JPG',1538917596);
+	(232,0,'/upload/20181007/IMG_0003.JPG',1538917596),
+	(233,0,'/upload/20181008/发票.pdf',1539017906);
 
 /*!40000 ALTER TABLE `par_upload_file_log` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -1551,8 +1560,8 @@ LOCK TABLES `par_user` WRITE;
 
 INSERT INTO `par_user` (`id`, `type`, `department_id`, `name`, `sex`, `cellphone`, `duty`, `user_excerpt`, `user_login`, `user_password`, `access_token`, `borned_at`, `created_at`, `updated_at`, `more`)
 VALUES
-	(1,0,0,'李静波','男',NULL,'111',NULL,'admin','bd417e904f9c00d3','eyJpdiI6IlU2d2t6aDlvMjllZldzZnRROVwvaDl3PT0iLCJ2YWx1ZSI6ImNTMnBNVjdYY29VT1Fpc3lncSt5Sjk5Rmd2bE9vaVRMd05NNnp6d3pqWlZMSEtDZ2Ezc2ZJM0x5Z1VHTVFOS3N6MnU0TlJ5ckVqcjVJT25KUXJGZGtCaEpLa2sreko3RmlzSUxWQTlIMFNSOXRGYXNjOFVDbkk1NmJmcTgwQW5vaXlaeEVNQThJeDVSOGtNV1Z4d0dqSkRpV3lHYUNDSXJzQVhCQUs4YW5RdHpqN2VKTkpLU21WTnNMUElEYVFUXC9tQjZQbGEwRkY3eXZmeUhaRzBLWVwvQ3N3bTJaS3YrWm15QzlQSXRQQnN3Q1lXbDhOcGZDK2htbHVuN2dXWDVGM2F3SWQzZlJyVGpmN21tTzl5Z0l4YmlVVjlOSk9pN3ZlV2VpMTQzYmF4aTZMUlZ0WFIrdVlETE5uWG1aZmNJcUhKOTVOUjh1eWIyWDdsSEg0OUY3VDFObGFQblNUR3F3TndwNU1MQzl4MHJGbW5VVFphQnUwT2lnWmNvUnlieHhBaHhHUlllWm1cL0hhQlpJdjl0Skpra3FORVBCZSt6citkdFZUclNtXC9JNE5NPSIsIm1hYyI6ImM4MDhjYjc5MjJlNjgzMTQ3NzE1ZjBmZjMxNGIwZDFjZjEzZmUzNzZiYTcwYjdmNzA2Y2ViMTc3NTM2ZjdmYjAifQ==',NULL,0,1538929487,'{\"thumbnail\":\"\\/upload\\/20180918\\/IMG_20160403_135828.jpg\"}'),
-	(2,3,1,'leader','女','15598259922','111','312321','leader','bd417e904f9c00d3','eyJpdiI6IldhWVdMTVNqWGJNWlNqdWxSVCs1Y1E9PSIsInZhbHVlIjoiM0VyYkJ6bjlzZ1ExWkQyaGp0NHNoOXFcL0lCUmVwU2E3NGs2d2gwXC85MEY2aG9oUUdKUG40ejdKV2JKY3RGTVpGZVpSWm5iVEZKeVpVUFNNcHVcLysya1BsNDh2Qnk5dkVBdXJkOXpGN1pLQlpHVFR4QWZ0Z2dQOG5RUHdQazZQYklFVU5tOHoyc2pYWW9mdWU1UWs2ekZaN3ExcEpVdG1INHVDQlwvcjMxNko1RWppSWNkSE5YRjA2cVMya1Ywc3ZPUnJYZVp2Nm5zZFhmSTIxZGxVa2xydXpER2x6MWtXSW10dGpvakdFRm9HUzVESVwvSDcyNEpJZjk4TG9MZmpMS2NMUnFtcVJTVTJpUW9zaWtuc0pMR21MOVIwb1dXYk1OSzVIdEg0ZzFTaFFXNlp0aTNWQ1laZStGTWgyN3g0alp2WkNyOEFWWTNzYVhLVFQ2TUJFQTc4VGswRHVEaXRsSnJIQnE5elwvSjZVUmdWRzU3OWFDUWMzckN4Q0NYdXBoTGk5N2xxdnY1NFVtS0RKaldpNHpiV0ljVVl0NHdqRUJsRmh0VXgzZ2M1UUprMD0iLCJtYWMiOiJmYTEyNmJjYWE5YTZmMjI5MTY2OWIwN2I5ODJmNjMxN2RlNWQ2MTAwZmUwMjQ3NmMyMjBhMTVhNjJhYjdjYjRmIn0=',NULL,0,1538929639,'{\"thumbnail\":\"\\/upload\\/20180918\\/IMG_20160403_135828.jpg\"}'),
+	(1,0,0,'李静波','男',NULL,'111',NULL,'admin','bd417e904f9c00d3','eyJpdiI6Imp1cVRVSFBIMVozNHM0ZEhtZXdXQmc9PSIsInZhbHVlIjoiQWV6SGdXSTlwU3JkTkVSMjkyV3Y0b1E0V3RcL0JUUG1oXC9weE9HSm5YM2s0VkxMclFLVUs3Z3drMnR4d05jV0s4dyttT29nNmdcL0lkU295SXMxc3Vtc2hJN1o4ZDNtZ3Y2V0ZJSVVcL2FzNTkzZE8wRmdtWFMrZ28wTGxEOUIyTFB0VEJLaExac1wvT2tOMHRhWE9vOVZNbDdEdGM3MEJKSzg3Nkh5Sm9pd3VGeXBiaVU0VDJHSnpuZG5BR2UzRWUyZXlaT05mU2FCaWlEY0R2MWVlRHk3dGZBVlBMRHhjNVozaHQyUVVzWmNYbkFcL0pqTExpS0lkd0VVbGVaeWlpRzhBajFyM2gwZTFBb3JXRkNzbzBSa05mcTV5WGY5ZmxEWFpNSmx0d0s5V1IrNVdtMWhOQlcyalNHTFhDZWwyakZ3T285TkI4RXYySHV2MGtTZlJSTUxKMEpld1dSMHZpK05qMHhtMld0OGdkNHRrelpJK1hXXC9jMm9UWDZHazAwU2NtcnljajhKWmlOSnRSZU9KTWZPbU11NGhTa1RrdjYwNmZVK251REZTYkxpbjQ9IiwibWFjIjoiOThkMzVhMjkwZmUxZjhjZjIzOTU2OTM3NzI1YTM2YzA2ODQ4NWI5NGNkZjhkNGZlNjQzMTM2YTRkM2EwMTVhYSJ9',NULL,0,1539018610,'{\"thumbnail\":\"\\/upload\\/20180918\\/IMG_20160403_135828.jpg\"}'),
+	(2,3,1,'leader','女','15598259922','111','312321','leader','bd417e904f9c00d3','eyJpdiI6IkdTT0RBMkJ2UWRaZzhsakY2c2Q1WHc9PSIsInZhbHVlIjoiRXJBaTdsaFRMeHFNVVZockRWN2dvamNWNnNyM0hlb25sQTd6UlwvUkJhQzN3R3N5WWIwRVczVkhcLzNOXC9od3JnV2x3b1ZKRTFTS2ZrTDMwQmZuN2w1ZEt1OXhrMXhMK2JtUlVLQ0huT25jQlhDNlRSYTQzYTQ3aFVZNUhPb3pXVHlFVGJxNVI4enp3dXJvTWkrZ3dSYTNlQ0x0N0ZPblFRZzFnNTB1YWk4VVBXNUFVbHpUTTR3dTl4N1dicFJ2VCt2cG5rNktYVklLWXplRER3NmVhZ3RcL2tyOFlzb2dDV090ZWlqRGlkSjc5eFwvNGlETGZTY0dUT2RBbFJxS1o1MVpZUnRYczdsdmp4a3hiWWx3SUtcLzFoSzJEaWlBYmZFcTQwb2FkWXlXMUNzWXBtOVo0TFN6UXpxajEreG9ZN2pwWDJ4QTBLMytnZ2tFYjBEeHJSZ2xDdmVpMzI0WlBacmYxUzBFcEFlNGNSSzZsZVQwcTBUSFwvenA4WUpudFpGdmFOTDhVRWtrWHFzNytHV1AwTEFqQzIrSEZ6bDNNMUtISWFVUXVGSEgrWExHV3M9IiwibWFjIjoiY2ExNTI1NDJhNTk5OTMyZTdjZGQ5YzcwOWRjMTEyZTFlM2ZlMDdmNWZjNzkwNGJhNGY0MjViMGY1MGUzODhkOSJ9',NULL,0,1539018664,'{\"thumbnail\":\"\\/upload\\/20180918\\/IMG_20160403_135828.jpg\"}'),
 	(5,2,2,'张三','男','15598259922',NULL,NULL,'party','bd417e904f9c00d3','eyJpdiI6Ilp3bytDS3A0dmFCMjBCOStwY1h6RHc9PSIsInZhbHVlIjoidStjaTN4dFBSRWVYT3lZS1pmVm13eWVSQmZKMW9rSGVsVTVTMWVtRGtpdmJsMW5id1poclwva2tCSVVkcEhmaE1wXC9UcXZlVURkNlZocDZlbzBUU1pKZDhjRTAraCs3elRNdkZKMTRuTFRlUGpzc0dVR2xlaU1qQ2l5bmduWFRyQmxhb1VJVTVcL3NNdVJOYVB2VlwvUHFQVXV6a29mTlo2SHFWcENockVWMDQwXC8yVEFxXC9rcjBJUEhFb0UxTk9aZ2dFaDNSc2M1aDAzSzNzMk03YkRiYWhlRmV5dEpMcUNpNFdmOXdMNlk0VzlWMTc5QlZZV0lCR1RCbGRlRDV2aUF3UGZTQVFRSm5TOWVxUTk4bTJoZ2w3bEN5eElyZUhcL3c1UmtVcVhmVXlxTGNPdlwvcVhQUHlodzl1MnhQYmZcL1g3Qk5cL2RiXC9zbHBaVHg0VnZ4Rk9DNnUwR3hLS3pvVGl5aTc0YkVvSkphNTFUbmk0U1wvcWVaZU4xY0lobXZ5QkJpc3hEa1ozVHlZXC9hclhLejZJRmtOeVRZN090MjYrbGZodk04MHlkVVhiY3RzZGs9IiwibWFjIjoiMjQ5YWZhNzhkMDE3NGY5Yjg4Y2ZjYmVjM2U4ZjUzZGMwZGUzN2M1ODg0NzkyYWVkYWZhZjI2YmNiNWEzYWY5NSJ9',NULL,0,1537170468,NULL),
 	(9,2,2,'李四','女','12312','办公室委员11',NULL,'lisi','bd417e904f9c00d3',NULL,321,0,1537153577,NULL),
 	(10,1,1,'王五','',NULL,NULL,NULL,'4','bd417e904f9c00d3',NULL,NULL,1537169358,1537169358,'{\"thumbnail\":\"\\/upload\\/20180918\\/IMG_20160403_135828.jpg\"}'),
@@ -1595,7 +1604,9 @@ VALUES
 	(11,0,0,'0','0','{\"files\":[{\"uid\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\",\"name\":\"IMG_20170907_170000.jpg\",\"size\":5127998,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\"},{\"uid\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\",\"name\":\"IMG_20171013_111047.jpg\",\"size\":4245915,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\"}]}',NULL,1536758844,1536758844),
 	(12,0,1,'0','0','{\"files\":[{\"uid\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\",\"name\":\"IMG_20170907_170000.jpg\",\"size\":5127998,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20170907_170000.jpg\"},{\"uid\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\",\"name\":\"IMG_20171013_111047.jpg\",\"size\":4245915,\"type\":\"image\\/jpeg\",\"status\":\"done\",\"url\":\"\\/upload\\/20180912\\/IMG_20171013_111047.jpg\"}]}',1536845224,1536758864,1536758864),
 	(14,9,1,'321','321','{\"files\":null}',1536760316,1536760317,1536760317),
-	(18,2,1,'测试留言11','11111\nfdfdsfdas\nfdafdafdaf\nfdsafdsaf\nfasdfadsf\nfasdfdsaf\nfafdsafdas\nfdasfdsa','{\"files\":[{\"lastModified\":1523412588000,\"lastModifiedDate\":\"2018-04-11T02:09:48.000Z\",\"name\":\"IMG_0003.JPG\",\"size\":2616894,\"type\":\"image\\/jpeg\",\"uid\":\"vc-upload-1538875033444-3\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181007\\/IMG_0003.JPG\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1538875033444-3\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181007\\/IMG_0003.JPG\"},{\"lastModified\":1523412584000,\"lastModifiedDate\":\"2018-04-11T02:09:44.000Z\",\"name\":\"IMG_0009.JPG\",\"size\":1950162,\"type\":\"image\\/jpeg\",\"uid\":\"vc-upload-1538875033444-4\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181007\\/IMG_0009.JPG\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1538875033444-4\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181007\\/IMG_0009.JPG\"},{\"lastModified\":1523412351000,\"lastModifiedDate\":\"2018-04-11T02:05:51.000Z\",\"name\":\"IMG_0066.JPG\",\"size\":1493920,\"type\":\"image\\/jpeg\",\"uid\":\"vc-upload-1538876484756-5\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181007\\/IMG_0066.JPG\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1538876484756-5\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181007\\/IMG_0066.JPG\"}]}',1538876702,1538875079,1538876703);
+	(18,2,1,'测试留言11','11111\nfdfdsfdas\nfdafdafdaf\nfdsafdsaf\nfasdfadsf\nfasdfdsaf\nfafdsafdas\nfdasfdsa','{\"files\":[{\"lastModified\":1523412588000,\"lastModifiedDate\":\"2018-04-11T02:09:48.000Z\",\"name\":\"IMG_0003.JPG\",\"size\":2616894,\"type\":\"image\\/jpeg\",\"uid\":\"vc-upload-1538875033444-3\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181007\\/IMG_0003.JPG\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1538875033444-3\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181007\\/IMG_0003.JPG\"},{\"lastModified\":1523412584000,\"lastModifiedDate\":\"2018-04-11T02:09:44.000Z\",\"name\":\"IMG_0009.JPG\",\"size\":1950162,\"type\":\"image\\/jpeg\",\"uid\":\"vc-upload-1538875033444-4\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181007\\/IMG_0009.JPG\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1538875033444-4\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181007\\/IMG_0009.JPG\"},{\"lastModified\":1523412351000,\"lastModifiedDate\":\"2018-04-11T02:05:51.000Z\",\"name\":\"IMG_0066.JPG\",\"size\":1493920,\"type\":\"image\\/jpeg\",\"uid\":\"vc-upload-1538876484756-5\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181007\\/IMG_0066.JPG\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1538876484756-5\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181007\\/IMG_0066.JPG\"}]}',1538876702,1538875079,1538876703),
+	(21,2,1,'测试推送','111','{\"files\":[{\"lastModified\":1538961520631,\"lastModifiedDate\":\"2018-10-08T01:18:40.631Z\",\"name\":\"\\u53d1\\u7968.pdf\",\"size\":24548,\"type\":\"application\\/pdf\",\"uid\":\"vc-upload-1539015606051-7\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181008\\/\\u53d1\\u7968.pdf\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1539015606051-7\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181008\\/\\u53d1\\u7968.pdf\"}]}',1539017481,1539018029,1539018029),
+	(24,2,1,'测试推送','111','{\"files\":[{\"lastModified\":1538961520631,\"lastModifiedDate\":\"2018-10-08T01:18:40.631Z\",\"name\":\"\\u53d1\\u7968.pdf\",\"size\":24548,\"type\":\"application\\/pdf\",\"uid\":\"vc-upload-1539015606051-7\",\"response\":{\"success\":1,\"data\":\"\\/upload\\/20181008\\/\\u53d1\\u7968.pdf\"},\"percent\":100,\"originFileObj\":{\"uid\":\"vc-upload-1539015606051-7\"},\"status\":\"done\",\"url\":\"\\/upload\\/20181008\\/\\u53d1\\u7968.pdf\"}]}',1539017481,1539018084,1539018084);
 
 /*!40000 ALTER TABLE `par_user_comment` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -1628,7 +1639,9 @@ VALUES
 	(6,17,2,0,NULL,1537378722,1537378722),
 	(12,19,2,0,NULL,1538877618,1538877618),
 	(13,20,2,0,NULL,1538877634,1538877634),
-	(14,18,2,2,'3123',1538880289,1538880307);
+	(14,18,2,2,'3123',1538880289,1538880307),
+	(17,21,2,0,NULL,1539018029,1539018029),
+	(20,24,2,1,NULL,1539018084,1539018237);
 
 /*!40000 ALTER TABLE `par_user_comment_audit` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -1684,7 +1697,8 @@ VALUES
 	(29,20,2,1538877634,1538877634),
 	(30,20,10,1538877634,1538877634),
 	(31,20,11,1538877634,1538877634),
-	(32,20,12,1538877634,1538877634);
+	(32,20,12,1538877634,1538877634),
+	(33,24,2,1539018084,1539018084);
 
 /*!40000 ALTER TABLE `par_user_comment_user` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -1772,6 +1786,21 @@ CREATE TABLE `par_user_notification` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `par_user_notification` WRITE;
+/*!40000 ALTER TABLE `par_user_notification` DISABLE KEYS */;
+
+INSERT INTO `par_user_notification` (`id`, `user_id`, `is_checked`, `related_type`, `related_id`, `operate_type`, `out_id`, `created_at`, `updated_at`)
+VALUES
+	(1,2,1,1,0,0,NULL,1,1539012885),
+	(2,2,1,2,0,0,NULL,1,1539020270),
+	(3,2,1,3,0,0,NULL,0,0),
+	(4,1,1,3,0,0,NULL,0,0),
+	(5,2,1,3,24,2,NULL,1539018084,1539020421),
+	(6,2,1,3,24,4,NULL,1539018237,1539019916),
+	(7,2,0,3,24,1,NULL,1539018238,1539018238);
+
+/*!40000 ALTER TABLE `par_user_notification` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table par_user_payment

@@ -12,9 +12,10 @@
 */
 require __DIR__ . '/helpers/common.php';
 require __DIR__ . '/helpers/blade.php';
+require __DIR__ . '/helpers/model.php';
 
 $app = new Illuminate\Foundation\Application(
-    realpath(__DIR__.'/../')
+    realpath(__DIR__ . '/../')
 );
 
 /*

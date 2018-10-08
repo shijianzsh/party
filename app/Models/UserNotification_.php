@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Services\Notification\Pusher;
 use DB;
-use App\Services\Pusher\Notification;
 
 class UserNotification_ extends UserNotification
 {
@@ -24,7 +24,7 @@ class UserNotification_ extends UserNotification
 
         $Obj = UserNotification::with($with);
 
-        $Obj->orderBy('is_checked', 'desc');
+        $Obj->orderBy('is_checked', 'asc');
 
         if (!empty($user_id)) {
             $Obj->where('user_id', $user_id);
@@ -62,20 +62,28 @@ class UserNotification_ extends UserNotification
         try {
             $get = UserNotification
                 ::where('user_id', $userId)
-                ::where('is_checked', 0)
+                ->where('is_checked', 0)
                 ->get()
                 ->toArray();
 
-            $data = [];
+            $count = [];
             for ($i = 0; $i < count($get); $i++) {
                 $row = $get[$i];
                 $related_type = $row['related_type'];
 
-                if (!array_key_exists($related_type, $data)) {
-                    $data[$related_type] = 0;
+                if (!array_key_exists($related_type, $count)) {
+                    $count[$related_type] = 0;
                 }
-                $data[$related_type]++;
+                $count[$related_type]++;
             }
+
+            $map = array_flip(self::RELATED_TYPE);
+            unset($map[0]);
+
+            $data = [
+                'map' => $map,
+                'count' => $count
+            ];
 
         } catch (\Exception $e) {
             $success = 0;
@@ -86,6 +94,12 @@ class UserNotification_ extends UserNotification
     }
 
     static public function getNotification(int $notificationId, array $with = []): array
+    {
+        $Obj = UserNotification::with($with)->findOrFail($notificationId);
+        return $Obj->toArray();
+    }
+
+    static public function checkNotification(int $notificationId, array $with = []): array
     {
         $Obj = UserNotification::with($with)->findOrFail($notificationId);
         if (!$Obj->is_checked) {
@@ -122,7 +136,7 @@ class UserNotification_ extends UserNotification
                 $notification_id = $Obj->id;
             });
 
-            Notification::send($requestData['user_id'],$notification_id,'new message');
+            Pusher::send($notification_id);
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

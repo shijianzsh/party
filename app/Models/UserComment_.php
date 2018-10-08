@@ -156,7 +156,14 @@ class UserComment_ extends UserComment
                 $Obj->save();
 
                 if ($Obj->need_audit) {
-                    $Obj->audit()->save(new UserCommentAudit(['audit_user_id' => $requestData['audit_user_id'] ?? 0]));
+                    $Obj->audit()->save(new UserCommentAudit(['audit_user_id' => $requestData['audit_user_id']]));
+
+                    createNotification([
+                        'user_id' => $requestData['audit_user_id'],
+                        'related_type' => \App\Models\UserNotification::RELATED_TYPE['留言'],
+                        'related_id' => $Obj->id,
+                        'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['审核'],
+                    ]);
                 }
 
                 $createMany = [];
@@ -251,7 +258,7 @@ class UserComment_ extends UserComment
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function auditComment(int $commentId, int $status,$reason)
+    static public function auditComment(int $commentId, int $status, $reason)
     {
         try {
             $row = UserCommentAudit::where('comment_id', $commentId)
@@ -266,6 +273,23 @@ class UserComment_ extends UserComment
             $row->status = $status;
             $row->reason = $reason;
             $success = $row->save();
+
+            if ($status) {
+                $comment = self::getComment($commentId);
+                createNotification([
+                    'user_id' => $comment['user_id'],
+                    'related_type' => \App\Models\UserNotification::RELATED_TYPE['留言'],
+                    'related_id' => $comment['id'],
+                    'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['审核通过'],
+                ]);
+
+                createNotification([
+                    'user_id' => $comment['to_user_ids'],
+                    'related_type' => \App\Models\UserNotification::RELATED_TYPE['留言'],
+                    'related_id' => $comment['id'],
+                    'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['查看'],
+                ]);
+            }
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

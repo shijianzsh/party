@@ -15,16 +15,75 @@ class ExamUserResult_ extends ExamUserResult
         int $pageSize = 0,
         array $filter = [
             'user_id' => null,
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
         ],
         array $with = []
     ): array
     {
+        $userId =& $filter['user_id'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
         $Obj = ExamUserResult::with($with);
 
+        if (!empty($userId)) {
+            $Obj->where('user_id', $userId);
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('created_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('created_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+    }
+
+    static public function getExamUserSubmittedResultList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'user_id' => null,
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
+        ],
+        array $with = []
+    ): array
+    {
         $userId =& $filter['user_id'];
-        if ($userId !== null) {
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = ExamUserResult::with($with);
+
+        if (!empty($userId)) {
             $Obj->where('user_id', $userId)
                 ->where('is_submitted', 1);
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('created_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('created_at', '<=', $endTimestamp);
         }
 
         $total = $Obj->count();

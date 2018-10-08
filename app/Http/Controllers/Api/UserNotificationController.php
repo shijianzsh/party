@@ -22,23 +22,13 @@ class UserNotificationController extends \App\Http\Controllers\Controller
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-                'keyword' => &$filter['keyword'],
+                'user_id' => &$filter['user_id'],
+                'related_type' => &$filter['related_type'],
+                'is_checked' => &$filter['is_checked'],
             ]
         );
 
         $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
-        return response()->json($result);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $result = UserNotification_::createNotification($request->input('data'));
         return response()->json($result);
     }
 
@@ -50,23 +40,10 @@ class UserNotificationController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $row = UserNotification_::getNotification($id, []);
+        $row = UserNotification_::checkNotification($id, []);
 
         $result = ['success' => 1, 'data' => $row];
         return response()->json($result);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     */
-    public function update(Request $request, $id)
-    {
-        return response()->json(['success' => 0, 'msg' => '没有这个方法']);
-//        $result = UserNotification_::updateNotification($id, $request->input('data'));
-//        return response()->json($result);
     }
 
     /**

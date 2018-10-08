@@ -9,13 +9,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\SMS\SMS;
-use App\Services\Pusher\Socket;
+use App\Services\Socket\Push;
 
 class Test extends \App\Http\Controllers\Controller
 {
     function __invoke()
     {
-        $r = Socket::send('push_to_uid', [1, 21, 3], 1);
+        $r = Push::send('push_notification_to_uid', [1, 21, 3], 2);
         dump($r);
     }
 }

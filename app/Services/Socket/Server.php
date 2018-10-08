@@ -33,22 +33,26 @@ class Server
                 $resValue =& $res['value'];
                 $uid =& $res['uid'];
 
-                switch ($resKey) {
-                    case 'push_to_uid':
-                        $success = (int)Helper::sendToUid($worker, $uid, ['push_to_uid' => $resValue]);
-                        break;
-                    case 'push_to_all':
-                        $success = (int)Helper::sendToAll($worker, ['push_to_all' => $resValue]);
-                        break;
-                    case 'push_to_admin':
-                        $success = (int)Helper::sendToAdmin($worker, ['push_to_admin' => $resValue]);
-                        break;
-                    default:
-                        $success = 0;
-                        break;
+                try {
+                    switch ($resKey) {
+                        case 'push_to_uid':
+                            $success = (int)Helper::sendToUid($worker, $uid, ['push_to_uid' => $resValue]);
+                            break;
+                        case 'push_to_all':
+                            $success = (int)Helper::sendToAll($worker, ['push_to_all' => $resValue]);
+                            break;
+                        case 'push_to_admin':
+                            $success = (int)Helper::sendToAdmin($worker, ['push_to_admin' => $resValue]);
+                            break;
+                        default:
+                            $success = (int)Helper::sendToUid($worker, $uid, [$resKey => $resValue]);
+                            break;
+                    }
+                } catch (\Exception $e) {
+                    $msg = $e->getMessage();
                 }
 
-                $result = ['success' => $success ?? 1];
+                $result = ['success' => $success ?? 1, 'msg' => $msg ?? null];
                 $connection->send(json_encode($result));
             };
             // ## 执行监听 ##
@@ -64,7 +68,7 @@ class Server
             $resKey =& $res['key'];
             switch ($resKey) {
                 case 'set_uid':
-                    Helper::setUid($main_worker,$connection, $res['value']);
+                    Helper::setUid($main_worker, $connection, $res['value']);
                     Helper::sendToAdmin($main_worker, ['push_uids' => Helper::getUids($main_worker)]);
                     Helper::send($connection, ['set_uid' => true]);
                     break;

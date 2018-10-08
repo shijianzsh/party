@@ -12,9 +12,10 @@ namespace App\Services\Socket;
 class Push
 {
     private const KEY_MAP = [
+        'push_notification_to_uid',
         'push_to_uid',
         'push_to_all',
-        'push_to_admin'
+        'push_to_admin',
     ];
 
     static public function send(string $sendKey, $sendValue, int $uid = null)
@@ -49,7 +50,11 @@ class Push
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $success ? $msg ?? null : '发送失败', 'data' => $data ?? null];
+        return [
+            'success' => (int)($success ?? 1),
+            'msg' => !$success ? ($msg ? $msg : '发送失败') : null,
+            'data' => $data ?? null
+        ];
 
     }
 }

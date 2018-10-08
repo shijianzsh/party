@@ -167,7 +167,7 @@ VALUES
 	(122,'post','api','user_notifications','?',NULL,NULL,'resource store',0,0),
 	(123,'put','api','user_notifications','?',NULL,NULL,'resource update',0,0),
 	(124,'delete','api','user_notifications','?',NULL,NULL,'resource destroy',0,0),
-	(125,'post','api','pusher','?','socket','?','Pusher@Socket',0,0),
+	(125,'post','api','pusher','?','index','?','Pusher@Socket',0,0),
 	(126,'post','api','pusher','?','sms',NULL,'Pusher@Sms',0,0);
 
 /*!40000 ALTER TABLE `par_auth_map` ENABLE KEYS */;

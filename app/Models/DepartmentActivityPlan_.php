@@ -12,7 +12,7 @@ class DepartmentActivityPlan_ extends DepartmentActivityPlan
         array $filter = [
             'initiate_user_id' => 0,
             'keyword' => null,
-            'start_timestamp' =>null,
+            'start_timestamp' => null,
             'end_timestamp' => null,
         ],
         array $with = ['attendUsersMiddle']
@@ -25,7 +25,7 @@ class DepartmentActivityPlan_ extends DepartmentActivityPlan
 
         $Obj = DepartmentActivityPlan::with(array_merge($with, ['department', 'initiateUser']));
 
-        if ( !empty($initiate_user_id)) {
+        if (!empty($initiate_user_id)) {
             $Obj->where('initiate_user_id', $initiate_user_id);
         }
         if (!empty($keyword)) {
@@ -107,6 +107,15 @@ class DepartmentActivityPlan_ extends DepartmentActivityPlan
                     ];
                 }
                 DepartmentActivityPlanUser::insert($createMany);
+
+                if ($Obj->type === self::TYPE['下发通知']) {
+                    createNotification([
+                        'user_id' => $requestData['attend_user_ids'],
+                        'related_type' => \App\Models\UserNotification::RELATED_TYPE['党支部活动'],
+                        'related_id' => $Obj->id,
+                        'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['参加'],
+                    ]);
+                }
             });
         } catch (\Exception $e) {
             $success = 0;

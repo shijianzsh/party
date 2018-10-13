@@ -30,7 +30,7 @@ class MeetingAudit extends _BaseModel
     public function getStatusFormatAttribute()
     {
         $arr = array_flip(self::STATUS);
-        if (!in_array($this->status, $arr)) {
+        if (!array_key_exists($this->status, $arr)) {
             return '未知状态';
         }
         return array_flip(self::STATUS)[$this->status];

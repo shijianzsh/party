@@ -9,7 +9,7 @@ class ExamUserResult extends _BaseModel
         'answers_snapshot' => 'json',
     ];
 
-    protected $appends = ['is_passed_format', 'submitted_at'];
+    protected $appends = ['is_passed_format', 'submitted_at','created_at_format','updated_at_format'];
 
     public function user()
     {

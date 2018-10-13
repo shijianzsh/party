@@ -145,21 +145,21 @@ class ExamUserResult_ extends ExamUserResult
                 ->where('paper_id', $paperId)
                 ->first();
 
-            if (!$checkResult) {
-                $Obj = new ExamUserResult();
-                $Obj->user_id = $userId;
-                $Obj->paper_id = $paperId;
-                $Obj->paper_snapshot = $paper->toArray();
-                $success = $Obj->save();
-
-                $data = $Obj;
-            } else {
-                $data = $checkResult;
-            }
-
             if ($checkResult && $checkResult->is_submitted) {
                 throw new \Exception('您已经参加过考试了');
             }
+
+            if ($checkResult) {
+                $checkResult->delete();
+            }
+
+            $Obj = new ExamUserResult();
+            $Obj->user_id = $userId;
+            $Obj->paper_id = $paperId;
+            $Obj->paper_snapshot = $paper->toArray();
+            $success = $Obj->save();
+
+            $data = $Obj;
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

@@ -10,8 +10,8 @@ class Meeting extends _BaseModel
         'type_format',
         'attend_users_count',
         'opened_at_format',
-        'meeting_leader', 'meeting_leader_name_format',
-        'meeting_attend_user', 'meeting_attend_user_name_format',
+        'meeting_leader', 'meeting_leader_ids', 'meeting_leader_name_format',
+        'meeting_attend_user', 'meeting_attend_user_ids', 'meeting_attend_user_name_format',
     ];
 
     public function audit()
@@ -82,6 +82,12 @@ class Meeting extends _BaseModel
         return implode(",", array_column($arr, 'name'));
     }
 
+    public function getMeetingLeaderIdsAttribute()
+    {
+        $arr = $this->meeting_leader;
+        return array_column($arr, 'id');
+    }
+
     //获取会议普通参会人
     public function getMeetingAttendUserAttribute()
     {
@@ -102,5 +108,11 @@ class Meeting extends _BaseModel
     {
         $arr = $this->meeting_attend_user;
         return implode(",", array_column($arr, 'name'));
+    }
+
+    public function getMeetingAttendUserIdsAttribute()
+    {
+        $arr = $this->meeting_attend_user;
+        return array_column($arr, 'id');
     }
 }

@@ -193,9 +193,6 @@ class ExamPaper_ extends ExamPaper
                 $finished_at =& $requestData['finished_at'];
 
                 $Obj = ExamPaper::findOrFail($examPaperId);
-                if (!$Obj) {
-                    throw new \Exception('updateExamPaper ExamPaper Obj null');
-                }
 
                 if ($Obj->published_at <= Carbon::now()->timestamp) {
                     throw new \Exception('已开考了，不允许修改');

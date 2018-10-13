@@ -32,11 +32,14 @@ class Pusher
 
         $socket = Push::send('push_notification_to_uid', ['notification_id' => $notification_id], $user_id);
 
-        $name = $notification['user']['name'];
-        $phone = $notification['user']['cellphone'];
-        $template_code = 'SMS_147202143';
-        $data = ['name' => $name, 'operate_type' => $operate_type_format, 'related_type' => $related_type_format];
-        $sms = Sms::send($phone, $template_code, $data);
+        $is_send_sms = (bool)$notification['is_send_sms'];
+        if ($is_send_sms) {
+            $name = $notification['user']['name'];
+            $phone = $notification['user']['cellphone'];
+            $template_code = 'SMS_147202143';
+            $data = ['name' => $name, 'operate_type' => $operate_type_format, 'related_type' => $related_type_format];
+            $sms = Sms::send($phone, $template_code, $data);
+        }
 
         return ['success' => 1, 'data' => ['socket' => $socket, 'sms' => $sms]];
     }

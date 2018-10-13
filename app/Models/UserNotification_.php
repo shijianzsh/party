@@ -116,6 +116,7 @@ class UserNotification_ extends UserNotification
             'related_type' => 'required',
             'related_id' => 'required',
             'operate_type' => 'required',
+            'is_send_sms' => 'required',
         ]);
 
         try {
@@ -131,6 +132,7 @@ class UserNotification_ extends UserNotification
                 $Obj->related_type = $requestData['related_type'];
                 $Obj->related_id = $requestData['related_id'];
                 $Obj->operate_type = $requestData['operate_type'];
+                $Obj->is_send_sms = (int)$requestData['is_send_sms'];
                 $Obj->save();
 
                 $notification_id = $Obj->id;

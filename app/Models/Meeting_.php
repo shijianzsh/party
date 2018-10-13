@@ -228,6 +228,7 @@ class Meeting_ extends Meeting
             'initiateUser',
 //            'attendUsers'
         ]);
+
         $Obj->where('need_audit', 1)
             ->whereHas('audit', function ($query) use ($userId) {
                 $query->where('meeting_audit.audit_user_id', $userId);
@@ -284,7 +285,6 @@ class Meeting_ extends Meeting
     static public function createMeeting(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-//            'initiate_user_id' => 'initiate_user_id',//自动获取
 //            'need_audit' => 'required',
             'title' => 'required',
             'type' => 'required',
@@ -314,7 +314,7 @@ class Meeting_ extends Meeting
             $Obj = null;
             DB::transaction(function () use (&$Obj, $requestData) {
                 $Obj = new Meeting;
-                $Obj->department_id = User::where('id', User_::getMyId())->first()->department->id;
+                $Obj->department_id = Department_::getMyId();
                 $Obj->initiate_user_id = User_::getMyId();
                 $Obj->need_audit = 1;
                 $Obj->title = $requestData['title'];
@@ -330,6 +330,13 @@ class Meeting_ extends Meeting
                             'audit_user_id' => $requestData['audit_user_id'],
                             'status' => MeetingAudit::STATUS['未审核']
                         ]);
+
+                    createNotification([
+                        'user_id' => $requestData['audit_user_id'],
+                        'related_type' => \App\Models\UserNotification::RELATED_TYPE['会议'],
+                        'related_id' => $Obj->id,
+                        'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['审核'],
+                    ]);
                 }
 
                 $saveMany = [];
@@ -361,17 +368,14 @@ class Meeting_ extends Meeting
 
     static public function updateMeeting(int $meetingId, array $requestData): array
     {
-        //TODO
-        return [];
         $validator = \Validator::make($requestData, [
-//            'initiate_user_id' => 'initiate_user_id',//自动获取
 //            'need_audit' => 'required',
             'title' => 'required',
             'type' => 'required',
             'location' => 'required',
             'opened_at' => 'required',
 //            'ended_at' => 'required',
-            'audit_user_id' => 'required',
+//            'audit_user_id' => 'required',
             'leader_ids' => 'required',
             'attend_user_ids' => 'required',
         ]);
@@ -392,11 +396,22 @@ class Meeting_ extends Meeting
             }
 
             $Obj = null;
-            DB::transaction(function () use (&$Obj, $requestData) {
-                $Obj = new Meeting;
-                $Obj->department_id = User::where('id', User_::getMyId())->first()->department['id'];
-                $Obj->initiate_user_id = User_::getMyId();
-                $Obj->need_audit = 1;
+            DB::transaction(function () use (&$Obj, $meetingId, $requestData) {
+                $Obj = Meeting::findOrFail($meetingId);
+
+                if ($Obj->need_audit
+                    && in_array(
+                        $Obj->audit->status,
+                        [
+                            MeetingAudit::STATUS['初审成功'],
+                            MeetingAudit::STATUS['预约成功'],
+                            MeetingAudit::STATUS['通过审核'],
+                        ]
+                    )
+                ) {
+                    throw new \Exception('当前状态不允许修改');
+                }
+
                 $Obj->title = $requestData['title'];
                 $Obj->type = $requestData['type'];
                 $Obj->location = $requestData['location'];
@@ -405,11 +420,17 @@ class Meeting_ extends Meeting
                 $Obj->save();
 
                 if ($Obj->need_audit) {
-                    $Obj->audit()
-                        ->create([
-                            'audit_user_id' => $requestData['audit_user_id'],
-                            'status' => MeetingAudit::STATUS['未审核']
-                        ]);
+
+                    $AuditObj = MeetingAudit::findOrFail($Obj->audit->id);
+                    $AuditObj->status = MeetingAudit::STATUS['未审核'];
+                    $AuditObj->save();
+
+                    createNotification([
+                        'user_id' => $requestData['audit_user_id'],
+                        'related_type' => \App\Models\UserNotification::RELATED_TYPE['会议'],
+                        'related_id' => $Obj->id,
+                        'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['审核'],
+                    ]);
                 }
 
                 $saveMany = [];
@@ -429,6 +450,7 @@ class Meeting_ extends Meeting
                             'need_appointment' => $Obj->type == self::TYPE['线下'] ? 1 : 0,
                         ]);
                 }
+                $Obj->attendUsersMiddle()->delete();
                 $Obj->attendUsersMiddle()->saveMany($saveMany);
             });
         } catch (\Exception $e) {
@@ -518,7 +540,7 @@ class Meeting_ extends Meeting
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
-    static public function auditMeeting(int $meetingId, int $status, $reason = null)
+    static public function auditMeeting(int $meetingId, int $status, $reason = '')
     {
         try {
             $row = MeetingAudit::where('meeting_id', $meetingId)->firstOrFail();
@@ -533,13 +555,66 @@ class Meeting_ extends Meeting
             }
 
             if ($row->status !== MeetingAudit::STATUS['未审核']) {
-                throw new \Exception('状态错误:状态为已审核');
+                throw new \Exception('状态错误');
+            }
+
+            if (!in_array($status, [MeetingAudit::STATUS['初审成功'], MeetingAudit::STATUS['初审失败']])) {
+                throw new \Exception('param status error');
             }
 
             $row->status = $status;
             $row->reason = $reason;
 
             $row->save();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+    }
+
+    static public function arrangeMeetingAndSendPush(int $meetingId, int $status, $reason = '')
+    {
+        try {
+            $row = MeetingAudit::where('meeting_id', $meetingId)->firstOrFail();
+            $userId = User_::getMyId();
+
+            if (empty($row)) {
+                throw new \Exception('获取审核信息失败');
+            }
+            if ($row->audit_user_id !== $userId) {
+                throw new \Exception('没有审核权限');
+            }
+            if ($row->status !== MeetingAudit::STATUS['初审成功']) {
+                throw new \Exception('状态错误');
+            }
+            if (!in_array($status, [MeetingAudit::STATUS['预约成功'], MeetingAudit::STATUS['预约失败']])) {
+                throw new \Exception('param status error');
+            }
+
+            $row->status = $status;
+            $row->reason = $reason;
+
+            $row->save();
+
+            if ($status) {
+                $meeting = self::getMeeting($meetingId);
+                createNotification([
+                    'user_id' => $meeting['initiate_user_id'],
+                    'related_type' => \App\Models\UserNotification::RELATED_TYPE['会议'],
+                    'related_id' => $meeting['id'],
+                    'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['审核通过'],
+                ]);
+
+                createNotification([
+                    'user_id' => array_column($meeting['attend_users'], 'id'),
+                    'related_type' => \App\Models\UserNotification::RELATED_TYPE['会议'],
+                    'related_id' => $meeting['id'],
+                    'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['参加'],
+                ]);
+            }
+
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

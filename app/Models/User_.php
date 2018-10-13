@@ -169,8 +169,8 @@ class User_ extends User
             'sex' => 'required',
             'duty' => 'required',
             'user_excerpt' => 'required',
-            'user_login' => 'required',
-            'user_password' => 'required',
+//            'user_login' => 'required',
+//            'user_password' => 'required',
             'more_thumbnail' => 'required',
         ]);
 
@@ -188,7 +188,7 @@ class User_ extends User
                 $Obj->duty = $requestData['duty'];
                 $Obj->user_excerpt = $requestData['user_excerpt'];
                 //$Obj->user_login = $requestData['user_login'];
-                $Obj->user_password = Login::getPassword($requestData['user_password']);
+//                $Obj->user_password = Login::getPassword($requestData['user_password']);
                 $Obj->more = [
                     'thumbnail' => $requestData['more_thumbnail'] ?? null,
                 ];
@@ -229,13 +229,22 @@ class User_ extends User
 
             foreach ($requestData as $key => $value) {
                 switch ($key) {
+                    case 'more_thumbnail':
+                        $user = User::findOrFail($userId);
+                        $more = $user->more;
+                        $more['thumbnail']=$value;
+                        $user->more=$more;
+                        $user->save();
+                        return [];
+                        break;
                     default:
+                        $updateData = [$key => $value];
+                        $success = User
+                            ::where('id', $userId)
+                            ->update($updateData);
                         break;
                 }
-                $updateData = [$key, $value];
-                $success = User
-                    ::where('id', $userId)
-                    ->update($updateData);
+
                 break;
             }
 

@@ -136,6 +136,7 @@ class UserComment_ extends UserComment
             'comment_content' => 'required',
             'leave_at' => 'required',
 //            'more_files' => 'required',
+            'is_send_sms' => 'required',
         ]);
 
         try {
@@ -163,6 +164,7 @@ class UserComment_ extends UserComment
                         'related_type' => \App\Models\UserNotification::RELATED_TYPE['留言'],
                         'related_id' => $Obj->id,
                         'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['审核'],
+                        'is_send_sms' => (int)$requestData['is_send_sms'],
                     ]);
                 }
 

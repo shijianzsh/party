@@ -375,11 +375,11 @@ class PortalPost_ extends PortalPost
             $cacheMinutes = 1;
 
             $result = Cache::remember($cacheName, $cacheMinutes, function () use ($categoryId, $postNumber) {
-                    return array_merge(
-                        ['category' => PortalCategory_::getCategory($categoryId)],
-                        self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
-                    );
-                });
+                return array_merge(
+                    ['category' => PortalCategory_::getCategory($categoryId)],
+                    self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
+                );
+            });
         }
         return $result;
     }

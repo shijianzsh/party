@@ -137,7 +137,12 @@ class Department_ extends Department
             $x = $temp[$i]['coordinate_x'];
             $y = $temp[$i]['coordinate_y'];
 
-            if ($x > self::COORDINATES_RANGE['x']['max'] || $x < self::COORDINATES_RANGE['x']['min'] || $y > self::COORDINATES_RANGE['y']['max'] || $y < self::COORDINATES_RANGE['x']['min']) {
+            if (
+                $x > self::COORDINATES_RANGE['x']['max']
+                || $x < self::COORDINATES_RANGE['x']['min']
+                || $y > self::COORDINATES_RANGE['y']['max']
+                || $y < self::COORDINATES_RANGE['y']['min']
+            ) {
                 continue;
             }
 

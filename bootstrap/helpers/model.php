@@ -20,8 +20,16 @@ function createNotification(array $data)
     if (!array_key_exists('operate_type', $data)) {
         throw new Exception('helper createNotification param error 4');
     }
+    if (!array_key_exists('is_send_sms', $data)) {
+        $data['is_send_sms'] = 1;
+    }
 
     $user_id = $data['user_id'];
+
+    if (empty($user_id)) {
+        return false;
+    }
+
     if (is_numeric($user_id)) {
         $result = \App\Models\UserNotification_::createNotification($data);
         return $result;

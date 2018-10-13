@@ -78,6 +78,7 @@ Route::namespace('Api')->group(function () {
         Route::get('meetings/attend_user', 'Meeting@attendUserMeetingList');
         Route::get('meetings/audit_user', 'Meeting@auditUserMeetingList');
         Route::post('meetings/{id}/audit', 'Meeting@audit');
+        Route::post('meetings/{id}/arrange_and_send_push', 'Meeting@arrangeAndSendPush');
         Route::post('meetings/{id}/sign_in', 'Meeting@signIn');
         Route::resource('meetings', 'MeetingController');
 

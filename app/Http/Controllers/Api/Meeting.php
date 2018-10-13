@@ -97,4 +97,12 @@ class Meeting extends \App\Http\Controllers\Controller
             $request->input('reason'));
         return response()->json($result);
     }
+
+    public function arrangeAndSendPush(Request $request, $id)
+    {
+        $result = Meeting_::arrangeMeetingAndSendPush($id,
+            $request->input('status'),
+            $request->input('reason'));
+        return response()->json($result);
+    }
 }

@@ -1,13 +1,14 @@
 <div class="w677 rm15 data_box">
     <div class="title01">
-        <span><i class="colour02"></i>已完成任务数量</span><span><i class="colour01"></i>所有任务数量</span>各支部党务工作进度</div>
+        <span><i class="colour02"></i>已完成任务数量</span><span><i class="colour01"></i>所有任务数量</span>各支部党务工作进度
+    </div>
     <div class="content_nr" style="height: 855px" id="main-1">
 
     </div>
 </div>
 
 <script>
-    (function(){
+    (function () {
         let option = {
             tooltip: {
                 trigger: 'axis',
@@ -29,7 +30,7 @@
             },
             yAxis: {
                 type: 'category',
-                data: ['巴西','印尼','美国','印度','中国','世界'],
+                data: ['新城区党支部', '赛罕区党支部', '玉泉区党支部', '回民区党支部', '金桥开发区党支部', '金山开发区党支部', '鄂尔多斯大街党支部', '海东路党支部', '陶思浩村党支部', '如意开发区党支部', '乌兰察布路街道党支部'],
                 "splitLine": {     //网格线
                     "show": false
                 }
@@ -38,12 +39,12 @@
                 {
                     name: '所有任务数量',
                     type: 'bar',
-                    data: [18203, 23489, 29034, 104970, 131744, 630230]
+                    data: [11, 16, 18, 23, 5, 22, 13, 6, 23, 4, 12]
                 },
                 {
                     name: '已完成任务数量',
                     type: 'bar',
-                    data: [19325, 23438, 31000, 121594, 134141, 681807]
+                    data: [4, 5, 11, 6, 23,23, 5, 22, 16, 18,  13, ]
                 }
             ]
         };

@@ -26,6 +26,7 @@ class UserPayment_ extends UserPayment
         $Obj = UserPayment::with(array_merge($with, ['user' => function ($query) {
             $query->with(['department']);
         }]));
+        $Obj->orderBy('updated_at', 'desc');
 
         if (!empty($userId)) {
             $Obj->whereHas('user', function ($query) use ($userId) {

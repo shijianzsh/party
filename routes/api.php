@@ -46,6 +46,7 @@ Route::namespace('Api')->group(function () {
 
         Route::resource('department_activity_plans', 'DepartmentActivityPlanController');
 
+        Route::get('users/{department_id}/department', 'User@getDepartmentUserList');
         Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
         Route::post('users/{id}/change_password', 'User@changePassword');
         Route::post('users/{id}/update_one_field', 'User@updateOneField');
@@ -101,6 +102,7 @@ Route::namespace('Api')->group(function () {
         Route::resource('exam_papers', 'ExamPaperController');
 
         Route::get('exam_results/{user_id}/user_submitted', 'ExamResult@getSubmittedList');
+        Route::get('exam_results/{user_id}/{paper_id}/get_user_exam_result_by_paper_id', 'ExamResult@getUserExamResultByPaperId');
         Route::post('exam_results/{paperId}/start', 'ExamResult@start');
         Route::post('exam_results/{id}/submit', 'ExamResult@submit');
         Route::resource('exam_results', 'ExamResultController');

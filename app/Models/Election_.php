@@ -24,6 +24,7 @@ class Election_ extends Election
         $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = Election::with(['initiateUser', 'options', 'attendUsersMiddle']);
+        $Obj->orderBy('updated_at', 'desc');
 
         if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);

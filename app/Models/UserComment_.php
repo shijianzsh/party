@@ -20,6 +20,7 @@ class UserComment_ extends UserComment
         $toUserId =& $filter['to_user_id'];
 
         $Obj = UserComment::with($with);
+        $Obj->orderBy('updated_at', 'desc');
 
         if ($userId) {
             $Obj->where('user_id', $userId);
@@ -76,6 +77,7 @@ class UserComment_ extends UserComment
         $toUserId =& $filter['to_user_id'];
 
         $Obj = UserComment::with($with);
+        $Obj->orderBy('created_at', 'desc');
 
         $Obj->where('need_audit', 1)
             ->whereHas('audit', function ($query) use ($auditUserId) {

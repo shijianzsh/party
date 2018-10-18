@@ -27,6 +27,13 @@ class ExamResult extends \App\Http\Controllers\Controller
         return response()->json($result);
     }
 
+    public function getUserExamResultByPaperId(Request $request, $user_id, $paper_id)
+    {
+        $get = ExamUserResult_::getUserExamResultByPaperId($user_id, $paper_id);
+        $result = ['success' => 1, 'data' => $get];
+        return response()->json($result);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,7 +41,6 @@ class ExamResult extends \App\Http\Controllers\Controller
      */
     public function start(Request $request, $id)
     {
-        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
         $result = ExamUserResult_::startExam($id, $request->input('user_id'));
         return response()->json($result);
     }

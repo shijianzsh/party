@@ -32,7 +32,7 @@ class Meeting_ extends Meeting
             'initiateUser',
 //            'attendUsers'
         ]);
-
+        $Obj->orderBy('updated_at', 'desc');
 
         if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);
@@ -97,8 +97,9 @@ class Meeting_ extends Meeting
             'initiateUser',
 //            'attendUsers'
         ]);
+        $Obj->orderBy('updated_at', 'desc');
 
-        $Obj->whereIn('department_id', Department_::getEscendants($departmentId)['ids']);
+        $Obj->whereIn('department_id', Department_::getDescendants($departmentId)['ids']);
 
         if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);
@@ -163,6 +164,8 @@ class Meeting_ extends Meeting
             'initiateUser',
 //            'attendUsers'
         ]);
+        $Obj->orderBy('updated_at', 'desc');
+
         $Obj->whereHas('attendUsersMiddle', function ($query) use ($userId) {
             $query->where('meeting_user.user_id', $userId);
         });
@@ -228,6 +231,7 @@ class Meeting_ extends Meeting
             'initiateUser',
 //            'attendUsers'
         ]);
+        $Obj->orderBy('updated_at', 'desc');
 
         $Obj->where('need_audit', 1)
             ->whereHas('audit', function ($query) use ($userId) {

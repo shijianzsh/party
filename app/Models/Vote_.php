@@ -24,6 +24,7 @@ class Vote_ extends _BaseModel
         $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = Vote::with(['initiateUser']);
+        $Obj->orderBy('updated_at', 'desc');
 
         if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);

@@ -189,7 +189,7 @@ class Department_ extends Department
             'telphone' => '',
             'cellphone' => '',
             'secretary' => '',
-            'established_at' => '',
+            'established_at' => 'required',
             'more_thumbnail' => 'required',
             'more_monitor_map' => 'required',
         ]);
@@ -297,7 +297,7 @@ class Department_ extends Department
     }
 
     //获取所有后裔department
-    static public function getEscendants(int $departmentIds, array $with = []): array
+    static public function getDescendants(int $departmentIds, array $with = []): array
     {
         $array = Department
             ::with($with)
@@ -324,6 +324,13 @@ class Department_ extends Department
         unset($array);
 
         return ['rows' => $result, 'ids' => array_unique($ids)];
+    }
+
+    //获取是否为后裔
+    static public function isDescendant(int $descendant_id, int $parent_id)
+    {
+        $descendant_ids = self::getDescendants($parent_id)['ids'];
+        return in_array($descendant_id, $descendant_ids);
     }
 
     static public function getDepartmentMeetingStatistics(int $departmentId): array

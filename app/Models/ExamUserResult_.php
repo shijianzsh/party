@@ -105,15 +105,24 @@ class ExamUserResult_ extends ExamUserResult
 
     static public function getExamUserResult(int $id, bool $getObject = false)
     {
-        $Obj = ExamUserResult::with(['user', 'paper'])->findOrFail($id);
+        $Obj = ExamUserResult::with(['user', 'paper'])->find($id);
 
         if ($getObject) {
             $result = $Obj;
         } else {
-            $result = $Obj->toArray();
+            $result = $Obj ? $Obj->toArray() : $Obj;
         }
 
         return $result;
+    }
+
+    static public function getUserExamResultByPaperId($user_id, $paper_id)
+    {
+        $Obj = ExamUserResult
+            ::where('user_id', $user_id)
+            ->where('paper_id', $paper_id)
+            ->first();
+        return $Obj;
     }
 
     static public function startExam(int $paperId, int $userId): array

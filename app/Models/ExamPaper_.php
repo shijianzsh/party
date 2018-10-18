@@ -11,16 +11,24 @@ class ExamPaper_ extends ExamPaper
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
+            'keyword' => null,
             'attend_user_id' => null,
         ],
         array $with = []
     ): array
     {
-        $Obj = ExamPaper::with($with);
-
+        $keyword =& $filter['keyword'];
         $attendUserId =& $filter['attend_user_id'];
 
-        if ($attendUserId !== null) {
+        $Obj = ExamPaper::with($with);
+        $Obj->orderBy('updated_at', 'desc');
+
+        if (!empty($keyword)) {
+            //获取用户可以参加考试的列表，包含任意时间段
+            $Obj->where('name','like', "%{$keyword}%");
+        }
+
+        if (!empty($attendUserId)) {
             //获取用户可以参加考试的列表，包含任意时间段
             $Obj->where(function ($query) use ($attendUserId) {
                 $query->where('is_restrict_user', 0)

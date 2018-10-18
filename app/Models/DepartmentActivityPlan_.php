@@ -24,6 +24,7 @@ class DepartmentActivityPlan_ extends DepartmentActivityPlan
         $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = DepartmentActivityPlan::with(array_merge($with, ['department', 'initiateUser']));
+        $Obj->orderBy('updated_at', 'desc');
 
         if (!empty($initiate_user_id)) {
             $Obj->where('initiate_user_id', $initiate_user_id);

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\Token\Token, App\Services\Token\AccessToken;
 use App\Services\Login\Login;
+use App\Models\Department_;
 use DB;
 
 class User_ extends User
@@ -74,6 +75,76 @@ class User_ extends User
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
+    static public function getDepartmentUserList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'department_id' => 0,
+            'descendant_id' => 0,
+            'keyword' => null,
+            'start_timestamp' => null,
+            'end_timestamp' => null,
+        ],
+        array $with = []
+    )
+    {
+        $ids =& $filter['ids'];
+        $departmentId = $filter['department_id'];
+        $descendant_id = &$filter['descendant_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = User::with(array_merge($with, ['department', 'partyExperience']));
+
+        if (!empty($descendant_id)) {
+            $Obj->where('department_id', $descendant_id);
+        } else {
+            $Obj->whereIn('department_id', Department_::getDescendants($departmentId)['ids']);
+        }
+
+        if (!empty($ids)) {
+            $Obj->whereIn('id', $ids);
+        }
+
+        if (!empty($keyword)) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('sex', 'like', "%{$keyword}%")
+                    ->orWhere('cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($startTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+    }
+
     /**
      * 获取当前user_id
      * user_id来源于 VerifyAccessToken中间件验证成功后写入session
@@ -88,12 +159,14 @@ class User_ extends User
 
     static public function getUser(int $userId = 0, bool $getObject = false, array $with = [])
     {
-        $Obj = User::with($with)->findOrFail($userId ? $userId : User_::getMyId());
+        $Obj = User::with($with)->find($userId ? $userId : User_::getMyId());
         if ($getObject) {
-            return $Obj;
+            $result = $Obj;
         } else {
-            return $Obj->toArray();
+            $result = $Obj ? $Obj->toArray() : $Obj;
         }
+
+        return $result;
     }
 
     static public function getUserWithPartyInfo(int $userId = 0)
@@ -232,8 +305,8 @@ class User_ extends User
                     case 'more_thumbnail':
                         $user = User::findOrFail($userId);
                         $more = $user->more;
-                        $more['thumbnail']=$value;
-                        $user->more=$more;
+                        $more['thumbnail'] = $value;
+                        $user->more = $more;
                         $user->save();
                         return [];
                         break;
@@ -332,7 +405,8 @@ class User_ extends User
                     $query->with(['auths']);
                 }])
                 ->where('user_login', $user_login)
-                ->firstOrFail();
+                ->first();
+
             if (empty($user)) {
                 throw new \Exception('用户不存在或密码错误');
             }

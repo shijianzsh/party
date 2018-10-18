@@ -24,6 +24,7 @@ class DepartmentWorkPlan_ extends DepartmentWorkPlan
         $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = DepartmentWorkPlan::with(array_merge($with, ['department', 'initiateUser']));
+        $Obj->orderBy('updated_at', 'desc');
 
         if ($initiate_user_id !== null) {
             $Obj->where('initiate_user_id', $initiate_user_id);

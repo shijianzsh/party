@@ -40,7 +40,7 @@ class ExamResultController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $row = ExamUserResult_::getExamUserResult($id, []);
+        $row = ExamUserResult_::getExamUserResult($id);
 
         $result = ['success' => 1, 'data' => $row];
         return response()->json($result);

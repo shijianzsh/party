@@ -28,7 +28,9 @@
                         <span>浏览量: {{$post['post_hits']}}</span>
                     </div>
 
-                    {{$post['post_content']}}
+                   <div style="min-height: 100px">
+                       {!! $post['post_content'] !!}
+                   </div>
 
                     <div class="con_bm cleafix">
                         <a href="javascript:goTop();" class="gotop">顶部</a>

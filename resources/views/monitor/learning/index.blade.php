@@ -165,7 +165,7 @@
         </div>
         <div style="width: 1875px; height: auto; float: left;">
             <div class="mt-10 data_box">
-                <div class="title01">新城区党支部在线开始通过率</div>
+                <div class="title01">新城区党支部在线考试通过率</div>
                 <div class="content_nr" style="padding-top: 0px; width: auto;">
                     <div style="width: 1845px;"><img src="/static/monitor/picture/pic17.png" width="1845" height="280" alt=""/></div>
                 </div>

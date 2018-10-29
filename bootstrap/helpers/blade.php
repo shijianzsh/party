@@ -58,3 +58,28 @@ function getCategoryPublishedPostList(int $categoryId, int $postNumber = 0): arr
 {
     return \App\Models\PortalPost_::getCategoryPublishedPostList($categoryId, $postNumber);
 }
+
+function sub_str($string, $start = 0, $length = null)
+{
+    $arr = preg_split('/(?<!^)(?!$)/u', (string)$string);
+
+    if ($start > count($arr) - 1) return '';
+
+    if ($length) {
+        $result_arr = array_slice($arr, $start, $length);
+    } else {
+        $result_arr = array_slice($arr, $start);
+    }
+    return implode("", $result_arr);
+}
+
+function format_string($string, $length = 15)
+{
+    if (empty(trim($string))) {
+        return '';
+    }
+
+    $count = count(preg_split('/(?<!^)(?!$)/u', (string)$string));
+    $result = sub_str(trim($string), 0, $length);
+    return $length < $count ? $result . '...' : $result;
+}

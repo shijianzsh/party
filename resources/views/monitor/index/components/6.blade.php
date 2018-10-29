@@ -7,6 +7,9 @@
 
 <script>
     (function(){
+        let data1 = [11, 16, 18, 23, 5, 22, 13, 6, 23, 4, 12];
+        let data2 = [4, 5, 11, 6, 23, 23, 5, 22, 16, 18, 13];
+
         let option = {
             tooltip: {
                 trigger: 'axis',
@@ -39,18 +42,24 @@
                 {
                     name: '所有任务数量',
                     type: 'bar',
-                    data: [18203, 23489, 29034, 104970, 131744,
-                        30230,23489, 29034, 104970, 131744, 63020]
+                    data: data1
                 },
                 {
                     name: '已完成任务数量',
                     type: 'bar',
-                    data: [19325, 23438, 31000, 121594,
-                        134141, 61807, 23438, 31000, 121594, 134141, 61807]
+                    data: data2
                 }
             ]
         };
         let chart = echarts.init(document.getElementById('main-6'), 'monitor');
         chart.setOption(option);
+
+        setInterval(function () {
+            for (let i = 0; i < data1.length; i++) {
+                data1[i]+=Math.random()*10;
+                data2[i]+=Math.random()*10;
+            }
+            chart.setOption(option);
+        }, 2000)
     })()
 </script>

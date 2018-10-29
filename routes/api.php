@@ -34,6 +34,8 @@ Route::namespace('Api')->group(function () {
         \App\Http\Middleware\VerifyAccessToken::class,
 //        \App\Http\Middleware\VerifyAuth::class,
     ]], function () {
+        Route::resource('dictionaries', 'DictionaryController');
+
         Route::resource('auth_maps', 'AuthMapController');
 
         Route::resource('auth_roles', 'AuthRoleController');

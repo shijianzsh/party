@@ -13,7 +13,7 @@
     </div>
     <div class="ddjs_nr">
         <a href="{{getPostUrl($top_post)}}" style="color: #515a6e">
-            <h1>{{$top_post?$top_post['post_title']:'未设置文章'}}</h1>
+            <h1>{{format_string($top_post?$top_post['post_title']:'未设置文章')}}</h1>
             <p style="height: 63px">{{$top_post?$top_post['post_excerpt']:'未设置文章'}}</p>
         </a>
 

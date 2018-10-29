@@ -27,6 +27,7 @@ class PortalPost_ extends PortalPost
         $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = PortalPost::with(array_merge(['categorys'], $with));
+        $Obj->orderBy('published_at', 'desc');
 
         if ($categoryId) {
             $Obj->whereHas('categorys', function ($query) use ($categoryId) {

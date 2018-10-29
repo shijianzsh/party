@@ -17,7 +17,7 @@
                         @if (time()-$post['published_at']<=86400*3)
                             <span class="sty01">最新</span>
                         @endif
-                        {{$post['post_title']}}
+                        {{format_string($post['post_title'],30)}}
                     </a>
                 </li>
             @endforeach

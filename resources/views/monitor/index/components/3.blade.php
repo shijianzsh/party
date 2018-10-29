@@ -13,14 +13,14 @@
                         <p>西街党支部</p>
                     </spam>
                 </li>
-                <li><img src="/static/monitor/images/photo_img.png" width="153" height="220" alt=""/>
-                    <spam><b>呼斯楞乌日</b>
-                        <p>西街党支部</p>
+                <li><img src="/static/monitor/pics/ljb.jpeg" width="153" height="220" alt=""/>
+                    <spam><b>李静波</b>
+                        <p>新城区党支部</p>
                     </spam>
                 </li>
-                <li><img src="/static/monitor/images/photo_img.png" width="153" height="220" alt=""/>
-                    <spam><b>呼斯楞乌日</b>
-                        <p>西街党支部</p>
+                <li><img src="/static/monitor/pics/yxl.jpeg" width="153" height="220" alt=""/>
+                    <spam><b>于晓丽</b>
+                        <p>赛罕区党支部</p>
                     </spam>
                 </li>
             </ul>

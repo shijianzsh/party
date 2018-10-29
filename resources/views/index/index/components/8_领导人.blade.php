@@ -39,15 +39,15 @@
 
                         <li>
                             <div class="pic">
-                                <a href="#">
+                                <a href="{{getPostUrl($post['id'])}}">
                                     <img src="{{$post['thumbnail_format']}}" alt=""/>
                                 </a>
                             </div>
-                            <div class="title">
+                            <div class="title"  style="text-align: center">
                                 <a href="{{getPostUrl($post['id'])}}">
                                     {{$post['post_title']}}
-                                    <br>
-                                    {{$post['post_excerpt']}}
+                                    {{--<br>--}}
+{{--                                    {{$post['post_excerpt']}}--}}
                                 </a>
                             </div>
                         </li>

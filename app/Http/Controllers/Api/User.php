@@ -61,6 +61,12 @@ class User extends \App\Http\Controllers\Controller
         return response()->json($result);
     }
 
+    public function getUserThumbnail($id)
+    {
+        $result = ['success' => 1, 'data' => User_::getUserThumbnail($id)];
+        return response()->json($result);
+    }
+
     public function changePassword(Request $request, $id)
     {
         $result = User_::changePassword($id, $request->input('data'));

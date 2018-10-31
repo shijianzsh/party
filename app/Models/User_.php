@@ -177,6 +177,12 @@ class User_ extends User
         return self::getUser($userId, false, $with);
     }
 
+    static public function getUserThumbnail(int $userId = 0)
+    {
+        $user = self::getUser($userId);
+        return $user['thumbnail_format'] ?? null;
+    }
+
     /**
      * 新增人员.
      *

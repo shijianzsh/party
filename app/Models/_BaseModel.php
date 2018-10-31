@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 
 class _BaseModel extends Model
 {
@@ -12,6 +13,7 @@ class _BaseModel extends Model
     protected $dateFormat = 'U';
     protected $appends = ['created_at_format'];
     const PAGE_SIZE = 10;
+    use Cachable;
 
     public function getTable()
     {

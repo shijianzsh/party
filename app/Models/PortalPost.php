@@ -20,6 +20,7 @@ class PortalPost extends _BaseModel
         'category_ids',
         'audit_status_format',
         'created_at_format',
+        'updated_at_format',
         'published_at_format',
         'thumbnail_format',
         'video_format',

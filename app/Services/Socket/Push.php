@@ -8,7 +8,6 @@
 
 namespace App\Services\Socket;
 
-
 class Push
 {
     private const KEY_MAP = [
@@ -18,6 +17,9 @@ class Push
         'push_to_admin',
     ];
 
+    /**
+     * 服务端发消息到socket服务器
+     */
     static public function send(string $sendKey, $sendValue, int $uid = null)
     {
         try {

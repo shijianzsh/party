@@ -7,8 +7,6 @@ use DB, Validator;
 
 class Meeting_ extends Meeting
 {
-    public const TYPE = ['未知类型' => 0, '线下' => 1, '线上' => 2];
-
     public const AHEAD_SIGN_IN_TIMESTAMP = 3600 * 2;//允许提前先到的时间
 
     static public function getMeetingList(

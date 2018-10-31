@@ -31,7 +31,7 @@ class Article extends \App\Http\Controllers\Controller
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],
             ],
-            ['user']
+            []//这里为什么要with user？
         );
 
         $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];

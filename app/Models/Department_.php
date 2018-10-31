@@ -335,6 +335,7 @@ class Department_ extends Department
 
     static public function getDepartmentMeetingStatistics(int $departmentId): array
     {
-        self::getDepartment($departmentId, true, ['meeting']);
+        //TODO
+        return self::getDepartment($departmentId, true, ['meeting']);
     }
 }

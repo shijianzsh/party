@@ -69,6 +69,12 @@
             <strong>Whoops!</strong> Something went wrong!
         @endcomponent
     </div>
-    </div>
 
+    <script>
+        window.addEventListener('message',function(event){
+            top.postMessage("init ready", '*')
+        }, false);
+    </script>
 @endsection
+
+

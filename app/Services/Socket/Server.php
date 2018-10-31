@@ -23,67 +23,16 @@ class Server
         $main_worker->count = 1;
 
         $main_worker->onWorkerStart = function ($worker) {
-            // 开启一个内部端口，方便内部系统推送数据，Text协议格式 文本+换行符
-            $inner_text_worker = new Worker(env('SOCKET_INNER_TCP_HOST'));
-            $inner_text_worker->count = 1;
-            $inner_text_worker->onMessage = function ($connection, $buffer) use (&$worker) {
-
-                $res = json_decode($buffer, true);
-                $resKey =& $res['key'];
-                $resValue =& $res['value'];
-                $uid =& $res['uid'];
-
-                try {
-                    switch ($resKey) {
-                        case 'push_to_uid':
-                            $success = (int)Helper::sendToUid($worker, $uid, ['push_to_uid' => $resValue]);
-                            break;
-                        case 'push_to_all':
-                            $success = (int)Helper::sendToAll($worker, ['push_to_all' => $resValue]);
-                            break;
-                        case 'push_to_admin':
-                            $success = (int)Helper::sendToAdmin($worker, ['push_to_admin' => $resValue]);
-                            break;
-                        default:
-                            $success = (int)Helper::sendToUid($worker, $uid, [$resKey => $resValue]);
-                            break;
-                    }
-                } catch (\Exception $e) {
-                    $msg = $e->getMessage();
-                }
-
-                $result = ['success' => $success ?? 1, 'msg' => $msg ?? null];
-                $connection->send(json_encode($result));
-            };
-            // ## 执行监听 ##
-            $inner_text_worker->listen();
+            MainWorker::onWorkerStart($worker);
         };
 
         $main_worker->onMessage = function ($connection, $data) use (&$main_worker) {
-            if (!is_json($data)) {
-                $connection->send('请求参数错误');
-            }
-
-            $res = json_decode($data, true);
-            $resKey =& $res['key'];
-            switch ($resKey) {
-                case 'set_uid':
-                    Helper::setUid($main_worker, $connection, $res['value']);
-                    Helper::sendToAdmin($main_worker, ['push_uids' => Helper::getUids($main_worker)]);
-                    Helper::send($connection, ['set_uid' => true]);
-                    break;
-                case 'get_uids':
-                    Helper::send($connection, ['get_uids' => Helper::getUids($main_worker)]);
-                    break;
-            }
+            MainWorker::onMessage($connection, $data, $main_worker);
         };
 
         // 当有客户端连接断开时
         $main_worker->onClose = function ($connection) use (&$main_worker) {
-            if (isset($connection->uid)) {
-                Helper::sendToAdmin($main_worker, ['push_uids' => Helper::getUids($main_worker)]);
-                $connection->uid = 0;
-            }
+            MainWorker::onClose($connection, $main_worker);
         };
         // 运行worker
         Worker::runAll();

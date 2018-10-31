@@ -6,10 +6,11 @@
  * Time: 10:25 AM
  */
 
-namespace App\Services\Socket;
+namespace App\Services\Socket\Helper;
 
-class Helper
+class SocketHelper
 {
+    //在connection中注册uid
     static public function setUid(&$worker, &$connection, int $uid)
     {
         foreach ($worker->connections as $connection) {
@@ -21,15 +22,16 @@ class Helper
         $connection->real_ip = array_key_exists('HTTP_X_REAL_IP', $_SERVER) ? $_SERVER['HTTP_X_REAL_IP'] : null;
     }
 
+    //获取connection中的uid
     static public function getUid(&$connection): int
     {
         if (!isset($connection->uid)) {
             return 0;
         }
-
         return (int)$connection->uid;
     }
 
+    //获取在线的所有uids
     static public function getUids(&$worker): array
     {
         $uids = [];
@@ -41,6 +43,7 @@ class Helper
         return $uids;
     }
 
+    //获取在线的所有user和对应ip
     static public function getOnlineUsers(&$worker): array
     {
         $users = [];
@@ -52,6 +55,7 @@ class Helper
         return $users;
     }
 
+    //给一个connection发送数据
     static public function send(&$connection, $data): bool
     {
         $result = ['success' => 1, 'data' => $data];
@@ -59,6 +63,7 @@ class Helper
         return true;
     }
 
+    //给指定uid发送数据
     static public function sendToUid(&$worker, int $uid, $data): bool
     {
         $isSend = false;
@@ -74,6 +79,7 @@ class Helper
         return $isSend;
     }
 
+    //给admin发送数据
     static public function sendToAdmin(&$worker, $data): bool
     {
         $uid = 1;
@@ -87,6 +93,7 @@ class Helper
         return $isSend;
     }
 
+    //广播给所有人数据
     static public function sendToAll(&$worker, $data): bool
     {
         $isSend = false;

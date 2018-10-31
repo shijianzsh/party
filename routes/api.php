@@ -30,6 +30,15 @@ Route::namespace('Api')->group(function () {
 
     Route::post('/login', 'User@login')->middleware(\App\Http\Middleware\VerifyToken::class);
 
+
+    Route::group(['middleware' => [
+        \App\Http\Middleware\VerifyIsSocketServer::class,
+//        \App\Http\Middleware\VerifyAuth::class,
+    ]], function () {
+        Route::post('chat_user_messages/{from_user_id}/{to_user_id}/create', 'ChatUserMessage@create');
+        Route::get('chat_user_messages/{from_user_id}/{to_user_id}/check', 'ChatUserMessage@check');
+    });
+
     Route::group(['middleware' => [
         \App\Http\Middleware\VerifyAccessToken::class,
 //        \App\Http\Middleware\VerifyAuth::class,
@@ -50,6 +59,7 @@ Route::namespace('Api')->group(function () {
 
         Route::get('users/{department_id}/department', 'User@getDepartmentUserList');
         Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
+        Route::get('users/{id}/thumbnail', 'User@getUserThumbnail');
         Route::post('users/{id}/change_password', 'User@changePassword');
         Route::post('users/{id}/update_one_field', 'User@updateOneField');
         Route::resource('users', 'UserController');

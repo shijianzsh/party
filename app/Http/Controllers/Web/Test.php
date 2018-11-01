@@ -9,13 +9,13 @@
 namespace App\Http\Controllers\Web;
 
 use App\Services\SMS\Send;
-use App\Services\Socket\Chat\UserChat;
+use App\Services\Socket\Chat\ChatUser;
 
 class Test extends \App\Http\Controllers\Controller
 {
     function __invoke()
     {
-        $a = UserChat::check(1, 2);
+        $a = ChatUser::check(1, 2);
         dump($a);
     }
 }

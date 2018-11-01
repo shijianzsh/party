@@ -78,7 +78,7 @@ class ChatUserMessage_ extends ChatUserMessage
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $Obj->toArray() ?? null];
     }
 
     //将目标人员的所有聊天记录标记为已读

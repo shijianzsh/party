@@ -46,7 +46,7 @@ class RequestHelper
     }
 
     //暴露给中间件验证是否为socket服务器的请求
-    static public function verifyEncryptionParams(array $params):bool
+    static public function verifyEncryptionParams(array $params): bool
     {
         if (!array_key_exists('socket_request_key', $params)) return false;
         if (!array_key_exists('socket_request_sign', $params)) return false;
@@ -79,6 +79,7 @@ class RequestHelper
     //请求方法的子方法 对response进行处理 如果是json 进行decode返回array
     private function getResponse($response)
     {
+        $response = json_encode($response);
         if (is_json($response)) {
             return json_decode($response, true);
         } else {

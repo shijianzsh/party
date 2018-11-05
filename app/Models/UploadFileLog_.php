@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DB;
+use App\Services\Upload\Upload as UploadService;
 
 class UploadFileLog_ extends UploadFileLog
 {
@@ -34,19 +35,20 @@ class UploadFileLog_ extends UploadFileLog
         return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
     }
 
-    static public function create(string $url): array
+    static public function create(): array
     {
-        if (empty($url)) {
+        try {
+            $url = UploadService::handleUpload();
+            if (empty($url)) throw new \Exception('上传失败');
+
+            $Obj = new UploadFileLog;
+            $Obj->user_id = User_::getMyId();
+            $Obj->url = $url;
+            $success = $Obj->save();
+        } catch (\Exception $e) {
             $success = 0;
-            goto end;
+            $msg = $e->getMessage();
         }
-
-        $Obj = new UploadFileLog;
-        $Obj->user_id = User_::getMyId();
-        $Obj->url = $url;
-        $success = $Obj->save();
-
-        end:
-        return ['success' => (int)($success ?? 1), 'data' => $url];
+        return ['success' => (int)($success ?? 1), 'data' => $url ?? null, 'msg' => $msg ?? null];
     }
 }

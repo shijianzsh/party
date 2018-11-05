@@ -5,10 +5,10 @@ namespace App\Models;
 class UserNotification extends _BaseModel
 {
     //关联的类型 涉及到array_flip故value不可重复
-    const RELATED_TYPE = ['未知类型' => 0, '文章' => 1, '会议' => 2, '留言' => 3, '党支部活动' => 4];
+    const RELATED_TYPE = ['未知类型' => 0, '文章' => 1, '会议' => 2, '留言' => 3, '党支部活动' => 4, '积极分子' => 5];
 
     //操作的类型 涉及到array_flip故value不可重复
-    const OPERATE_TYPE = ['未知类型' => 0, '查看' => 1, '审核' => 2, '参加' => 3, '审核通过' => 4];
+    const OPERATE_TYPE = ['未知类型' => 0, '查看' => 1, '审核' => 2, '参加' => 3, '审核通过' => 4, '注册成功' => 5];
 
     protected $appends = [
         'related_type_format',

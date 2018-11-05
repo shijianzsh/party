@@ -1,12 +1,19 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: lijingbo
+ * Date: 2018/8/21
+ * Time: 下午9:43
+ */
 
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Models\User_;
-use Illuminate\Support\Facades\Crypt;
+use App\Services\Token\Token as TokenModel, App\Services\Token\AccessToken as AccessTokenModel;
+use App\Models\UserActivist_;
+use App\Models\Department_;
 
-class UserController extends \App\Http\Controllers\Controller
+class ActivistController extends \App\Http\Controllers\Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,22 +22,21 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function index(Request $request)
     {
-        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
-
-        $list = User_::getUserList(
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+        $list = PortalPost_::getPostList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-                'ids' => &$filter['ids'],
-                'department_id' => &$filter['department_id'],
+                'category_id' => &$filter['category_id'],
+                'is_published' => &$filter['is_published'],
                 'keyword' => &$filter['keyword'],
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],
             ],
-            []
+            ['user']
         );
 
-        $result = ['success' => 1, 'data' => $list];
+        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
         return response()->json($result);
     }
 
@@ -42,7 +48,7 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function store(Request $request)
     {
-        return response()->json(User_::createUser($request->input('data')));
+        return response()->json(UserActivist_::createActivist($request->input('data')));
     }
 
     /**
@@ -53,7 +59,7 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $result = ['success' => 1, 'data' => User_::getUser($id)];
+        $result = ['success' => 1, 'data' => UserActivist_::getActivist($id)];
         return response()->json($result);
     }
 
@@ -62,11 +68,11 @@ class UserController extends \App\Http\Controllers\Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        return response()->json(User_::updateUser($id, $request->input('data')));
+        $result = PortalPost_::updatePost($id, $request->input('data'));
+        return response()->json($result);
     }
 
     /**
@@ -77,6 +83,6 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function destroy($id)
     {
-        return response()->json(User_::deleteUser($id));
+        return response()->json(PortalPost_::deletePost($id));
     }
 }

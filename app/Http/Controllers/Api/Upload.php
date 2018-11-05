@@ -9,14 +9,12 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Services\Upload\Upload as UploadService;
 use App\Models\UploadFileLog_;
 
 class Upload extends \App\Http\Controllers\Controller
 {
     public function __invoke(Request $request)
     {
-        $url = UploadService::handleUpload();
-        return UploadFileLog_::create($url);
+        return UploadFileLog_::create();
     }
 }

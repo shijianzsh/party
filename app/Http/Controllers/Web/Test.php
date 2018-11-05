@@ -16,6 +16,5 @@ class Test extends \App\Http\Controllers\Controller
     function __invoke()
     {
         $a = ChatUser::check(1, 2);
-        dump($a);
     }
 }

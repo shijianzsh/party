@@ -56,6 +56,7 @@ class UserInfoPartyRelation_ extends UserInfoPartyRelation
             'started_at' => 'required',
             'ended_at' => 'required',
             'department_name' => 'required',
+            'guarantor' => 'required',
         ]);
 
         try {
@@ -86,6 +87,7 @@ class UserInfoPartyRelation_ extends UserInfoPartyRelation
             'started_at' => 'required',
             'ended_at' => 'required',
             'department_name' => 'required',
+            'guarantor' => 'required',
         ]);
 
         try {

@@ -229,6 +229,8 @@ class ExamUserResult_ extends ExamUserResult
 
             //评分
             $score = 0;
+            $collection = [];
+
             foreach ($paper->questions as $question) {
                 $key = $question['question_id'];
                 if (array_key_exists($key, $questionsIdToIndex)) {
@@ -240,9 +242,13 @@ class ExamUserResult_ extends ExamUserResult
                         $answers[$questionsIdToIndex[$key]]['is_correct'] = 1;
                     } else {
                         $answers[$questionsIdToIndex[$key]]['is_correct'] = 0;
+                        $collection[] = $answers[$questionsIdToIndex[$key]];
                     }
                 }
             }
+
+            ExamUserCollectQuestion_::createCollectQuestions(User_::getMyId(), $collection);
+
             $isPassed = $score >= $paper->pass_score ? 1 : 0;
             $msg = $isPassed ? '恭喜您！考试通过！' : '很遗憾，没有通过考试，请再接再厉！';
             //更新记录

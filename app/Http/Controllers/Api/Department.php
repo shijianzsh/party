@@ -17,7 +17,21 @@ class Department extends \App\Http\Controllers\Controller
     {
         $list = Department_::getDepartmentDepartmentList(0, 0,
             [
-                'department_id', $id
+                'department_id' => $id
+            ],
+            $request->query('with', []) ? $request->query('with', []) : []
+        );
+        $result = ['success' => 1, 'data' => $list, '$request' => $request->query()];
+        return response()->json($result);
+    }
+
+    public function selectComponentList(Request $request)
+    {
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+
+        $list = Department_::getSelectComponentList(
+            [
+                'department_id' => &$filter['department_id']
             ],
             $request->query('with', []) ? $request->query('with', []) : []
         );

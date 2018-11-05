@@ -16,6 +16,5 @@ class Test extends \App\Http\Controllers\Controller
     function __invoke()
     {
         $r = Push::send('push_notification_to_uid', [1, 21, 3], 2);
-        dump($r);
     }
 }

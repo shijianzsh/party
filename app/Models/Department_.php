@@ -85,9 +85,7 @@ class Department_ extends Department
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
 
-        if (!empty($departmentId)) {
-            $Obj->where('path', 'like', "%-{$departmentId}-%");
-        }
+        $Obj->where('path', 'like', "%-{$departmentId}-%");
 
         if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
@@ -124,6 +122,25 @@ class Department_ extends Department
             'rows' => $get->toArray(),
             'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
         ];
+    }
+
+    static public function getSelectComponentList(
+        array $filter = [
+            'department_id' => null,
+        ],
+        array $with = []
+    ): array
+    {
+        $departmentId =& $filter['department_id'];
+
+        $Obj = Department::with($with);
+
+        if (!empty($departmentId)) {
+            $Obj->where('parent_id', $departmentId);
+        }
+
+        $get = $Obj->get(['id','parent_id','name','path']);
+        return $get->toArray();
     }
 
     static public function getDepartmentCoordinateList(int $departmentId): array

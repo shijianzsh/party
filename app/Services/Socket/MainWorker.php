@@ -24,7 +24,8 @@ class MainWorker
         '注册' => 'register',
         '获取uids' => 'get_uids',
         '获取users' => 'get_online_users',
-        '发送消息' => 'send_message_to_user',
+        '发送消息' => 'chat_send_message_to_user',
+        '聊天设置session' => 'chat_set_session_uid',
     ];
 
     //start钩子处创建text协议 接受服务器发送的消息
@@ -57,7 +58,7 @@ class MainWorker
 
             switch ($requestKey) {
                 case self::ON_MESSAGE_REQUEST_KEY_MAP['心跳']:
-                    $Helper->send(['beep' => ['success' => 1, 'data' => $connection->event]]);
+                    $Helper->send();
                     break;
                 case self::ON_MESSAGE_REQUEST_KEY_MAP['注册']:
                     $Helper->register($event, $requestValue)->send(true);
@@ -79,6 +80,9 @@ class MainWorker
                             break;
                         case self::ON_MESSAGE_REQUEST_KEY_MAP['发送消息']:
                             $Helper->sendChatMessage($requestValue);
+                            break;
+                        case self::ON_MESSAGE_REQUEST_KEY_MAP['聊天设置session']:
+                            $Helper->setSession($requestValue);
                             break;
                     }
                     break;

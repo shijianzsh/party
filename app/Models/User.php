@@ -5,16 +5,19 @@ namespace App\Models;
 class User extends _BaseModel
 {
     const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
+    const ACTIVIST_STATUS = ['未知状态' => 0, '待审核' => 1, '约谈' => 2, '群众' => 3];
 
     protected $appends = [
         'type_format',
-        'borned_at_format',
+        'user_borned_at_format',
         'thumbnail_format',
         'role_ids',
         'roles_format',
 //        'auths_format',//数据库访问太多了 被动加载
     ];
     protected $casts = [
+        'user_family_member' => 'json',
+        'party_rewards_and_punishment_record' => 'json',
         'more' => 'json',
     ];
 
@@ -46,6 +49,11 @@ class User extends _BaseModel
         return $this->belongsTo('App\Models\Department', 'department_id');
     }
 
+    public function activist()
+    {
+        return $this->hasOne('App\Models\UserActivist', 'user_id');
+    }
+
     //党员经历
     public function partyExperience()
     {
@@ -53,7 +61,7 @@ class User extends _BaseModel
     }
 
     //党员关系
-    public function partyRelation()
+    public function partyRelations()
     {
         return $this->hasMany('App\Models\UserInfoPartyRelation', 'user_id');
     }
@@ -267,14 +275,22 @@ class User extends _BaseModel
         return $this->hasMany('App\Models\ExamUserResult', 'user_id');
     }
 
+    /**
+     * 错题记录
+     */
+    public function examCollectQuestions()
+    {
+        return $this->hasMany('App\Models\ExamUserCollectQuestion', 'user_id');
+    }
+
     public function getTypeFormatAttribute()
     {
         return array_flip(self::TYPE)[$this->type];
     }
 
-    public function getBornedAtFormatAttribute()
+    public function getUserBornedAtFormatAttribute()
     {
-        return $this->borned_at ? date("Y-m-d", $this->borned_at) : '';
+        return $this->user_borned_at ? date("Y-m-d", $this->user_borned_at) : '';
     }
 
     public function getRoleIdsAttribute()
@@ -293,7 +309,7 @@ class User extends _BaseModel
         $temp = [];
         $roles = $this->roles;
         foreach ($roles as $role) {
-            $temp = array_merge($temp,$role->auths->toArray());
+            $temp = array_merge($temp, $role->auths->toArray());
         }
 
         if (!count($temp)) {
@@ -313,6 +329,6 @@ class User extends _BaseModel
             $result[] = $row;
         }
 
-        return array_column($result,'auth_format');
+        return array_column($result, 'auth_format');
     }
 }

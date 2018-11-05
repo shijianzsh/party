@@ -37,7 +37,6 @@ class MeetingTest extends TestCase
         ];
 
         $res=Meeting_::auditMeeting($id,$requestData);
-        dump($res);
 
 
 

@@ -18,9 +18,10 @@ trait ChatUser
         '有人上线' => 'chat_user_get_online',
         '有人下线' => 'chat_user_get_offline',
         '在线用户情况' => 'chat_online_users_status',
+        '聊天设置session返回聊天记录' => 'chat_set_session_uid',
     ];
 
-    private function check(int $fromUserId, int $toUserId)
+    private function getUserChatMessageList(int $fromUserId, int $toUserId)
     {
         return RequestHelper::get("api/chat_user_messages/{$fromUserId}/{$toUserId}/check");
     }
@@ -67,6 +68,7 @@ trait ChatUser
             'created_at' => $createRequest['data']['created_at'],
             'updated_at' => $createRequest['data']['updated_at'],
             'send_success' => 1,
+            'id' => $createRequest['data']['id'],
         ];
 
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], $fromUserId, $sendDataToSender);
@@ -91,13 +93,22 @@ trait ChatUser
 
     }
 
-    public function feedbackOnlineUsersStatus($uid){
-        $uids=$this->uids()->get();
+    public function feedbackOnlineUsersStatus($uid)
+    {
+        $uids = $this->uids()->get();
 
         $sendData = [
             'key' => $this->SEND_KEY_MAP['在线用户情况'],
             'uids' => $uids,
         ];
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], $uid, $sendData);
+    }
+
+    public function setSession(array $data = ['from_user_id' => null, 'session_user_id' => null])
+    {
+        $check = $this->getUserChatMessageList($data['from_user_id'], $data['session_user_id']);
+        $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'],
+            $data['from_user_id'],
+            ['key' => $this->SEND_KEY_MAP['聊天设置session返回聊天记录'], 'rows' => $check['data']]);
     }
 }

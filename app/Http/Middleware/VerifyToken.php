@@ -16,8 +16,14 @@ class VerifyToken
      */
     public function handle($request, Closure $next)
     {
+        $token = $request->input('token', '');
+        if (empty($token)) {
+            return response()->json(['success' => 0, 'msg' => 'verify token middleware token null error']);
+        }
+//        if ($token === 'api_test_token') return $next($request);
+
         $TokenObj = new Token();
-        $verify = $TokenObj->verify($request->input('token',''));
+        $verify = $TokenObj->verify($token);
         if (!$verify['success']) {
             return response()->json($verify);
         }

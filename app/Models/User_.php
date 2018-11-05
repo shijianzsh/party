@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Services\Token\Token, App\Services\Token\AccessToken;
 use App\Services\Login\Login;
-use App\Models\Department_;
 use DB;
 
 class User_ extends User
@@ -183,6 +182,7 @@ class User_ extends User
         return $user['thumbnail_format'] ?? null;
     }
 
+
     /**
      * 新增人员.
      *
@@ -195,9 +195,12 @@ class User_ extends User
             'type' => 'required',
             'role_ids' => 'required',
             'department_id' => 'required',
-            'name' => 'required',
-            'sex' => 'required',
-            'duty' => 'required',
+            'user_name' => 'required',
+            'user_sex' => 'required',
+            'user_birthplace' => 'required',
+            'user_nation' => 'required',
+            'user_cellphone' => 'required',
+            'user_duty' => 'required',
             'user_excerpt' => 'required',
 //            'user_login' => 'required',
 //            'user_password' => 'required',
@@ -213,11 +216,16 @@ class User_ extends User
                 $Obj = new User;
                 $Obj->type = $requestData['type'];
                 $Obj->department_id = $requestData['department_id'];
-                $Obj->name = $requestData['name'];
-                $Obj->duty = $requestData['duty'];
+                $Obj->user_name = $requestData['user_name'];
+                $Obj->user_sex = $requestData['user_sex'];
+                $Obj->user_birthplace = $requestData['user_birthplace'];
+                $Obj->user_nation = $requestData['user_nation'];
+                $Obj->user_cellphone = $requestData['user_cellphone'];
+                $Obj->user_duty = $requestData['user_duty'];
                 $Obj->user_excerpt = $requestData['user_excerpt'];
 //                $Obj->user_login = $requestData['user_login'];
 //                $Obj->user_password = Login::getPassword($requestData['user_password']);
+
                 $Obj->more = [
                     'thumbnail' => $requestData['more_thumbnail'] ?? null,
                 ];
@@ -244,9 +252,9 @@ class User_ extends User
             'type' => 'required',
             'role_ids' => 'required',
             'department_id' => 'required',
-            'name' => 'required',
-            'sex' => 'required',
-            'duty' => 'required',
+            'user_name' => 'required',
+            'user_sex' => 'required',
+            'user_duty' => 'required',
             'user_excerpt' => 'required',
 //            'user_login' => 'required',
 //            'user_password' => 'required',
@@ -263,8 +271,9 @@ class User_ extends User
 
                 $Obj->type = $requestData['type'];
                 $Obj->department_id = $requestData['department_id'];
-                $Obj->name = $requestData['name'];
-                $Obj->duty = $requestData['duty'];
+                $Obj->user_name = $requestData['user_name'];
+                $Obj->user_sex = $requestData['user_sex'];
+                $Obj->user_duty = $requestData['user_duty'];
                 $Obj->user_excerpt = $requestData['user_excerpt'];
                 //$Obj->user_login = $requestData['user_login'];
 //                $Obj->user_password = Login::getPassword($requestData['user_password']);
@@ -293,11 +302,11 @@ class User_ extends User
     static public function editUser(int $userId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-            'name' => '',
-            'sex' => '',
-            'cellphone' => '',
-            'duty' => '',
-            'borned_at' => '',
+            'user_name' => '',
+            'user_sex' => '',
+            'user_cellphone' => '',
+            'user_duty' => '',
+            'user_borned_at' => '',
             'more_thumbnail' => '',
         ]);
 
@@ -446,7 +455,6 @@ class User_ extends User
             'success' => (int)($success ?? 1),
             'data' => $data ?? ['user_id' => $user['id'] ?? null],
             'msg' => $msg ?? null,
-            '$requestData' => $requestData,
         ];
     }
 }

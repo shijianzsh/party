@@ -178,7 +178,7 @@ class SocketHelper
                 }
             }
 
-            if (!$isSend) throw new \Exception('send error');
+//            if (!$isSend) throw new \Exception('send error');
             return $this;
         }
 

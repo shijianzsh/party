@@ -58,8 +58,6 @@ class AccessToken extends TokenBase
             throw new \Exception('AccessToken verify error,code 3');
         }
 
-
-
         $this->userId = $data['user_id'];
 
         $verifyToken = $TokenObj->verify($data['token']);

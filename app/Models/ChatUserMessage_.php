@@ -91,11 +91,22 @@ class ChatUserMessage_ extends ChatUserMessage
                 ->where('is_checked', 0)
                 ->update(['is_checked' => 1]);
 
+            $data = ChatUserMessage
+                ::where(function ($query) use ($fromUserId, $toUserId) {
+                    $query
+                        ->orWhere('from_user_id', $fromUserId)
+                        ->orWhere('from_user_id', $toUserId)
+                        ->orWhere('to_user_id', $fromUserId)
+                        ->orWhere('to_user_id', $toUserId);
+                })
+                ->get()
+                ->toArray();
+
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data ?? null];
     }
 }

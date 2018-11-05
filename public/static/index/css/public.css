@@ -43,7 +43,7 @@ img{border:0px;  outline-width:0px;  vertical-align:top;}
 .w600{width: 600px; float: left;}
 .w570{width: 570px; float: left;}
 /* about-history */
-.about-history{ height:auto; padding:50px 100px 0; background:url(../images/bg_about_history.jpg) no-repeat center fixed; -webkit-background-size:100% 100%; background-size:100% 100%;}
+.about-history{ height:auto; padding:50px 100px 0; -webkit-background-size:100% 100%; background-size:100% 100%;}
 .about-title {margin-bottom: 25px;}
 .about-title h3 {margin: 0 0 10px;font-size:34px;font-weight:400;color: #2c2c2c;}
 .about-title p {margin: 0;font-size: 36px;font-weight: 300;color: #ECECEC;}

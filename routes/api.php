@@ -22,6 +22,10 @@ Route::namespace('Api')->group(function () {
         return '非法访问';
     });
 
+    Route::get('/git_push', function (Request $request) {
+        return 'yes';
+    });
+
     Route::get('/test', 'Test');
 
     Route::get('/token', 'Token');

@@ -9,7 +9,8 @@
  */
 
 define('LARAVEL_START', microtime(true));
-
+echo 123;
+exit;
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader

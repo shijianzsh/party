@@ -366,22 +366,11 @@ class PortalPost_ extends PortalPost
         //数量不传的情况下获取所有文章
         $postNumber = !$postNumber ? 9999 : $postNumber;
 
-        if (!env('APP_USE_CACHE')) {
-            $result = array_merge(
-                ['category' => PortalCategory_::getCategory($categoryId)],
-                self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
-            );
-        } else {
-            $cacheName = "CategoryPublishedPostList_{$categoryId}_$postNumber";
-            $cacheMinutes = 1;
+        $result = array_merge(
+            ['category' => PortalCategory_::getCategory($categoryId)],
+            self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
+        );
 
-            $result = Cache::remember($cacheName, $cacheMinutes, function () use ($categoryId, $postNumber) {
-                return array_merge(
-                    ['category' => PortalCategory_::getCategory($categoryId)],
-                    self::getPublishedPostList(1, $postNumber, ['category_id' => $categoryId])
-                );
-            });
-        }
         return $result;
     }
 

@@ -40,18 +40,7 @@ class Auth
     {
         $userId = $this->getUserId();
 
-        if (!env('APP_USE_CACHE')) {
-            $result = AuthMap_::getUserAuth($userId);
-        } else {
-            $cacheName = "getAuths_{$userId}";
-            $cacheMinutes = 120;
-
-            $result = Cache::tags(['auth', 'getAuths'])
-                ->remember($cacheName, $cacheMinutes, function () use ($userId) {
-                    return AuthMap_::getUserAuth($userId);
-                });
-        }
-        return $result;
+        return AuthMap_::getUserAuth($userId);
     }
 
     public function verify(string $method, string $path): bool

@@ -129,12 +129,12 @@ Route::namespace('Api')->group(function () {
                 Route::post('exam_results/{id}/submit', 'ExamResult@submit');
                 Route::resource('exam_results', 'ExamResultController');
 
+                Route::resource('exam_collect_questions', 'ExamCollectQuestionController');
+
                 Route::post('pusher/{user_id}/socket/{send_key}', 'Pusher@Socket');
                 Route::post('pusher/{user_id}/sms', 'Pusher@Sms');
             });
 
     });
-
-
 });
 

@@ -22,7 +22,7 @@ Route::namespace('Api')->group(function () {
         return '非法访问';
     });
 
-    Route::get('/git_push', function (Request $request) {
+    Route::post('/git_push', function (Request $request) {
         return 'yes';
     });
 

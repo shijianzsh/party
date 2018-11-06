@@ -8,7 +8,6 @@
  * @author   Taylor Otwell <taylor@laravel.com>
  */
 
-echo 1122333;
 define('LARAVEL_START', microtime(true));
 /*
 |--------------------------------------------------------------------------

@@ -1,2 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["9cdb"],{"9cdb":function(n,e,t){"use strict";t.r(e);var c=function(){var n=this,e=n.$createElement,t=n._self._c||e;return t("div",[n._v("\n    功能开发中。。。\n")])},l=[],u={},i=u,o=t("2877"),s=Object(o["a"])(i,c,l,!1,null,null,null);s.options.__file="Index.vue";e["default"]=s.exports}}]);
-//# sourceMappingURL=9cdb.af3a2265.js.map

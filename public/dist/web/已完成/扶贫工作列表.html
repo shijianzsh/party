@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>智慧党建大数据管理系统</title>
+<link rel="stylesheet" href="css/spectre.min.css">
+<link rel="stylesheet" href="css/spectre-exp.min.css">
+<link rel="stylesheet" href="css/spectre-icons.min.css">
+<link rel="stylesheet" href="css/reset.css">
+</head>
+
+<body>
+<div class="header" style="position: fixed; width: 100%; z-index: 999;">
+  <div class="columns">
+    <div class="column col-6">
+      <div class="logo fl"><a href="#"><img src="images/logo.png" alt=""/></a></div>
+    </div>
+    <div class="column col-6">
+      <div class="input-group fr" style="width: 260px; margin: 20px;">
+        <input class="form-input" type="text" placeholder="请输入关键词" style="border-radius: 20px;">
+        <button class="btn btn-style03 input-group-btn select_btn" style="padding: 0 10px; border-radius: 20px; margin-left: -30px; z-index: 99;"><i class="icon icon-search"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="columns">
+    <div class="column col-12" style=" text-align: center;">
+      <ul class="breadcrumb fr" style="margin-right: 25px;">
+        <i class="icon icon-location"></i>
+        <li class="breadcrumb-item"> <a href="#">首页</a> </li>
+        <li class="breadcrumb-item"> <a href="#">组织管理</a> </li>
+        <li class="breadcrumb-item"> <a href="#">党员提名</a> </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="docs-content">
+  <div class="columns col-gapless mb-20">
+    <div class="column col-12" style="margin-left: -13px;">
+      <button class="btn btn-style01">上报审批</button>
+      <button class="btn btn-style01">下发执行</button>
+    </div>
+  </div>
+  <div class="columns bac_white">
+    <div class="container">
+      <div class="columns mb-20">
+        <div class="column col-4">
+          <input class="form-input" type="text" placeholder="内容关键词">
+        </div>
+        <div class="column col-4">
+          <input class="form-input" type="text" placeholder="计划负责人">
+        </div>
+        <div class="column col-4">
+          <div class="input-group">
+            <input class="form-input login_input01" type="text" placeholder="请输入关键词">
+            <button class="btn btn-style03 input-group-btn"><i class="icon icon-search"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="columns mb-20">
+        <div class="column col-4">
+          <div class="input-group"><span class="input-group-addon">计划时间段</span>
+            <input class="form-input" type="text" placeholder="2018-08-27">
+            <input class="form-input" type="text" placeholder="2018-12-30">
+          </div>
+        </div>
+        <div class="column col-4"></div>
+        <div class="column col-4">
+          <button style="width: 49%;" class="btn btn-style02">查询</button>
+          <button style="width: 49%;" class="btn btn-style03">清空条件</button>
+        </div>
+      </div>
+    </div>
+    <table class="layui-table" lay-even lay-skin="nob">
+      <thead>
+        <tr>
+          <th bgcolor="#F1EDE1">选择</th>
+          <th bgcolor="#F1EDE1">序号</th>
+          <th bgcolor="#F1EDE1">计划名称</th>
+          <th bgcolor="#F1EDE1">计划负责人</th>
+          <th bgcolor="#F1EDE1">完成时间</th>
+          <th bgcolor="#F1EDE1">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="layui-table mt-15">
+          <td><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>01</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr class="layui-table mt-15">
+          <td><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>02</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr class="layui-table mt-15">
+          <td><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>03</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr class="layui-table mt-15">
+          <td><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>04</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr class="layui-table mt-15">
+          <td><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>05</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="layui-table mt-15">
+      <thead>
+        <tr>
+          <th bgcolor="#f1ede1">选择</th>
+          <th bgcolor="#f1ede1">序号</th>
+          <th bgcolor="#f1ede1">计划名称</th>
+          <th bgcolor="#f1ede1">计划负责人</th>
+          <th bgcolor="#f1ede1">完成时间</th>
+          <th width="214" bgcolor="#f1ede1">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center"><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>01</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr>
+          <td class="text-center"><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>02</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr>
+          <td class="text-center"><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>03</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr>
+          <td class="text-center"><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>04</td>
+          <td>关于投票选择迎风路党支部党委书记的投票内容</td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+        <tr>
+          <td class="text-center"><div class="form-group" style="width: 20px;">
+              <label class="form-checkbox">
+                <input type="checkbox">
+                <i class="form-icon"></i></label>
+            </div></td>
+          <td>05</td>
+          <td>&nbsp;  </td>
+          <td>表决</td>
+          <td>2018-03-01</td>
+          <td><a href="#"><i class="icon icon-edit"></i> 修改</a> <a href="#"><i class="icon icon-delete"></i> 删除</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="float: right; width: 100%; padding: 10px 0;">
+      <ul class="pagination" style="float:right;">
+        <li class="page-item disabled"> <a href="#" tabindex="-1">上一页</a> </li>
+        <li class="page-item active"> <a href="#">1</a> </li>
+        <li class="page-item"> <a href="#">2</a> </li>
+        <li class="page-item"> <a href="#">3</a> </li>
+        <li class="page-item"> <span>...</span> </li>
+        <li class="page-item"> <a href="#">12</a> </li>
+        <li class="page-item"> <a href="#">下一页</a> </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="left_nav">
+  <nav class="navigation"> <a href="#" class="navigation-item current">选举表决</a> <a href="#" class="navigation-item">工作计划</a> <a href="#" class="navigation-item" style="height: 32px;">扶贫工作</a> </nav>
+</div>
+<div class="bottom_nav_bg">
+  <div class="bottom_nav">
+    <ul class="rdfwList">
+      <li><a href="#"><span class="current"><img src="images/menu_ico01.png" alt=""/></span>党建信息</a></li>
+      <li><a href="#"><span><img src="images/menu_ico02.png" alt=""/></span>党务工作</a></li>
+      <li><a href="#"><span><img src="images/menu_ico03.png" alt=""/></span>党员学习</a></li>
+      <li><a href="#"><span><img src="images/menu_ico04.png" alt=""/></span>智能会议</a></li>
+      <li class="menu_dj"><img src="images/menu_dj.png" alt=""/></li>
+      <li><a href="#"><span><img src="images/menu_ico05.png" alt=""/></span>个人中心</a></li>
+      <li><a href="#"><span><img src="images/menu_ico06.png" alt=""/></span>组织管理</a></li>
+      <li><a href="#"><span><img src="images/menu_ico07.png" alt=""/></span>党建展览</a></li>
+      <li><a href="#"><span><img src="images/menu_ico08.png" alt=""/></span>退出登录</a></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

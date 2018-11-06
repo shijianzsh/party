@@ -170,7 +170,7 @@ class User_ extends User
 
     static public function getUserWithPartyInfo(int $userId = 0)
     {
-        $with = ['department', 'partyExperience', 'partyRelation' => function ($query) {
+        $with = ['department', 'partyExperience', 'partyRelations' => function ($query) {
             $query->orderBy('sort_order', 'asc');
         }];
         return self::getUser($userId, false, $with);

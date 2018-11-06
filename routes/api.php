@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-//Route::options('/{all}', function (Request $request) {
-//})->middleware(\App\Http\Middleware\Cors::class);
-
-
 Route::namespace('Api')->group(function () {
     Route::get('/', function (Request $request) {
         return '非法访问';
@@ -152,4 +148,3 @@ Route::namespace('Api')->group(function () {
 
     });
 });
-

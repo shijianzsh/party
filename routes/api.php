@@ -22,7 +22,7 @@ Route::namespace('Api')->group(function () {
         return '非法访问';
     });
 
-    Route::post('/git_push', function (Request $request) {
+    Route::any('/git_push', function (Request $request) {
         $secret = "198842";
         $path = "/www/wwwroot/party/";
 

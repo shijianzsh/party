@@ -62,7 +62,7 @@ class Department_ extends Department
 
         return [
             'rows' => $get->toArray(),
-            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+            'pagination' =>getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -120,7 +120,7 @@ class Department_ extends Department
 
         return [
             'rows' => $get->toArray(),
-            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+            'pagination' =>getPagination($currentPage, $pageSize, $total)
         ];
     }
 

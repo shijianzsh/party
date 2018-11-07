@@ -71,7 +71,7 @@ class User_ extends User
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getDepartmentUserList(
@@ -141,7 +141,7 @@ class User_ extends User
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
     }
 
     /**

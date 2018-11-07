@@ -57,7 +57,7 @@ class UserComment_ extends UserComment
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(),
-            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+            'pagination' =>getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -119,7 +119,7 @@ class UserComment_ extends UserComment
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(),
-            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+            'pagination' =>getPagination($currentPage, $pageSize, $total)
         ];
     }
 

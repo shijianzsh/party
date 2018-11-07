@@ -59,7 +59,7 @@ class Vote_ extends _BaseModel
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getVote(int $voteId, bool $getObject = false)

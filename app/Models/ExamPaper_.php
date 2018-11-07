@@ -55,7 +55,7 @@ class ExamPaper_ extends ExamPaper
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getExamPaper(int $examPaperId, bool $getObject = false)

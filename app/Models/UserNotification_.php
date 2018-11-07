@@ -53,7 +53,7 @@ class UserNotification_ extends UserNotification
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(),
-            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+            'pagination' =>getPagination($currentPage, $pageSize, $total)
         ];
     }
 

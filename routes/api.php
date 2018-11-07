@@ -24,7 +24,7 @@ Route::namespace('Api')->group(function () {
 
         $signature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
         if ($signature) {
-            $hash = "sha1=".hash_hmac('sha1', file_get_contents("php://input"), $secret);
+            $hash = "sha1=" . hash_hmac('sha1', file_get_contents("php://input"), $secret);
             if (strcmp($signature, $hash) == 0) {
                 echo shell_exec("cd {$path} && git pull");
                 exit();
@@ -40,6 +40,16 @@ Route::namespace('Api')->group(function () {
     Route::post('upload', 'Upload');
 
     Route::group(['middleware' => [
+        \App\Http\Middleware\VerifyIsSocketServer::class,
+    ]],
+        function () {
+            Route::post('chat_user_messages/{from_user_id}/{to_user_id}/create', 'ChatUserMessage@create');
+            Route::get('chat_user_messages/{from_user_id}/{to_user_id}/check', 'ChatUserMessage@check');
+
+            Route::resource('user_learning_records', 'UserLearningRecordController')->only(['store', 'update']);
+        });
+
+    Route::group(['middleware' => [
         \App\Http\Middleware\VerifyToken::class,
     ]], function () {
         Route::post('/login', 'User@login');
@@ -48,14 +58,6 @@ Route::namespace('Api')->group(function () {
         Route::resource('activists', 'ActivistController')->only(['store']);
 
         Route::get('departments/select_component', 'Department@selectComponentList');
-
-        Route::group(['middleware' => [
-            \App\Http\Middleware\VerifyIsSocketServer::class,
-        ]],
-            function () {
-                Route::post('chat_user_messages/{from_user_id}/{to_user_id}/create', 'ChatUserMessage@create');
-                Route::get('chat_user_messages/{from_user_id}/{to_user_id}/check', 'ChatUserMessage@check');
-            });
 
         Route::group(['middleware' => [
             \App\Http\Middleware\VerifyAccessToken::class,
@@ -91,6 +93,8 @@ Route::namespace('Api')->group(function () {
                 Route::resource('user_info_party_relations', 'UserInfoPartyRelationController');
 
                 Route::resource('user_payments', 'UserPaymentController');
+
+                Route::resource('user_learning_records', 'UserLearningRecordController')->except(['store', 'update']);
 
                 Route::get('articles/published', 'Article@publishedArticleList');
                 Route::get('articles/user', 'Article@userArticleList');

@@ -13,7 +13,7 @@ class SocketHelper
     private $worker = null;
     private $connection = null;
 
-    use FlashData, ChatUser;
+    use FlashData, ChatUser, Learning;
 
     public function __construct(&$worker, &$connection)
     {
@@ -149,7 +149,7 @@ class SocketHelper
                     $result = [
                         'success' => 1,
                         'msg' => null,
-                        'data' =>$data,
+                        'data' => $data,
                         'event' => $event,
                     ];
                     $connection->send(json_encode($result));
@@ -170,7 +170,7 @@ class SocketHelper
                     $result = [
                         'success' => 1,
                         'msg' => null,
-                        'data' =>$data,
+                        'data' => $data,
                         'event' => $event,
                     ];
                     $connection->send(json_encode($result));
@@ -192,7 +192,7 @@ class SocketHelper
                     $result = [
                         'success' => 1,
                         'msg' => null,
-                        'data' =>$data,
+                        'data' => $data,
                         'event' => $event,
                     ];
                     $connection->send(json_encode($result));

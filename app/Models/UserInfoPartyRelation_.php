@@ -40,7 +40,7 @@ class UserInfoPartyRelation_ extends UserInfoPartyRelation
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(),
-            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+            'pagination' =>getPagination($currentPage, $pageSize, $total)
         ];
     }
 

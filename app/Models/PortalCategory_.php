@@ -48,7 +48,7 @@ class PortalCategory_ extends PortalCategory
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getCategory(int $categoryId, bool $getObject = false, array $with = [])

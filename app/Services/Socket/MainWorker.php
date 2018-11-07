@@ -18,6 +18,7 @@ class MainWorker
         '后台管理' => 'admin',
         '通知' => 'notification',
         '聊天' => 'chat',
+        '学习' => 'learning',
     ];
     public const ON_MESSAGE_REQUEST_KEY_MAP = [
         '心跳' => 'beep',
@@ -26,6 +27,7 @@ class MainWorker
         '获取users' => 'get_online_users',
         '发送消息' => 'chat_send_message_to_user',
         '聊天设置session' => 'chat_set_session_uid',
+        '学习计时' => 'learning_record',
     ];
 
     //start钩子处创建text协议 接受服务器发送的消息
@@ -75,14 +77,24 @@ class MainWorker
                 case self::ON_MESSAGE_REQUEST_KEY_EVENT['聊天']:
                     switch ($requestKey) {
                         case self::ON_MESSAGE_REQUEST_KEY_MAP['注册']:
-                            $Helper->feedbackOnlineUsersStatus($requestValue);
-                            $Helper->broadcastUserOnline($requestValue);
+                            $Helper->chatFeedbackOnlineUsersStatus($requestValue);
+                            $Helper->chatBroadcastUserOnline($requestValue);
                             break;
                         case self::ON_MESSAGE_REQUEST_KEY_MAP['发送消息']:
-                            $Helper->sendChatMessage($requestValue);
+                            $Helper->chatSendMessage($requestValue);
                             break;
                         case self::ON_MESSAGE_REQUEST_KEY_MAP['聊天设置session']:
-                            $Helper->setSession($requestValue);
+                            $Helper->chatSetSession($requestValue);
+                            break;
+                    }
+                    break;
+                case self::ON_MESSAGE_REQUEST_KEY_EVENT['学习']:
+                    switch ($requestKey) {
+//                        case self::ON_MESSAGE_REQUEST_KEY_MAP['注册']:
+//                            $Helper->learningRegister($requestValue);
+//                            break;
+                        case self::ON_MESSAGE_REQUEST_KEY_MAP['学习计时']:
+                            $Helper->learningRecord($requestValue);
                             break;
                     }
                     break;
@@ -110,7 +122,7 @@ class MainWorker
 
             switch ($event) {
                 case self::ON_MESSAGE_REQUEST_KEY_EVENT['聊天']:
-                    $Helper->broadcastUserOffline($uid);
+                    $Helper->chatBroadcastUserOffline($uid);
                     break;
             }
 

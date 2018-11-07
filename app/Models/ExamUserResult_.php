@@ -53,7 +53,7 @@ class ExamUserResult_ extends ExamUserResult
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getExamUserSubmittedResultList(
@@ -100,7 +100,7 @@ class ExamUserResult_ extends ExamUserResult
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]];
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getExamUserResult(int $id, bool $getObject = false)

@@ -12,7 +12,7 @@ use App\Services\Socket\MainWorker;
 
 trait ChatUser
 {
-    private $SEND_KEY_MAP = [
+    private $CHAT_SEND_KEY_MAP = [
         '新消息' => 'chat_new_message',
         '发送回执' => 'chat_send_feedback',
         '有人上线' => 'chat_user_get_online',
@@ -31,7 +31,7 @@ trait ChatUser
         return RequestHelper::post("api/chat_user_messages/{$fromUserId}/{$toUserId}/create", ['type' => $messageType, 'message' => $message]);
     }
 
-    public function sendChatMessage(array $data = ['from_user_id' => null, 'to_user_id' => null, 'type' => null, 'message' => null])
+    public function chatSendMessage(array $data = ['from_user_id' => null, 'to_user_id' => null, 'type' => null, 'message' => null])
     {
         //获取参数
         $fromUserId = $this->uid()->get();
@@ -48,7 +48,7 @@ trait ChatUser
 
         //消息发送给接收者
         $sendDataToReceiver = [
-            'key' => $this->SEND_KEY_MAP['新消息'],
+            'key' => $this->CHAT_SEND_KEY_MAP['新消息'],
             'from_user_id' => $fromUserId,
             'to_user_id' => $toUserId,
             'type' => $messageType,
@@ -60,7 +60,7 @@ trait ChatUser
 
         //发送结果发送给发送者
         $sendDataToSender = [
-            'key' => $this->SEND_KEY_MAP['发送回执'],
+            'key' => $this->CHAT_SEND_KEY_MAP['发送回执'],
             'from_user_id' => $fromUserId,
             'to_user_id' => $toUserId,
             'type' => $messageType,
@@ -74,41 +74,41 @@ trait ChatUser
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], $fromUserId, $sendDataToSender);
     }
 
-    public function broadcastUserOnline($uid)
+    public function chatBroadcastUserOnline($uid)
     {
         $sendData = [
-            'key' => $this->SEND_KEY_MAP['有人上线'],
+            'key' => $this->CHAT_SEND_KEY_MAP['有人上线'],
             'user_id' => $uid,
         ];
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], null, $sendData);
     }
 
-    public function broadcastUserOffline($uid)
+    public function chatBroadcastUserOffline($uid)
     {
         $sendData = [
-            'key' => $this->SEND_KEY_MAP['有人下线'],
+            'key' => $this->CHAT_SEND_KEY_MAP['有人下线'],
             'user_id' => $uid,
         ];
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], null, $sendData);
 
     }
 
-    public function feedbackOnlineUsersStatus($uid)
+    public function chatFeedbackOnlineUsersStatus($uid)
     {
         $uids = $this->uids()->get();
 
         $sendData = [
-            'key' => $this->SEND_KEY_MAP['在线用户情况'],
+            'key' => $this->CHAT_SEND_KEY_MAP['在线用户情况'],
             'uids' => $uids,
         ];
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], $uid, $sendData);
     }
 
-    public function setSession(array $data = ['from_user_id' => null, 'session_user_id' => null])
+    public function chatSetSession(array $data = ['from_user_id' => null, 'session_user_id' => null])
     {
         $check = $this->getUserChatMessageList($data['from_user_id'], $data['session_user_id']);
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'],
             $data['from_user_id'],
-            ['key' => $this->SEND_KEY_MAP['聊天设置session返回聊天记录'], 'rows' => $check['data']]);
+            ['key' => $this->CHAT_SEND_KEY_MAP['聊天设置session返回聊天记录'], 'rows' => $check['data']]);
     }
 }

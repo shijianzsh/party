@@ -41,7 +41,7 @@ class PortalPostComment_ extends PortalPostComment
         end:
         return [
             'rows' => isset($get)?$get->toArray():[],
-            'pagination' => ['current' => $currentPage, 'pageSize' => $pageSize, 'total' => $total ?? 0]
+            'pagination' =>getPagination($currentPage, $pageSize, $total)
         ];
     }
 

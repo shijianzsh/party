@@ -46,3 +46,14 @@ function createNotification(array $data)
 
     throw new Exception('helper createNotification flow error');
 }
+
+function getPagination(int $current, int $pageSize, int $total)
+{
+    $isLastPage = $current * $pageSize >= $total ? 1 : 0;
+    return [
+        'current' => $current,
+        'pageSize' => $pageSize,
+        'total' => $total,
+        'isLastPage' => $isLastPage
+    ];
+}

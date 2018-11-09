@@ -24,7 +24,7 @@ class DepartmentController extends \App\Http\Controllers\Controller
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],
             ],
-            $request->query('with', []) ? $request->query('with', []) : []
+            (array)$request->query('with', [])
         );
         $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
         return response()->json($result);

@@ -25,7 +25,8 @@ class UserLearningRecordController extends \App\Http\Controllers\Controller
                 'user_id' => &$filter['user_id'],
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],
-            ]
+            ],
+            (array)$request->query('with', [])
         );
 
         $result = ['success' => 1, 'data' => $list, '$request' => $request, '$filter' => $filter];
@@ -40,7 +41,7 @@ class UserLearningRecordController extends \App\Http\Controllers\Controller
      */
     public function store(Request $request)
     {
-        $result = UserLearningRecord_::recordLearningRecord(0,$request->input('data'));
+        $result = UserLearningRecord_::recordLearningRecord(0, $request->input('data'));
         return response()->json($result);
     }
 

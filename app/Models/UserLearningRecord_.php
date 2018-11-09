@@ -22,8 +22,7 @@ class UserLearningRecord_ extends UserLearningRecord
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
 
-        $Obj = parent::with($with);
-        $Obj->orderBy('updated_at', 'desc');
+        $Obj = UserLearningRecord::with($with);
 
         if ($userId) {
             $Obj->where('user_id', $userId);
@@ -49,6 +48,7 @@ class UserLearningRecord_ extends UserLearningRecord
             $Obj->offset($offset)->limit($pageSize);
         }
 
+//        $Obj->orderBy('updated_at', 'desc');
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)
@@ -57,7 +57,7 @@ class UserLearningRecord_ extends UserLearningRecord
 
     static public function getLearningRecord(int $learningRecordId, array $with = []): array
     {
-        return $Obj = parent::with($with)->findOrFail($learningRecordId)->toArray();
+        return $Obj = UserLearningRecord::with($with)->findOrFail($learningRecordId)->toArray();
     }
 
     static public function recordLearningRecord(int $learningRecordId, array $requestData): array
@@ -125,7 +125,7 @@ class UserLearningRecord_ extends UserLearningRecord
     static public function deleteLearningRecord(int $learningRecordId): array
     {
         try {
-            $success = parent::destroy($learningRecordId);
+            $success = UserLearningRecord::destroy($learningRecordId);
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

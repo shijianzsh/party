@@ -30,8 +30,6 @@ trait Learning
         $userId = $this->uid()->get();
         $request = $this->learningRecordRequest($data['type'], $userId, $data['target_id']);
 
-        print_r($request);
-
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['学习'],
             $userId,
             ['key' => $this->LEARNING_SEND_KEY_MAP['记录'], 'request' => $request]);

@@ -60,10 +60,10 @@ class MainWorker
 
             switch ($requestKey) {
                 case self::ON_MESSAGE_REQUEST_KEY_MAP['心跳']:
-                    $Helper->send();
+                    $Helper->send(['key' => self::ON_MESSAGE_REQUEST_KEY_MAP['心跳']]);
                     break;
                 case self::ON_MESSAGE_REQUEST_KEY_MAP['注册']:
-                    $Helper->register($event, $requestValue)->send(true);
+                    $Helper->register($event, $requestValue)->send(['key' => self::ON_MESSAGE_REQUEST_KEY_MAP['注册']]);
                     break;
                 case self::ON_MESSAGE_REQUEST_KEY_MAP['获取uids']:
                     $Helper->uids()->send();

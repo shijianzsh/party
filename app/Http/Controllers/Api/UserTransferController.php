@@ -1,19 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lijingbo
- * Date: 2018/8/21
- * Time: 下午9:43
- */
 
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Services\Token\Token as TokenModel, App\Services\Token\AccessToken as AccessTokenModel;
-use App\Models\UserActivist_;
-use App\Models\Department_;
+use  App\Models\UserTransferDepartment_;
+use Illuminate\Support\Facades\Crypt;
+use Gate;
 
-class ActivistController extends \App\Http\Controllers\Controller
+class UserTransferController extends \App\Http\Controllers\Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,14 +16,16 @@ class ActivistController extends \App\Http\Controllers\Controller
      */
     public function index(Request $request)
     {
-        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
-        $list = UserActivist_::getActivistList(
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+        $list = UserTransferDepartment_::getTransferList(
             $request->input('current_page', 0),
             $request->input('page_size', 0),
             [
-                'keyword' => &$filter['keyword'],
-            ],
-            []
+                'user_id' => &$filter['user_id'],
+                'audit_user_id' => &$filter['audit_user_id'],
+                'old_department_id' => &$filter['old_department_id'],
+                'new_department_id' => &$filter['new_department_id'],
+            ]
         );
 
         $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
@@ -44,7 +40,8 @@ class ActivistController extends \App\Http\Controllers\Controller
      */
     public function store(Request $request)
     {
-        return response()->json(UserActivist_::createActivist($request->input('data')));
+        $result = UserTransferDepartment_::createTransfer($request->input('data'));
+        return response()->json($result);
     }
 
     /**
@@ -55,7 +52,9 @@ class ActivistController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $result = ['success' => 1, 'data' => UserActivist_::getActivist($id)];
+        $row = UserTransferDepartment_::getTransfer($id, []);
+
+        $result = ['success' => 1, 'data' => $row];
         return response()->json($result);
     }
 
@@ -67,8 +66,7 @@ class ActivistController extends \App\Http\Controllers\Controller
      */
     public function update(Request $request, $id)
     {
-        $result = UserActivist_::updateActivist($id, $request->input('data'));
-        return response()->json($result);
+        //TODO
     }
 
     /**
@@ -79,6 +77,6 @@ class ActivistController extends \App\Http\Controllers\Controller
      */
     public function destroy($id)
     {
-        return response()->json(UserActivist_::deleteActivist($id));
+        return response()->json(UserTransferDepartment_::deleteTransfer($id));
     }
 }

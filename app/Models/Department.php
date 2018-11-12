@@ -44,6 +44,12 @@ class Department extends _BaseModel
         return $this->hasMany('App\Models\DepartmentActivityPlan', 'department_id');
     }
 
+    public function projects()
+    {
+        //工作计划
+        return $this->hasMany('App\Models\DepartmentProject', 'department_id');
+    }
+
     public function getUsersCountAttribute()
     {
         return $this->users()->count();

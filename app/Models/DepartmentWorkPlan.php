@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+//工作规划
 class DepartmentWorkPlan extends _BaseModel
 {
     protected $casts = [

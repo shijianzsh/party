@@ -30,13 +30,13 @@ class UserPayment_ extends UserPayment
 
         if (!empty($userId)) {
             $Obj->whereHas('user', function ($query) use ($userId) {
-                $query->where('user.id', $userId);
+                $query->where('id', $userId);
             });
         }
 
         if (!empty($departmentId)) {
             $Obj->whereHas('user', function ($query) use ($departmentId) {
-                $query->where('user.department_id', $departmentId);
+                $query->where('department_id', $departmentId);
             });
         }
 

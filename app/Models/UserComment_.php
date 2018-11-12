@@ -28,7 +28,7 @@ class UserComment_ extends UserComment
 
         if ($toUserId) {
             $Obj->whereHas('commentUsersMiddle', function ($query) use ($toUserId) {
-                $query->where('user_comment_user.user_id', $toUserId);
+                $query->where('user_id', $toUserId);
             });
 
             $Obj->where(function ($query) {
@@ -36,7 +36,7 @@ class UserComment_ extends UserComment
                     ->orWhere(function ($query) {
                         $query->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('user_comment_audit.status', 1);
+                                $query->where('status', 1);
                             });
                     });
             });
@@ -81,7 +81,7 @@ class UserComment_ extends UserComment
 
         $Obj->where('need_audit', 1)
             ->whereHas('audit', function ($query) use ($auditUserId) {
-                $query->where('user_comment_audit.audit_user_id', $auditUserId);
+                $query->where('audit_user_id', $auditUserId);
             });
 
         if ($userId) {
@@ -90,7 +90,7 @@ class UserComment_ extends UserComment
 
         if ($toUserId) {
             $Obj->whereHas('commentUsersMiddle', function ($query) use ($toUserId) {
-                $query->where('user_comment_user.user_id', $toUserId);
+                $query->where('user_id', $toUserId);
             });
 
             $Obj->where(function ($query) {
@@ -98,7 +98,7 @@ class UserComment_ extends UserComment
                     ->orWhere(function ($query) {
                         $query->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('user_comment_audit.status', 1);
+                                $query->where('status', 1);
                             });
                     });
             });
@@ -269,7 +269,7 @@ class UserComment_ extends UserComment
                 ->where('audit_user_id', User_::getMyId())
                 ->firstOrFail();
 
-            if ($row->status !== UserCommentAudit::STATUS['待审核']) {
+            if ($row->status !== UserCommentAudit::STATUS['未审核']) {
                 $statusNow = array_flip(UserCommentAudit::STATUS)[$row->status];
                 throw new \Exception('操作失败，已经审核过了。当前状态为 ' . $statusNow);
             }

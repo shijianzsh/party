@@ -30,8 +30,8 @@ class PortalPost_ extends PortalPost
         $Obj->orderBy('published_at', 'desc');
 
         if ($categoryId) {
-            $Obj->whereHas('categorys', function ($query) use ($categoryId) {
-                $query->where('portal_category.id', $categoryId);
+            $Obj->whereHas('categoryMiddle', function ($query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
             });
         }
 
@@ -45,7 +45,7 @@ class PortalPost_ extends PortalPost
                         $query
                             ->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                $query->where('status', PortalPostAudit::STATUS['通过']);
                             });
                     });
             });
@@ -119,12 +119,12 @@ class PortalPost_ extends PortalPost
 
         $Obj->where('need_audit', 1)
             ->whereHas('audit', function ($query) use ($auditUserId) {
-                $query->where('portal_post_audit.audit_user_id', $auditUserId);
+                $query->where('audit_user_id', $auditUserId);
             });
 
         if ($categoryId) {
-            $Obj->whereHas('categorys', function ($query) use ($categoryId) {
-                $query->where('portal_category.id', $categoryId);
+            $Obj->whereHas('categoryMiddle', function ($query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
             });
         }
 
@@ -138,7 +138,7 @@ class PortalPost_ extends PortalPost
                         $query
                             ->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                $query->where('status', PortalPostAudit::STATUS['通过']);
                             });
                     });
             });
@@ -212,8 +212,8 @@ class PortalPost_ extends PortalPost
         $Obj->where('user_id', $userId);
 
         if ($categoryId) {
-            $Obj->whereHas('categorys', function ($query) use ($categoryId) {
-                $query->where('portal_category.id', $categoryId);
+            $Obj->whereHas('categoryMiddle', function ($query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
             });
         }
 
@@ -227,7 +227,7 @@ class PortalPost_ extends PortalPost
                         $query
                             ->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                $query->where('status', PortalPostAudit::STATUS['通过']);
                             });
                     });
             });
@@ -299,6 +299,7 @@ class PortalPost_ extends PortalPost
         $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
         $Obj->orderBy('published_at', 'desc');//根据发布日期排序
         $Obj->orderBy('is_top', 'desc');//根据是否置顶排序
+
         $Obj->where(function ($query) {//审核约束
             $query
                 ->where('need_audit', 0)//不需要审核
@@ -306,14 +307,14 @@ class PortalPost_ extends PortalPost
                     $query
                         ->where('need_audit', 1)
                         ->whereHas('audit', function ($query) {
-                            $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                            $query->where('status', PortalPostAudit::STATUS['通过']);
                         });
                 });
         });
 
         if ($categoryId) {
-            $Obj->whereHas('categorys', function ($query) use ($categoryId) {
-                $query->where('portal_category.id', $categoryId);
+            $Obj->whereHas('categoryMiddle', function ($query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
             });
         }
 
@@ -395,7 +396,7 @@ class PortalPost_ extends PortalPost
                         $query
                             ->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                $query->where('status', PortalPostAudit::STATUS['通过']);
                             });
                     });
             })
@@ -425,7 +426,7 @@ class PortalPost_ extends PortalPost
                         $query
                             ->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                $query->where('status', PortalPostAudit::STATUS['通过']);
                             });
                     });
             })
@@ -447,7 +448,7 @@ class PortalPost_ extends PortalPost
                         $query
                             ->where('need_audit', 1)
                             ->whereHas('audit', function ($query) {
-                                $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                $query->where('status', PortalPostAudit::STATUS['通过']);
                             });
                     });
             })
@@ -629,7 +630,7 @@ class PortalPost_ extends PortalPost
             ->where('audit_user_id', User_::getMyId())
             ->firstOrFail();
 
-        if ($row->status !== PortalPostAudit::STATUS['待审核']) {
+        if ($row->status !== PortalPostAudit::STATUS['未审核']) {
             $statusNow = array_flip(PortalPostAudit::STATUS)[$row->status];
             throw new \Exception('操作失败，已经审核过了。当前状态为 ' . $statusNow);
         }

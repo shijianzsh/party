@@ -51,11 +51,12 @@ Route::namespace('Api')->group(function () {
 
     Route::group(['middleware' => [
         \App\Http\Middleware\VerifyToken::class,
+        \App\Http\Middleware\TryToVerifyAccessToken::class,
     ]], function () {
         Route::post('/login', 'User@login');
 
         Route::get('activists/{code}/code', 'Activist@getActivistByCode');
-        Route::resource('activists', 'ActivistController')->only(['store']);
+        Route::resource('activists', 'ActivistController');
 
         Route::get('departments/select_component', 'Department@selectComponentList');
 
@@ -78,14 +79,19 @@ Route::namespace('Api')->group(function () {
 
                 Route::resource('department_activity_plans', 'DepartmentActivityPlanController');
 
+                Route::resource('department_projects', 'DepartmentProjectController');
+
                 Route::get('users/{department_id}/department', 'User@getDepartmentUserList');
+                Route::get('users/{department_id}/department_transfer', 'User@getDepartmentTransferUserList');
+                Route::get('users/{department_id}/department_receive', 'User@getDepartmentReceiveUserList');
                 Route::get('users/{id}/party_info', 'User@getUserWithPartyInfo');
                 Route::get('users/{id}/thumbnail', 'User@getUserThumbnail');
                 Route::post('users/{id}/change_password', 'User@changePassword');
                 Route::post('users/{id}/update_one_field', 'User@updateOneField');
                 Route::resource('users', 'UserController');
 
-                Route::resource('activists', 'ActivistController')->except(['store']);
+                Route::post('user_transfers/{user_id}/audit', 'UserTransfer@audit');
+                Route::resource('user_transfers', 'UserTransferController');
 
                 Route::get('user_notifications/{user_id}/unread_badge_count', 'UserNotification@getUserUnreadNotificationBadgeCount');
                 Route::resource('user_notifications', 'UserNotificationController');
@@ -149,6 +155,5 @@ Route::namespace('Api')->group(function () {
                 Route::post('pusher/{user_id}/socket/{send_key}', 'Pusher@Socket');
                 Route::post('pusher/{user_id}/sms', 'Pusher@Sms');
             });
-
     });
 });

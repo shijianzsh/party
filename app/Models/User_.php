@@ -71,13 +71,14 @@ class User_ extends User
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
+        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getDepartmentUserList(
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
+            'ids' => [],
             'department_id' => 0,
             'descendant_id' => 0,
             'keyword' => null,
@@ -105,6 +106,136 @@ class User_ extends User
         if (!empty($ids)) {
             $Obj->whereIn('id', $ids);
         }
+
+        if (!empty($keyword)) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('user_name', 'like', "%{$keyword}%")
+                    ->orWhere('user_sex', 'like', "%{$keyword}%")
+                    ->orWhere('user_cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('user_duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($startTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
+    }
+
+    static public function getDepartmentTransferUserList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'department_id' => 0,
+            'keyword' => null,
+            'start_timestamp' => null,
+            'end_timestamp' => null,
+        ],
+        array $with = ['transfers']
+    )
+    {
+        $departmentId = $filter['department_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = User::with(array_merge($with, ['department', 'partyExperience']));
+
+        if (!empty($keyword)) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('sex', 'like', "%{$keyword}%")
+                    ->orWhere('cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+            });
+        }
+
+        $Obj->where(function ($query) use ($departmentId) {
+            $query
+                ->whereHas('transfers', function ($query) use ($departmentId) {
+                    $query->where('from_department_id', $departmentId);
+                })
+                ->orWhere('department_id', $departmentId);
+        });
+
+        if ($startTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            //TODO
+//            $Obj->where('established_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
+    }
+
+    static public function getDepartmentReceiveUserList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'department_id' => 0,
+            'keyword' => null,
+            'start_timestamp' => null,
+            'end_timestamp' => null,
+        ],
+        array $with = []
+    )
+    {
+        $departmentId = $filter['department_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = User::with(array_merge($with, ['department', 'transfers']));
+
+        $Obj->where('department_id', $departmentId);
+
+        $Obj->whereHas('transfers', function ($query) use ($departmentId) {
+            $query
+                ->where('to_department_id', $departmentId)
+                ->where('audit_status', '<>', UserTransferDepartment::AUDIT_STATUS['通过']);
+        });
 
         if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
@@ -141,7 +272,7 @@ class User_ extends User
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
+        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
     }
 
     /**
@@ -153,7 +284,10 @@ class User_ extends User
     static public function getMyId(): int
     {
         $Obj = new AccessToken();
-        return $Obj->getUserId();
+        $userId = $Obj->getUserId();
+        if (!$userId) throw new \Exception('user getMyId error:user_id null');
+
+        return $userId;
     }
 
     static public function getUser(int $userId = 0, bool $getObject = false, array $with = [])

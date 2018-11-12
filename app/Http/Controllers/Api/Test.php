@@ -10,11 +10,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\SMS\SMS;
 use App\Services\Socket\Push;
+use App\Models\AuthMap_;
 
 class Test extends \App\Http\Controllers\Controller
 {
     function __invoke()
     {
-        $r = Push::send('push_notification_to_uid', [1, 21, 3], 2);
+        $a = AuthMap_::getUserAuth(2);
+        dump($a);
     }
 }

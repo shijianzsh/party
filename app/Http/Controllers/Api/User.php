@@ -47,6 +47,46 @@ class User extends \App\Http\Controllers\Controller
         return response()->json($result);
     }
 
+    public function getDepartmentTransferUserList(Request $request, $department_id)
+    {
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+
+        $list = User_::getDepartmentTransferUserList(
+            $request->input('current_page', 0),
+            $request->input('page_size', 0),
+            [
+                'department_id' => $department_id,
+                'keyword' => &$filter['keyword'],
+                'start_timestamp' => &$filter['start_timestamp'],
+                'end_timestamp' => &$filter['end_timestamp'],
+            ],
+            []
+        );
+
+        $result = ['success' => 1, 'data' => $list, '$request' => $list];
+        return response()->json($result);
+    }
+
+    public function getDepartmentReceiveUserList(Request $request, $department_id)
+    {
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+
+        $list = User_::getDepartmentReceiveUserList(
+            $request->input('current_page', 0),
+            $request->input('page_size', 0),
+            [
+                'department_id' => $department_id,
+                'keyword' => &$filter['keyword'],
+                'start_timestamp' => &$filter['start_timestamp'],
+                'end_timestamp' => &$filter['end_timestamp'],
+            ],
+            []
+        );
+
+        $result = ['success' => 1, 'data' => $list, '$request' => $list];
+        return response()->json($result);
+    }
+
     public function login(Request $request)
     {
         return User_::getAccessToken(

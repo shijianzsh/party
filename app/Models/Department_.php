@@ -177,8 +177,9 @@ class Department_ extends Department
     static public function getMyId(): int
     {
         $userId = User_::getMyId();
-        $get = User::findOrFail($userId);
-        return $get->department_id;
+        $User = User::find($userId);
+        if(empty($User))throw new \Exception('department getMyId user null error'.$userId);
+        return $User->department_id;
     }
 
     static public function getDepartment(int $departmentId, bool $getObject = false, array $with = [])

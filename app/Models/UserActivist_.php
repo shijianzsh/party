@@ -12,12 +12,56 @@ use DB;
 
 class UserActivist_ extends User
 {
-    static public function getActivist(int $id)
+    static public function getActivistList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'keyword' => null,
+        ],
+        array $with = []
+    )
+    {
+        $keyword =& $filter['keyword'];
+
+        $Obj = User::with(array_merge($with, ['department', 'activist', 'partyExperience']));
+        $Obj->whereHas('activist', function ($query) {
+            $query->where('activist_department_id', Department_::getMyId());
+        });
+
+        if (!empty($keyword)) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('user_name', 'like', "%{$keyword}%")
+                    ->orWhere('user_sex', 'like', "%{$keyword}%")
+                    ->orWhere('user_cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('user_duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+            });
+        }
+
+       $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+       $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
+    }
+
+    static public function getActivist(int $user_id)
     {
         return User
             ::with(['partyExperience', 'partyRelations', 'activist'])
             ->where('type', self::TYPE['群众'])
-            ->findOrFail($id)
+            ->findOrFail($user_id)
             ->toArray();
     }
 
@@ -26,7 +70,9 @@ class UserActivist_ extends User
         return User
             ::with(['partyExperience', 'partyRelations', 'activist'])
             ->where('type', self::TYPE['群众'])
-            ->where('code', $code)
+            ->whereHas('activist', function ($query) use ($code) {
+                $query->where('code', $code);
+            })
             ->firstOrFail()
             ->toArray();
     }
@@ -73,19 +119,19 @@ class UserActivist_ extends User
 
                 $activist = new UserActivist([
                     'code' => rand_str(),
-                    'status' => self::ACTIVIST_STATUS['待审核'],
+                    'status' => UserActivist::AUDIT_STATUS['未初审'],
                     'audit_user_id' => $requestData['audit_user_id'],
                     'recommend_user_id' => $requestData['recommend_user_id'],
                 ]);
                 $Obj->activist()->save($activist);
                 $userId = $Obj->id;
 
-                createNotification([
-                    'user_id' => $userId,
-                    'related_type' => \App\Models\UserNotification::RELATED_TYPE['积极分子'],
-                    'related_id' => $Obj->id,
-                    'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['注册成功'],
-                ]);
+//                createNotification([
+//                    'user_id' => $userId,
+//                    'related_type' => \App\Models\UserNotification::RELATED_TYPE['积极分子'],
+//                    'related_id' => $Obj->id,
+//                    'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['注册成功'],
+//                ]);
             });
         } catch (\Exception $e) {
             $success = 0;

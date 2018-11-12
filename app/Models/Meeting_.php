@@ -165,7 +165,7 @@ class Meeting_ extends Meeting
         $Obj->orderBy('updated_at', 'desc');
 
         $Obj->whereHas('attendUsersMiddle', function ($query) use ($userId) {
-            $query->where('meeting_user.user_id', $userId);
+            $query->where('user_id', $userId);
         });
 
         if ($initiate_user_id) {
@@ -233,7 +233,7 @@ class Meeting_ extends Meeting
 
         $Obj->where('need_audit', 1)
             ->whereHas('audit', function ($query) use ($userId) {
-                $query->where('meeting_audit.audit_user_id', $userId);
+                $query->where('audit_user_id', $userId);
             });
 
         if ($initiate_user_id !== null) {

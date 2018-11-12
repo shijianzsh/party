@@ -35,7 +35,7 @@ class ExamPaper_ extends ExamPaper
                     ->orWhere(function ($query) use ($attendUserId) {
                         $query->where('is_restrict_user', 1)
                             ->whereHas('attendUsersMiddle', function ($query) use ($attendUserId) {
-                                $query->where('exam_paper_user.user_id', $attendUserId);
+                                $query->where('user_id', $attendUserId);
                             });
                     });
             });

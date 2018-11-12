@@ -36,6 +36,15 @@ class PortalPost extends _BaseModel
         return $this->belongsTo('App\Models\User', 'user_id');
     }
 
+    public function categoryMiddle()
+    {
+        return $this->hasMany(
+            'App\Models\PortalCategoryPost',
+            'post_id',
+            'id'
+        );
+    }
+
     public function categorys()
     {
         return $this->hasManyThrough(

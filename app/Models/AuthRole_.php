@@ -53,7 +53,7 @@ class AuthRole_ extends AuthRole
     {
         $get = AuthRole::with(['userMiddle', 'auths'])
             ->whereHas('userMiddle', function ($query) use ($userId) {
-                $query->where('auth_role_user.user_id', $userId);
+                $query->where('user_id', $userId);
             })
             ->get()
             ->toArray();

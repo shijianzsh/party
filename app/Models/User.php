@@ -5,7 +5,7 @@ namespace App\Models;
 class User extends _BaseModel
 {
     const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
-    const ACTIVIST_STATUS = ['未知状态' => 0, '待审核' => 1, '约谈' => 2, '群众' => 3];
+//    const STATUS = ['冻结' => 0, '活跃' => 1, '转换中' => 2];
 
     protected $appends = [
         'type_format',
@@ -13,6 +13,7 @@ class User extends _BaseModel
         'thumbnail_format',
         'role_ids',
         'roles_format',
+        'transfer_format',
 //        'auths_format',//数据库访问太多了 被动加载
     ];
     protected $casts = [
@@ -52,6 +53,11 @@ class User extends _BaseModel
     public function activist()
     {
         return $this->hasOne('App\Models\UserActivist', 'user_id');
+    }
+
+    public function transfers()
+    {
+        return $this->hasMany('App\Models\UserTransferDepartment', 'user_id');
     }
 
     //党员经历
@@ -330,5 +336,21 @@ class User extends _BaseModel
         }
 
         return array_column($result, 'auth_format');
+    }
+
+    public function getTransferFormatAttribute()
+    {
+        $transfers = $this->transfers->toArray();
+
+        foreach ($transfers as $t) {
+            if ($t['audit_status'] === UserTransferDepartment::AUDIT_STATUS['通过']) continue;
+            return $t;
+        }
+
+        if (!empty($transfers)) {
+            return $transfers[count($transfers) - 1];
+        }
+
+        return null;
     }
 }

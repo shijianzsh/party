@@ -75,7 +75,7 @@ class PortalCategory_ extends PortalCategory
                                 $query
                                     ->where('need_audit', 1)
                                     ->whereHas('audit', function ($query) {
-                                        $query->where('portal_post_audit.status', PortalPostAudit::STATUS['通过']);
+                                        $query->where('status', PortalPostAudit::STATUS['通过']);
                                     });
                             });
                     });

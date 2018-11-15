@@ -513,12 +513,13 @@ class User_ extends User
 
             $Obj->user_password = Login::getPassword($requestData['user_password']);
             $success = $Obj->save();
+            $data = User_::getMyId();
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'getMyId' => User_::getMyId()];
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data];
     }
 
     static public function changeDepartment()
@@ -572,9 +573,24 @@ class User_ extends User
             $AccessTokenObj = new AccessToken();
             $getAccessToken = $AccessTokenObj->create($token, (int)$user['id']);
 
+            $user_format = $user->toArray();
+
+            foreach ($user_format as $key => $value) {
+                switch ($key) {
+                    case 'id':
+                    case 'type':
+                    case 'type_format':
+                    case 'department_id':
+                        continue;
+                    default:
+                         unset($user_format[$key]);
+                        break;
+                }
+            }
+
             $data = array_merge(
                 $getAccessToken['data'],
-                ['user' => $user->toArray()],
+                ['user' => $user_format],
                 ['auths_format' => $user->auths_format]
             );
 
@@ -587,7 +603,7 @@ class User_ extends User
 
         return [
             'success' => (int)($success ?? 1),
-            'data' => $data ?? ['user_id' => $user['id'] ?? null],
+            'data' => $data ?? null,
             'msg' => $msg ?? null,
         ];
     }

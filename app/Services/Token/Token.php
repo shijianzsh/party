@@ -36,7 +36,7 @@ class Token extends TokenBase
             return ['success' => 0, 'msg' => 'Token verify error,code 3'];
         }
 
-        if ($this->nowTimestamp - (int)$data['timestamp'] > $this->expirationTimestamp) {
+        if ($this->expirationTimestamp && $this->nowTimestamp - (int)$data['timestamp'] > $this->expirationTimestamp) {
             return ['success' => 0, 'msg' => 'token令牌过期'];
         }
 

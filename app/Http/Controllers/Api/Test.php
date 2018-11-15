@@ -16,7 +16,7 @@ class Test extends \App\Http\Controllers\Controller
 {
     function __invoke()
     {
-        $a = AuthMap_::getUserAuth(2);
-        dump($a);
+        $a = new \App\Services\Exam\Excel();
+        $a->justReadFile();
     }
 }

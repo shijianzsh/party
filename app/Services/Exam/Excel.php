@@ -68,7 +68,7 @@ class Excel
             $length = count($data[$i]['options']);
 
             if (!$length) {
-                $msg="解析选项错误1：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                $msg = "解析选项错误1：请检查序号为 {$data[$i]['excel_index']} 的题目";
                 throw new \Exception($msg);
             }
 
@@ -78,13 +78,13 @@ class Excel
                 $tempLength = count($temp);
 
                 if ($tempLength !== 2) {
-                    $msg="解析选项错误2：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                    $msg = "解析选项错误2：请检查序号为 {$data[$i]['excel_index']} 的题目";
                     throw new \Exception($msg);
                 }
                 $tempArr[$temp[0]] = $temp[1];
             }
             if (count($tempArr) !== $length) {
-                $msg="解析选项错误3：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                $msg = "解析选项错误3：请检查序号为 {$data[$i]['excel_index']} 的题目";
                 throw new \Exception($msg);
             }
 
@@ -104,7 +104,7 @@ class Excel
 
             for ($j = 0; $j < count($data[$i]['answers']); $j++) {
                 if (strlen($data[$i]['answers'][$j]) !== 1) {
-                    $msg="解析答案错误：请检查序号为 {$data[$i]['excel_index']} 的题目";
+                    $msg = "解析答案错误：请检查序号为 {$data[$i]['excel_index']} 的题目";
                     throw new \Exception($msg);
                 }
             }
@@ -142,5 +142,11 @@ class Excel
     {
         $Obj = new Excel;
         return $Obj->run($file);
+    }
+
+    public function justReadFile($file): array
+    {
+        $this->readFile($file);
+        return $this->data;
     }
 }

@@ -87,6 +87,13 @@ class User extends \App\Http\Controllers\Controller
         return response()->json($result);
     }
 
+    public function getCommunication(Request $request, $id)
+    {
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+        $filter = array_merge($filter, ['user_id'=> $id]);
+        return response()->json(User_::getCommunication($filter));
+    }
+
     public function login(Request $request)
     {
         return User_::getAccessToken(

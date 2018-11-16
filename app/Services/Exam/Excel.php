@@ -23,13 +23,13 @@ class Excel
 
     private $data;
 
-    private function readFile($file): Excel
+    private function readFile($file,$titleRow=1): Excel
     {
         if (!file_exists($file)) {
             throw new \Exception('Excel readFile file does not exists');
         }
 
-        $this->data = ExcelClass::readExcelFile($file, Excel::Map, 3);
+        $this->data = ExcelClass::readExcelFile($file, Excel::Map, $titleRow);
         return $this;
     }
 
@@ -125,7 +125,7 @@ class Excel
     {
         try {
             $data = $this
-                ->readFile($file)
+                ->readFile($file,3)
                 ->analyzeData()
                 ->analyzeDataOptions()
                 ->analyzeDataAnswers()

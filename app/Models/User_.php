@@ -39,11 +39,12 @@ class User_ extends User
         if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
                 $query
-                    ->where('name', 'like', "%{$keyword}%")
-                    ->orWhere('sex', 'like', "%{$keyword}%")
-                    ->orWhere('cellphone', 'like', "%{$keyword}%")
-                    ->orWhere('duty', 'like', "%{$keyword}%")
-                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+                    ->where('user_name', 'like', "%{$keyword}%")
+                    ->orWhere('user_sex', 'like', "%{$keyword}%")
+                    ->orWhere('user_cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('user_duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('user_email', 'like', "%{$keyword}%");
             });
         }
 
@@ -114,7 +115,8 @@ class User_ extends User
                     ->orWhere('user_sex', 'like', "%{$keyword}%")
                     ->orWhere('user_cellphone', 'like', "%{$keyword}%")
                     ->orWhere('user_duty', 'like', "%{$keyword}%")
-                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('user_email', 'like', "%{$keyword}%");
             });
         }
 
@@ -167,11 +169,12 @@ class User_ extends User
         if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
                 $query
-                    ->where('name', 'like', "%{$keyword}%")
-                    ->orWhere('sex', 'like', "%{$keyword}%")
-                    ->orWhere('cellphone', 'like', "%{$keyword}%")
-                    ->orWhere('duty', 'like', "%{$keyword}%")
-                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+                    ->where('user_name', 'like', "%{$keyword}%")
+                    ->orWhere('user_sex', 'like', "%{$keyword}%")
+                    ->orWhere('user_cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('user_duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('user_email', 'like', "%{$keyword}%");
             });
         }
 
@@ -240,11 +243,12 @@ class User_ extends User
         if (!empty($keyword)) {
             $Obj->where(function ($query) use ($keyword) {
                 $query
-                    ->where('name', 'like', "%{$keyword}%")
-                    ->orWhere('sex', 'like', "%{$keyword}%")
-                    ->orWhere('cellphone', 'like', "%{$keyword}%")
-                    ->orWhere('duty', 'like', "%{$keyword}%")
-                    ->orWhere('user_excerpt', 'like', "%{$keyword}%");
+                    ->where('user_name', 'like', "%{$keyword}%")
+                    ->orWhere('user_sex', 'like', "%{$keyword}%")
+                    ->orWhere('user_cellphone', 'like', "%{$keyword}%")
+                    ->orWhere('user_duty', 'like', "%{$keyword}%")
+                    ->orWhere('user_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('user_email', 'like', "%{$keyword}%");
             });
         }
 
@@ -273,6 +277,71 @@ class User_ extends User
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
+    }
+
+    static public function getCommunication(
+        array $filter = [
+            'user_id' => 0,
+            'keyword' => null,
+        ],
+        array $with = []
+    )
+    {
+        try {
+            $userId =& $filter['user_id'];
+            $keyword =& $filter['keyword'];
+
+            $User = self::getUser($userId, true);
+            $departmentId = $User->department_id;
+
+            $Obj = User::with($with);
+
+            $Obj->where('department_id', $departmentId);
+            $Obj->where('id', '<>', $User);
+
+            if (!empty($keyword)) {
+                $Obj->where(function ($query) use ($keyword) {
+                    $query
+                        ->where('user_name', 'like', "%{$keyword}%")
+                        ->orWhere('user_sex', 'like', "%{$keyword}%")
+                        ->orWhere('user_cellphone', 'like', "%{$keyword}%")
+                        ->orWhere('user_duty', 'like', "%{$keyword}%")
+                        ->orWhere('user_excerpt', 'like', "%{$keyword}%")
+                        ->orWhere('user_email', 'like', "%{$keyword}%");
+                });
+            }
+            $Obj->orderBy('user_name', 'asc');
+
+            $total = $Obj->count();
+
+            $get = $Obj->get();
+
+            $result = [];
+            for ($i = 0; $i < count($get); $i++) {
+                $row =& $get[$i];
+                $firstLetter = get_first_charter($row->user_name);
+
+                if (!array_key_exists($firstLetter, $result)) {
+                    $result[$firstLetter] = [];
+                }
+
+                $result[$firstLetter][] = [
+                    'id' => $row->id,
+                    'user_name' => $row->user_name,
+                    'thumbnail_format' => $row->thumbnail_format,
+                    'user_duty' => $row->user_duty,
+                    'user_email' => $row->user_email,
+                    'user_cellphone' => $row->user_cellphone,
+                    'user_borned_at_format' => $row->user_borned_at_format,
+                    'user_nation' => $row->user_nation,
+                ];
+            }
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'data' => ['rows' => $result, 'pagination' => getPagination(0, 0, $total)], 'msg' => $msg ?? null];
     }
 
     /**
@@ -315,7 +384,6 @@ class User_ extends User
         $user = self::getUser($userId);
         return $user['thumbnail_format'] ?? null;
     }
-
 
     /**
      * 新增人员.
@@ -583,7 +651,7 @@ class User_ extends User
                     case 'department_id':
                         continue;
                     default:
-                         unset($user_format[$key]);
+                        unset($user_format[$key]);
                         break;
                 }
             }

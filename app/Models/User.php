@@ -4,7 +4,7 @@ namespace App\Models;
 
 class User extends _BaseModel
 {
-    const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3];
+    const TYPE = ['超级管理员' => 0, '领导' => 1, '党员' => 2, '群众' => 3,'积极分子'=>4];
 //    const STATUS = ['冻结' => 0, '活跃' => 1, '转换中' => 2];
 
     protected $appends = [

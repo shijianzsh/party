@@ -48,7 +48,8 @@ class ExamCollectQuestionController extends \App\Http\Controllers\Controller
      */
     public function store(Request $request)
     {
-        return response()->json(UserActivist_::createActivist($request->input('data')));
+        //TODO
+//        return response()->json(UserActivist_::createActivist($request->input('data')));
     }
 
     /**
@@ -59,8 +60,9 @@ class ExamCollectQuestionController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $result = ['success' => 1, 'data' => UserActivist_::getActivist($id)];
-        return response()->json($result);
+        //TODO
+//        $result = ['success' => 1, 'data' => UserActivist_::getActivist($id)];
+//        return response()->json($result);
     }
 
     /**
@@ -71,8 +73,9 @@ class ExamCollectQuestionController extends \App\Http\Controllers\Controller
      */
     public function update(Request $request, $id)
     {
-        $result = PortalPost_::updatePost($id, $request->input('data'));
-        return response()->json($result);
+        //TODO
+//        $result = PortalPost_::updatePost($id, $request->input('data'));
+//        return response()->json($result);
     }
 
     /**

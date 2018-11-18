@@ -18,6 +18,9 @@ class FormatFileUrl
      */
     public function handle($request, Closure $next)
     {
+        //TODO 写入
+//        dump($request);
+//        exit;
         $response = $next($request);
         return response()->json($this->formatArray($response->original));
     }

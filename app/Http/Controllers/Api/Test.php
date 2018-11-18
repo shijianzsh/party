@@ -19,6 +19,8 @@ class Test extends \App\Http\Controllers\Controller
     function __invoke()
     {
         $data = $this->getData();
+        var_dump($data);
+        exit;
         $insert = $this->insertToDb($data);
         echo 'finished';
     }
@@ -95,7 +97,7 @@ class Test extends \App\Http\Controllers\Controller
         };
 
         $a = new \App\Services\Exam\Excel();
-        $arr = $a->justReadFile('./2018.xls');
+        $arr = $a->justReadFile('./2018.xlsx');
 
         for ($i = 0; $i < count($arr); $i++) {
             $row =& $arr[$i];
@@ -112,7 +114,8 @@ class Test extends \App\Http\Controllers\Controller
                         $value = $getNumber($value);
                         break;
                     case '检验依据 basis':
-                        $value = json_encode($getBasis($value));
+//                        $value = json_encode($getBasis($value));
+                        $value = $getBasis($value);
                         break;
                     case '要求完成日期 completion_time':
                     case '抽样日期 ms_rm_supervise sampling_date':
@@ -154,7 +157,6 @@ class Test extends \App\Http\Controllers\Controller
             $row = $arr[$i];
 
             $toInsertData_main = [
-                'intact_number' => $row['r_number_prefix'] . $row['intact_number'],
                 'status' => '等待检验',
                 'type' => '监督抽查',
                 'cost' => 0,
@@ -168,7 +170,14 @@ class Test extends \App\Http\Controllers\Controller
             foreach ($row as $key => $value) {
                 $keyArr = explode(' ', $key);
                 if (count($keyArr) === 1) {
-                    $toInsertData_main[$key] = $value;
+                    switch ($key){
+                        case 'intact_number':
+                            $toInsertData_main[$key] = $row['r_number_prefix'] . $row['intact_number'];
+                            break;
+                        default:
+                            $toInsertData_main[$key] = $value;
+                            break;
+                    }
                 } else {
                     $toInsertData_supervise[$keyArr[1]] = $value;
                 }

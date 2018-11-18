@@ -404,8 +404,8 @@ class User_ extends User
             'user_cellphone' => 'required',
             'user_duty' => 'required',
             'user_excerpt' => 'required',
-//            'user_login' => 'required',
-//            'user_password' => 'required',
+            'user_login' => 'required',
+            'user_password' => 'required',
             'more_thumbnail' => 'required',
         ]);
 
@@ -425,8 +425,8 @@ class User_ extends User
                 $Obj->user_cellphone = $requestData['user_cellphone'];
                 $Obj->user_duty = $requestData['user_duty'];
                 $Obj->user_excerpt = $requestData['user_excerpt'];
-//                $Obj->user_login = $requestData['user_login'];
-//                $Obj->user_password = Login::getPassword($requestData['user_password']);
+                $Obj->user_login = $requestData['user_login'];
+                $Obj->user_password = Login::getPassword($requestData['user_password']);
 
                 $Obj->more = [
                     'thumbnail' => $requestData['more_thumbnail'] ?? null,

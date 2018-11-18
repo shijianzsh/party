@@ -9,10 +9,13 @@ class UserActivist extends _BaseModel
         '未初审' => 1,
         '初审通过' => 2,
         '初审未通过' => 3,
-        '约谈' => 4,
-        '群众' => 5,
+        '约谈通过' => 4,
+        '成为积极分子' => 5,
     ];
 
+    protected $casts = [
+        'more' => 'json',
+    ];
     protected $fillable = ['code', 'status', 'audit_user_id', 'recommend_user_id'];
 
     protected $appends = [
@@ -38,7 +41,6 @@ class UserActivist extends _BaseModel
 
     public function getAuditStatusFormatAttribute()
     {
-        return $this->audit_status;
         return array_flip(self::AUDIT_STATUS)[$this->audit_status];
     }
 }

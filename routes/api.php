@@ -62,6 +62,9 @@ Route::namespace('Api')->group(
                 Route::post('/login', 'User@login');
 
                 Route::get('activists/{code}/code', 'Activist@getActivistByCode');
+                Route::post('activists/{id}/audit', 'Activist@audit');
+                Route::post('activists/{id}/submit_appointment_and_chat_result', 'Activist@submitAppointmentChatResult');//约谈
+                Route::post('activists/{id}/create_account', 'Activist@createActivistAccount');//创建积极分子账号
                 Route::resource('activists', 'ActivistController');
 
                 Route::get('departments/select_component', 'Department@selectComponentList');

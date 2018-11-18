@@ -23,7 +23,33 @@ class Activist extends \App\Http\Controllers\Controller
      */
     public function getActivistByCode($code)
     {
-        $result = ['success' => 1, 'data' => UserActivist_::getActivistByCode($code)];
+        try {
+            $result = ['success' => 1, 'data' => UserActivist_::getActivistByCode($code)];
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json(['success' => 0, 'msg' => $e->getMessage()]);
+        }
+    }
+
+    public function audit(Request $request, $id)
+    {
+        $result = UserActivist_::auditActivist($id,
+            $request->input('status'),
+            $request->input('reason'),
+            $request->input('more_files')
+        );
+        return response()->json($result);
+    }
+
+    public function submitAppointmentChatResult(Request $request, $id)
+    {
+        $result = UserActivist_::submitAppointmentChat($id, $request->input('data'));
+        return response()->json($result);
+    }
+
+    public function createActivistAccount(Request $request, $id)
+    {
+        $result = UserActivist_::createActivistAccount($id, $request->input('data'));
         return response()->json($result);
     }
 }

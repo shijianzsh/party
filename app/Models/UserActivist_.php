@@ -16,6 +16,7 @@ class UserActivist_ extends User
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
+            'department_id' => null,
             'keyword' => null,
         ],
         array $with = []
@@ -39,7 +40,7 @@ class UserActivist_ extends User
             });
         }
 
-       $total = $Obj->count();
+        $total = $Obj->count();
 
         if ($currentPage) {
             $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
@@ -51,30 +52,36 @@ class UserActivist_ extends User
             $Obj->offset($offset)->limit($pageSize);
         }
 
-       $get = $Obj->get();
+        $get = $Obj->get();
 
         return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
     }
 
-    static public function getActivist(int $user_id)
+    static public function getActivist(int $user_id): User
     {
-        return User
+        $activist = User
             ::with(['partyExperience', 'partyRelations', 'activist'])
-            ->where('type', self::TYPE['群众'])
-            ->findOrFail($user_id)
-            ->toArray();
+//            ->where('type', self::TYPE['群众'])
+            ->find($user_id);
+        if (empty($activist)) throw new \Exception('查找积极分子失败，此人不存在');
+        if ($activist->type !== User::TYPE['群众']) throw new \Exception('此人不是积极分子身份');
+        return $activist;
     }
 
-    static public function getActivistByCode(string $code)
+    static public function getActivistByCode(string $code): User
     {
-        return User
+        $user = User
             ::with(['partyExperience', 'partyRelations', 'activist'])
             ->where('type', self::TYPE['群众'])
             ->whereHas('activist', function ($query) use ($code) {
                 $query->where('code', $code);
             })
-            ->firstOrFail()
-            ->toArray();
+            ->first();
+        if (empty($user)) throw new \Exception('查询码不存在或已过期');
+
+        if ($user->type !== User::TYPE['群众']) throw new \Exception('查询码不存在或已过期');
+
+        return $user;
     }
 
     static public function createActivist(array $requestData): array
@@ -132,6 +139,99 @@ class UserActivist_ extends User
 //                    'related_id' => $Obj->id,
 //                    'operate_type' => \App\Models\UserNotification::OPERATE_TYPE['注册成功'],
 //                ]);
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $userId ?? null];
+    }
+
+    static public function auditActivist(int $user_id, int $status, $reason = '', array $files = [])
+    {
+        try {
+            $User = self::getActivist($user_id);
+            if ($User->activist->audit_user_id !== User_::getMyId()) {
+                throw new \Exception('您没有审核权限');
+            }
+
+            if ($User->activist->audit_status !== UserActivist::AUDIT_STATUS['未初审']) {
+                throw new \Exception('当前状态不允许初审');
+            }
+
+            $Activist = UserActivist::where('user_id', $user_id)->firstOrFail();
+            $Activist->audit_status = $status;
+            $Activist->reason = $reason;
+            $Activist->more['audit_files'] = $files;
+            $success = $Activist->save();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+    }
+
+    static public function submitAppointmentChat(int $user_id, array $requestData)
+    {
+        $validator = \Validator::make($requestData, [
+            'more_chat_files' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            $User = self::getActivist($user_id);
+
+            if ($User->activist->audit_status !== UserActivist::AUDIT_STATUS['初审通过']) {
+                throw new \Exception('当前状态不允许该操作');
+            }
+
+            DB::transaction(function () use ($user_id, $requestData) {
+                $Activist = UserActivist::where('user_id', $user_id)->firstOrFail();
+                $Activist->audit_status = UserActivist::AUDIT_STATUS['约谈通过'];
+                $Activist->more['chat_files'] = $requestData['more_chat_files'];
+                $Activist->save();
+            });
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $userId ?? null];
+    }
+
+    static public function createActivistAccount(int $user_id, array $requestData)
+    {
+        $validator = \Validator::make($requestData, [
+            'user_login' => 'required',
+            'user_password' => 'required',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
+            $User = self::getActivist($user_id);
+
+            if ($User->activist->audit_status !== UserActivist::AUDIT_STATUS['约谈通过']) {
+                throw new \Exception('当前状态不允许该操作');
+            }
+
+            $success = 0;
+            DB::transaction(function () use (&$success, $User, $user_id, $requestData) {
+                $Activist = UserActivist::where('user_id', $user_id)->firstOrFail();
+                $Activist->audit_status = UserActivist::AUDIT_STATUS['成为积极分子'];
+                $Activist->save();
+
+                $User->type = User::TYPE['积极分子'];
+                $User->user_login = $requestData['user_login'];
+                $User->user_password = Login::getPassword($requestData['user_password']);
+                $success = $User->save();
             });
         } catch (\Exception $e) {
             $success = 0;

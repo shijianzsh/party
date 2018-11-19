@@ -439,6 +439,11 @@ class User_ extends User
                     $saveMany[] = new AuthRoleUser(['auth_role_id' => $role_ids[$i]]);
                 }
                 $Obj->rolesMiddle()->saveMany($saveMany);
+
+                $checkUnique = User::where('user_login', $requestData['user_login'])
+                    ->get()
+                    ->toArray();
+                if (count($checkUnique) !== 1) throw new \Exception('用户名不可用');
             });
         } catch (\Exception $e) {
             $success = 0;
@@ -549,10 +554,15 @@ class User_ extends User
 
     static public function deleteUser(int $userId): array
     {
-        $Obj = User::findOrFail($userId);
-        $delete = $Obj->delete();
-
-        return ['success' => $delete];
+        try {
+            $Obj = User::findOrFail($userId);
+            if ($Obj->type !== User::TYPE['群众']) throw new \Exception('账户类型错误，不允许删除');
+            $success = $Obj->delete();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $userId ?? null];
     }
 
     static public function changePassword(int $userId, array $requestData): array

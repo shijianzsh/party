@@ -22,6 +22,9 @@ class UserActivist extends _BaseModel
         'created_at_format',
         'updated_at_format',
         'audit_status_format',
+        'audit_user_name_format',
+        'chat_user_name_format',
+        'recommend_user_name_format',
     ];
 
     public function user()
@@ -34,6 +37,11 @@ class UserActivist extends _BaseModel
         return $this->hasOne('App\Models\User', 'id', 'audit_user_id');
     }
 
+    public function chatUser()
+    {
+        return $this->hasOne('App\Models\User', 'id', 'chat_user_id');
+    }
+
     public function recommendUser()
     {
         return $this->hasOne('App\Models\User', 'id', 'recommend_user_id');
@@ -42,5 +50,20 @@ class UserActivist extends _BaseModel
     public function getAuditStatusFormatAttribute()
     {
         return array_flip(self::AUDIT_STATUS)[$this->audit_status];
+    }
+
+    public function getAuditUserNameFormatAttribute()
+    {
+        return !empty($this->auditUser) ? $this->auditUser->user_name : null;
+    }
+
+    public function getChatUserNameFormatAttribute()
+    {
+        return !empty($this->chatUser) ? $this->chatUser->user_name : null;
+    }
+
+    public function getRecommendUserNameFormatAttribute()
+    {
+        return !empty($this->recommendUser) ? $this->recommendUser->user_name : null;
     }
 }

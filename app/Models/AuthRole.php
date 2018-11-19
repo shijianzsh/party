@@ -8,6 +8,7 @@ namespace App\Models;
 class AuthRole extends _BaseModel
 {
     protected $appends = ['auth_count', 'auth_map_ids'];
+    protected $hidden = ['auth_middle'];
 
     /**
      * 中间表-拥有的权限

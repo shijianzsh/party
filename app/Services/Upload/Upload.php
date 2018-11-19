@@ -17,6 +17,6 @@ class Upload
         is_dir($path) or mkdir($path);
 
         move_uploaded_file($_FILES["file"]["tmp_name"], $path . "/" . $_FILES["file"]["name"]);
-        return $url = '/' . $path . '/' . $_FILES["file"]["name"];
+        return $url = env('FILE_URL') . '/' . $path . '/' . $_FILES["file"]["name"];
     }
 }

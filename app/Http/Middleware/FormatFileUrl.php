@@ -18,11 +18,15 @@ class FormatFileUrl
      */
     public function handle($request, Closure $next)
     {
-        //TODO 写入
-//        dump($request);
-//        exit;
         $response = $next($request);
-        return response()->json($this->formatArray($response->original));
+        $originalResponse = $response->original;
+        if (is_array($originalResponse)) {
+            return response()->json($this->formatArray($originalResponse));
+        }
+        if (is_json($originalResponse)) {
+            return response()->json($this->formatArray(json_decode($originalResponse, true)));
+        }
+        return $response;
     }
 
     private function formatArray(array $arr): array
@@ -40,12 +44,16 @@ class FormatFileUrl
 
     private function formatString($key, string $str): string
     {
-        //TODO 待完善
         switch ($key) {
             case 'url':
             case 'thumbnail_format':
             case 'thumbnail':
-                $result = env('FILE_URL') . $str;
+            case 'monitor_map_format':
+                if (empty($str) || strpos($str, "http")) {
+                    $result = $str;
+                } else {
+                    $result = env('FILE_URL') . $str;
+                }
                 break;
             default:
                 $result = $str;

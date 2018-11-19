@@ -33,11 +33,7 @@ class Activist extends \App\Http\Controllers\Controller
 
     public function audit(Request $request, $id)
     {
-        $result = UserActivist_::auditActivist($id,
-            $request->input('status'),
-            $request->input('reason'),
-            $request->input('more_files')
-        );
+        $result = UserActivist_::auditActivist($id,$request->input('data'));
         return response()->json($result);
     }
 

@@ -8,6 +8,8 @@
 
 namespace App\Models;
 
+use App\Models\UserActivist;
+use App\Services\Login\Login;
 use DB;
 
 class UserActivist_ extends User
@@ -52,9 +54,16 @@ class UserActivist_ extends User
             $Obj->offset($offset)->limit($pageSize);
         }
 
-        $get = $Obj->get();
+        $get = $Obj->get()->toArray();
 
-        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
+        for ($i = 0; $i < count($get); $i++) {
+            $row =& $get[$i];
+            unset($row['activist']['audit_user']);
+            unset($row['activist']['chat_user']);
+            unset($row['activist']['recommend_user']);
+        }
+
+        return ['rows' => $get, 'pagination' => getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getActivist(int $user_id): User
@@ -148,9 +157,20 @@ class UserActivist_ extends User
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $userId ?? null];
     }
 
-    static public function auditActivist(int $user_id, int $status, $reason = '', array $files = [])
+    static public function auditActivist(int $user_id, array $requestData)
     {
+        $validator = \Validator::make($requestData, [
+            'chat_user_id' => 'required',
+            'audit_status' => 'required',
+            'audit_reason' => 'required',
+            'more_audit_files' => 'required',
+        ]);
+
         try {
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+
             $User = self::getActivist($user_id);
             if ($User->activist->audit_user_id !== User_::getMyId()) {
                 throw new \Exception('您没有审核权限');
@@ -161,9 +181,12 @@ class UserActivist_ extends User
             }
 
             $Activist = UserActivist::where('user_id', $user_id)->firstOrFail();
-            $Activist->audit_status = $status;
-            $Activist->reason = $reason;
-            $Activist->more['audit_files'] = $files;
+            $Activist->chat_user_id = $requestData['chat_user_id'];
+            $Activist->audit_status = $requestData['audit_status'];
+            $Activist->audit_reason = $requestData['audit_reason'];
+            $Activist->more = is_array($Activist->more)
+                ? array_merge($Activist->more, ['audit_files' => $requestData['more_audit_files']])
+                : ['audit_files' => $requestData['more_audit_files']];
             $success = $Activist->save();
         } catch (\Exception $e) {
             $success = 0;
@@ -193,7 +216,9 @@ class UserActivist_ extends User
             DB::transaction(function () use ($user_id, $requestData) {
                 $Activist = UserActivist::where('user_id', $user_id)->firstOrFail();
                 $Activist->audit_status = UserActivist::AUDIT_STATUS['约谈通过'];
-                $Activist->more['chat_files'] = $requestData['more_chat_files'];
+                $Activist->more = is_array($Activist->more)
+                    ? array_merge($Activist->more, ['chat_files' => $requestData['more_chat_files']])
+                    : ['chat_files' => $requestData['more_audit_files']];
                 $Activist->save();
             });
         } catch (\Exception $e) {
@@ -232,12 +257,30 @@ class UserActivist_ extends User
                 $User->user_login = $requestData['user_login'];
                 $User->user_password = Login::getPassword($requestData['user_password']);
                 $success = $User->save();
+
+                $checkUnique = User::where('user_login', $requestData['user_login'])
+                    ->get()
+                    ->toArray();
+                if (count($checkUnique) !== 1) throw new \Exception('用户名不可用');
             });
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $userId ?? null];
+    }
+
+    static public function deleteActivist(int $userId): array
+    {
+        try {
+            $Obj = User::findOrFail($userId);
+            if ($Obj->type !== User::TYPE['群众']) throw new \Exception('账户类型错误，不允许删除');
+            $success = $Obj->delete();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $userId ?? null];
     }
 }

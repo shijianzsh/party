@@ -13,7 +13,7 @@ class _BaseModel extends Model
     protected $dateFormat = 'U';
     protected $appends = ['created_at_format'];
     const PAGE_SIZE = 10;
-//    use Cachable;
+    use Cachable;
 
     public function getTable()
     {

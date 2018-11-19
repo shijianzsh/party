@@ -55,10 +55,16 @@ class DepartmentProject_ extends DepartmentProject
             $Obj->offset($offset)->limit($pageSize);
         }
 
-        $get = $Obj->get();
+        $get = $Obj->get()->toArray();
+
+        for ($i = 0; $i < count($get); $i++) {
+            $row =& $get[$i];
+            unset($row['audit_user']);
+            unset($row['initiate_user']);
+        }
 
         return [
-            'rows' => $get->toArray(),
+            'rows' => $get,
             'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
@@ -79,12 +85,12 @@ class DepartmentProject_ extends DepartmentProject
     static public function createProject(array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-            'department_id' => 'required',
-            'initiate_user_id' => 'required',
+//            'department_id' => 'required',
+//            'initiate_user_id' => 'required',
             'audit_user_id' => 'required',
             'title' => 'required',
             'content' => 'required',
-            'more_thumbnail' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -92,14 +98,15 @@ class DepartmentProject_ extends DepartmentProject
                 throw new \Exception($validator->errors()->first());
             }
 
-            $Obj = new Project();
-            $Obj->department_id = $requestData['department_id'];
-            $Obj->initiate_user_id = $requestData['initiate_user_id'];
+            $Obj = new DepartmentProject();
+            $Obj->department_id = Department_::getMyId();
+            $Obj->initiate_user_id = User_::getMyId();
             $Obj->audit_user_id = $requestData['audit_user_id'];
+            $Obj->audit_status = DepartmentProject::AUDIT_STATUS['未审核'];
             $Obj->title = $requestData['title'];
             $Obj->content = $requestData['content'];
             $Obj->more = [
-                'thumbnail' => $requestData['more_thumbnail'] ?? '',
+                'files' => $requestData['more_files'] ?? '',
             ];
             $success = $Obj->save();
         } catch (\Exception $e) {
@@ -113,12 +120,9 @@ class DepartmentProject_ extends DepartmentProject
     static public function updateProject(int $projectId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-            'department_id' => 'required',
-            'initiate_user_id' => 'required',
-            'audit_user_id' => 'required',
             'title' => 'required',
             'content' => 'required',
-            'more_thumbnail' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -127,13 +131,10 @@ class DepartmentProject_ extends DepartmentProject
             }
 
             $Obj = DepartmentProject::findOrFail($projectId);
-            $Obj->department_id = $requestData['department_id'];
-            $Obj->initiate_user_id = $requestData['initiate_user_id'];
-            $Obj->audit_user_id = $requestData['audit_user_id'];
             $Obj->title = $requestData['title'];
             $Obj->content = $requestData['content'];
             $Obj->more = [
-                'thumbnail' => $requestData['more_thumbnail'] ?? '',
+                'files' => $requestData['more_files'] ?? '',
             ];
             $success = $Obj->save();
         } catch (\Exception $e) {

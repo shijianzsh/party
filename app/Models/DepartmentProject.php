@@ -12,6 +12,8 @@ class DepartmentProject extends _BaseModel
         'created_at_format',
         'updated_at_format',
         'audit_status_format',
+        'initiate_user_name_format',
+        'audit_user_name_format',
     ];
 
     public function department()
@@ -34,9 +36,18 @@ class DepartmentProject extends _BaseModel
         return $this->hasMany('App\Models\DepartmentProjectStep', 'projects_id');
     }
 
-
     public function getAuditStatusFormatAttribute()
     {
         return array_flip(self::AUDIT_STATUS)[$this->audit_status];
+    }
+
+    public function getAuditUserNameFormatAttribute()
+    {
+        return !empty($this->auditUser) ? $this->auditUser->user_name : null;
+    }
+
+    public function getInitiateUserNameFormatAttribute()
+    {
+        return !empty($this->initiateUser) ? $this->initiateUser->user_name : null;
     }
 }

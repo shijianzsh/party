@@ -55,8 +55,12 @@ class ActivistController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $result = ['success' => 1, 'data' => UserActivist_::getActivist($id)];
-        return response()->json($result);
+       try{
+           $result = ['success' => 1, 'data' => UserActivist_::getActivist($id)];
+           return response()->json($result);
+       }catch(\Exception $e){
+           return response()->json(['success'=>0,'msg'=>$e->getMessage()]);
+       }
     }
 
     /**

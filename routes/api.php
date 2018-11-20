@@ -59,6 +59,9 @@ Route::namespace('Api')->group(
                 \App\Http\Middleware\FormatFileUrl::class,
             ]],
             function () {
+                Route::get('app_versions/{type}/latest', 'AppVersion@getLatestVersion');
+                Route::resource('app_versions', 'AppVersionController');
+
                 Route::post('/login', 'User@login');
 
                 Route::get('activists/{code}/code', 'Activist@getActivistByCode');

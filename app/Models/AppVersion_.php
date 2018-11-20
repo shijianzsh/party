@@ -8,26 +8,21 @@ class AppVersion_ extends AppVersion
         int $currentPage = 0,
         int $pageSize = 0,
         array $filter = [
-            'keyword' => null,
+            'type' => null,
             'start_timestamp' => null,
             'end_timestamp' => null,
         ],
         array $with = []
     ): array
     {
-        $keyword =& $filter['keyword'];
+        $type =& $filter['type'];
         $startTimestamp =& $filter['start_timestamp'];
         $endTimestamp =& $filter['end_timestamp'];
 
         $Obj = AppVersion::with($with);
 
-        if (!empty($keyword)) {
-            $Obj->where(function ($query) use ($keyword) {
-                $query
-                    ->where('version', 'like', "%{$keyword}%")
-                    ->orWhere('code', 'like', "%{$keyword}%")
-                    ->orWhere('log', 'like', "%{$keyword}%");
-            });
+        if (!empty($type)) {
+            $Obj->where('type', $type);
         }
 
         if ($startTimestamp) {
@@ -54,7 +49,7 @@ class AppVersion_ extends AppVersion
 
         return [
             'rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -77,7 +72,7 @@ class AppVersion_ extends AppVersion
             'type' => 'required',
             'version' => 'required',
             'code' => 'required',
-            'url' => 'required',
+            'more_file' => 'required',
             'log' => 'required',
         ]);
 
@@ -86,21 +81,13 @@ class AppVersion_ extends AppVersion
                 throw new \Exception($validator->errors()->first());
             }
 
-            $Obj = new Version();
-            $Obj->parent_id = $requestData['parent_id'] ?? 0;
-            $Obj->name = $requestData['name'];
-            $Obj->introduce = $requestData['introduce'] ?? '';
-            $Obj->location = $requestData['location'] ?? '';
-            $Obj->coordinate_x = $requestData['coordinate_x'] ?? '';
-            $Obj->coordinate_y = $requestData['coordinate_y'] ?? '';
-            $Obj->telphone = $requestData['telphone'] ?? '';
-            $Obj->cellphone = $requestData['cellphone'] ?? '';
-            $Obj->secretary = $requestData['secretary'] ?? '';
-            $Obj->established_at = $requestData['established_at'] ?? '';
-            $Obj->path = null;
+            $Obj = new AppVersion();
+            $Obj->type = $requestData['type'];
+            $Obj->version = $requestData['version'];
+            $Obj->code = $requestData['code'];
+            $Obj->log = $requestData['log'];
             $Obj->more = [
-                'thumbnail' => $requestData['more_thumbnail'] ?? '',
-                'monitor_map' => $requestData['more_monitor_map'] ?? ''
+                'file' => $requestData['more_file'],
             ];
             $success = $Obj->save();
         } catch (\Exception $e) {
@@ -114,18 +101,11 @@ class AppVersion_ extends AppVersion
     static public function updateVersion(int $versionId, array $requestData): array
     {
         $validator = \Validator::make($requestData, [
-            'parent_id' => '',
-            'name' => 'required',
-            'introduce' => '',
-            'location' => '',
-            'coordinate_x' => '',
-            'coordinate_y' => '',
-            'telphone' => '',
-            'cellphone' => '',
-            'secretary' => '',
-            'established_at' => '',
-            'more_thumbnail' => '',
-            'more_monitor_map' => 'required',
+            'type' => 'required',
+            'version' => 'required',
+            'code' => 'required',
+            'more_file' => 'required',
+            'log' => 'required',
         ]);
 
         try {
@@ -134,20 +114,12 @@ class AppVersion_ extends AppVersion
             }
 
             $Obj = AppVersion::findOrFail($versionId);
-            $Obj->parent_id = $requestData['parent_id'] ?? 0;
-            $Obj->name = $requestData['name'];
-            $Obj->introduce = $requestData['introduce'] ?? '';
-            $Obj->location = $requestData['location'] ?? '';
-            $Obj->coordinate_x = $requestData['coordinate_x'] ?? '';
-            $Obj->coordinate_y = $requestData['coordinate_y'] ?? '';
-            $Obj->telphone = $requestData['telphone'] ?? '';
-            $Obj->cellphone = $requestData['cellphone'] ?? '';
-            $Obj->secretary = $requestData['secretary'] ?? '';
-            $Obj->established_at = $requestData['established_at'] ?? '';
-            $Obj->path = null;
+            $Obj->type = $requestData['type'];
+            $Obj->version = $requestData['version'];
+            $Obj->code = $requestData['code'];
+            $Obj->log = $requestData['log'];
             $Obj->more = [
-                'thumbnail' => $requestData['more_thumbnail'] ?? '',
-                'monitor_map' => $requestData['more_monitor_map'] ?? ''
+                'file' => $requestData['more_file'],
             ];
             $success = $Obj->save();
         } catch (\Exception $e) {
@@ -161,20 +133,8 @@ class AppVersion_ extends AppVersion
     static public function deleteVersion(int $versionId): array
     {
         try {
-            $Obj = AppVersion::with(['children', 'users'])->findOrFail($versionId);
-            if (!$Obj) {
-                throw new \Exception('deleteVersion Obj null error');
-            }
-
-            if (count($Obj->children)) {
-                throw new \Exception('拥有子级单位，无法删除！');
-            }
-
-            if (count($Obj->users)) {
-                throw new \Exception('拥有用户，无法删除！');
-            }
-
-            $Obj->delete();
+            $Obj = AppVersion::findOrFail($versionId);
+            $success = $Obj->delete();
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
@@ -183,4 +143,19 @@ class AppVersion_ extends AppVersion
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
     }
 
+    static public function getLatestVersion(int $type)
+    {
+        try {
+            $row = AppVersion::where('type', $type)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            if (empty($row)) throw new \Exception('查询失败，数据不存在');
+            $data = $row->toArray();
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $data ?? null];
+    }
 }

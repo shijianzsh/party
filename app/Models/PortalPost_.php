@@ -84,7 +84,7 @@ class PortalPost_ extends PortalPost
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -176,7 +176,7 @@ class PortalPost_ extends PortalPost
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -266,7 +266,7 @@ class PortalPost_ extends PortalPost
         $get = $Obj->get();
 
         return ['rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -351,7 +351,87 @@ class PortalPost_ extends PortalPost
 
         return [
             'rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
+        ];
+    }
+
+    static public function getCategoryDescendantPublishedPostList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'category_id' => 0,
+            'keyword' => "",
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
+        ],
+        array $with = []
+    ): array
+    {
+        $categoryId =& $filter['category_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj = PortalPost::with(array_merge(['categorys'], $with));
+
+        $Obj->where('post_status', 1);
+        $Obj->where('published_at', '<', \Carbon\Carbon::now()->timestamp);
+        $Obj->orderBy('published_at', 'desc');//根据发布日期排序
+        $Obj->orderBy('is_top', 'desc');//根据是否置顶排序
+
+        $categoryIds = PortalCategory_::getDescendants($categoryId)['ids'];
+        if (!count($categoryIds)) throw new \Exception('检索分类约束条件失败');
+
+        $Obj->whereHas('categoryMiddle', function ($query) use ($categoryIds) {
+            $query->whereIn('category_id', $categoryIds);
+        });
+
+        $Obj->where(function ($query) {//审核约束
+            $query
+                ->where('need_audit', 0)//不需要审核
+                ->orWhere(function ($query) {//需要审核同时通过审核
+                    $query
+                        ->where('need_audit', 1)
+                        ->whereHas('audit', function ($query) {
+                            $query->where('status', PortalPostAudit::STATUS['通过']);
+                        });
+                });
+        });
+
+        if ($keyword) {
+            $Obj->where(function ($query) use ($keyword) {
+                $query
+                    ->where('post_title', 'like', "%{$keyword}%")
+                    ->orWhere('post_excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('post_content', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($startTimestamp) {
+            $Obj->where('published_at', '>=', $startTimestamp);
+        }
+
+        if ($endTimestamp) {
+            $Obj->where('published_at', '<=', $endTimestamp);
+        }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return [
+            'rows' => $get->toArray(),
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 

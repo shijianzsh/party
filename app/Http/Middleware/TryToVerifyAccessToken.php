@@ -18,9 +18,9 @@ class TryToVerifyAccessToken
      */
     public function handle($request, Closure $next)
     {
-        $AccessTokenObj = new AccessToken();
 
         try {
+            $AccessTokenObj = new AccessToken();
             $AccessTokenObj->verifyAndSetToSession($request->input('access_token', ''));
         } catch (\Exception $e) {
 

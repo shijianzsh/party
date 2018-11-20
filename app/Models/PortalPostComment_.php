@@ -40,8 +40,8 @@ class PortalPostComment_ extends PortalPostComment
 
         end:
         return [
-            'rows' => isset($get)?$get->toArray():[],
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'rows' => isset($get) ? $get->toArray() : [],
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -75,11 +75,14 @@ class PortalPostComment_ extends PortalPostComment
                 throw new \Exception('文章不允许评论');
             }
 
-            $Obj = new PortalPostComment();
-            $Obj->post_id = $requestData['post_id'];
-            $Obj->user_id = User_::getMyId();
-            $Obj->comment_content = $requestData['comment_content'] ?? '';
-            $success = $Obj->save();
+            $Obj = PortalPost::findOrFail($requestData['post_id']);
+            $Obj->increment('post_comments');
+            $Obj->save();
+
+            $Obj->comments()->save(new PortalPostComment([
+                'user_id' => User_::getMyId(),
+                'comment_content' => $requestData['comment_content'] ?? '',
+            ]));
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

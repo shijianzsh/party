@@ -92,7 +92,7 @@ class UserLearningRecord_ extends UserLearningRecord
 
 
                 $Obj = new parent();
-                $update =$Obj->increment('duration_record', 1,
+                $update = $Obj->increment('duration_record', 1,
                     [
                         'type' => $requestData['type'],
                         'user_id' => $requestData['user_id'],
@@ -132,5 +132,51 @@ class UserLearningRecord_ extends UserLearningRecord
         }
 
         return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null];
+    }
+
+    static public function getLearningRecordDuration(int $userId)
+    {
+        try {
+            $temp = [];
+            $types = array_values(UserLearningRecord::TYPE);
+            for ($i = 0; $i < count($types); $i++) {
+                $type = $types[$i];
+                $temp[$type] = 0;
+            }
+
+            $record = self::getLearningRecordList(0, 0, ['user_id' => $userId], [])['rows'];
+            for ($i = 0; $i < count($record); $i++) {
+                $row = $record[$i];
+                if (!array_key_exists($row['type'], $temp)) {
+                    throw new \Exception('getLearningRecordDuration key exist error 1');
+                }
+                $temp[$row['type']] += $row['duration_record'];
+            }
+
+            $typeFlip = array_flip(UserLearningRecord::TYPE);
+            $result = [];
+            $sumDuration = 0;
+            foreach ($temp as $type => $duration) {
+                if (!array_key_exists($type, $typeFlip)) {
+                    throw new \Exception('getLearningRecordDuration key exist error 2');
+                }
+                $result[] = [
+                    'type' => $type,
+                    'type_format' => $typeFlip[$type],
+                    'duration_record' => $duration,
+                ];
+                $sumDuration += $duration;
+            }
+            $result[]=[
+                'type' => null,
+                'type_format' => '总计',
+                'duration_record' => $sumDuration,
+            ];
+        } catch (\Exception $e) {
+            $success = 0;
+            $msg = $e->getMessage();
+        }
+
+        return ['success' => (int)($success ?? 1), 'msg' => $msg ?? null, 'data' => $result ?? null];
     }
 }

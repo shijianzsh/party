@@ -35,14 +35,14 @@ class FormatFileUrl
             if (is_array($value)) {
                 $value = $this->formatArray($value);
             }
-            if (is_string($value) && !empty($value)) {
+            if (is_string($key) && is_string($value) && !empty($value)) {
                 $value = $this->formatString($key, $value);
             }
         }
         return $arr;
     }
 
-    private function formatString($key, string $str): string
+    private function formatString(string $key, string $str): string
     {
         switch ($key) {
             case 'url':
@@ -57,6 +57,7 @@ class FormatFileUrl
                 break;
             default:
                 $result = $str;
+                break;
         }
         return $result;
     }

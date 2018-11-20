@@ -184,4 +184,34 @@ class PortalCategory_ extends PortalCategory
         end:
         return $result;
     }
+
+    //获取所有后裔category
+    static public function getDescendants(int $categoryId, array $with = []): array
+    {
+        $array = PortalCategory
+            ::with($with)
+            ->where('parent_id', '<>', 0)
+            ->get()
+            ->toArray();
+
+        $ids = [$categoryId];
+        $result = [];
+        $isChanged = true;
+
+        while ($isChanged) {
+            $isChanged = false;
+            for ($i = 0; $i < count($array); $i++) {
+                if (in_array($array[$i]['parent_id'], $ids)) {
+                    $ids[] = $array[$i]['id'];
+                    $result[] = $array[$i];
+                    $array[$i] = null;
+                    $isChanged = true;
+                }
+            }
+            $array = array_values($array);
+        }
+        unset($array);
+
+        return ['rows' => $result, 'ids' => array_unique($ids)];
+    }
 }

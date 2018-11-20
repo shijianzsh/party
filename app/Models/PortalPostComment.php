@@ -5,6 +5,7 @@ namespace App\Models;
 class PortalPostComment extends _BaseModel
 {
     const PAGE_SIZE = 3;
+    protected $fillable = ['user_id','comment_content'];
     protected $appends = [
         'user_name',
         'user_thumbnail_format',

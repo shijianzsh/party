@@ -21,7 +21,7 @@ class Department extends \App\Http\Controllers\Controller
             ],
             (array)$request->query('with', [])
         );
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query()];
+        $result = ['success' => 1, 'data' => $list->query()];
         return response()->json($result);
     }
 
@@ -35,7 +35,7 @@ class Department extends \App\Http\Controllers\Controller
             ],
             (array)$request->query('with', [])
         );
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query()];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 

@@ -15,7 +15,7 @@ class CategoryController extends \App\Http\Controllers\Controller
     public function index(Request $request)
     {
         $list = PortalCategory_::getCategoryList();
-        $result = ['success' => 1, 'data' => $list, '$request' => $request];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 

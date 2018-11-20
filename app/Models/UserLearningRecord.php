@@ -25,7 +25,7 @@ class UserLearningRecord extends _BaseModel
 //    public function live()
 //    {
 //        return null;
-//        //TODO
+//        //TODO 直播学习
 //        return $this->belongsTo('App\Models\Live', 'live_id');
 //    }
 

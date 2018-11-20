@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\PortalPost;
 use Illuminate\Http\Request;
-use  App\Models\PortalPost_;
+use App\Models\PortalPost_;
 use Illuminate\Support\Facades\Crypt;
 use Gate;
 
@@ -34,8 +34,30 @@ class Article extends \App\Http\Controllers\Controller
             []//这里为什么要with user？
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
+    }
+
+    public function categoryDescendantPublishedArticleList(Request $request, $category_id)
+    {
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+        try {
+            $list = PortalPost_::getCategoryDescendantPublishedPostList(
+                $request->input('current_page', 0),
+                $request->input('page_size', 0),
+                [
+                    'category_id' => $category_id,
+                    'is_published' => &$filter['is_published'],
+                    'keyword' => &$filter['keyword'],
+                    'start_timestamp' => &$filter['start_timestamp'],
+                    'end_timestamp' => &$filter['end_timestamp'],
+                ],
+                []//这里为什么要with user？
+            );
+            return response()->json(['success' => 1, 'data' => $list]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => 0, 'msg' => $e->getMessage()]);
+        }
     }
 
     public function userArticleList(Request $request)
@@ -52,10 +74,10 @@ class Article extends \App\Http\Controllers\Controller
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],
             ],
-            ['user']
+            ['user', 'audit']
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 
@@ -73,10 +95,10 @@ class Article extends \App\Http\Controllers\Controller
                 'start_timestamp' => &$filter['start_timestamp'],
                 'end_timestamp' => &$filter['end_timestamp'],
             ],
-            ['user']
+            ['user', 'audit']
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 

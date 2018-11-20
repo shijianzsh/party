@@ -111,9 +111,11 @@ Route::namespace('Api')->group(
 
                         Route::resource('user_payments', 'UserPaymentController');
 
+                        Route::get('user_learning_records/{user_id}/duration', 'UserLearningRecord@duration');
                         Route::resource('user_learning_records', 'UserLearningRecordController')->except(['store', 'update']);
 
                         Route::get('articles/published', 'Article@publishedArticleList');
+                        Route::get('articles/{category_id}/category_descendant_published_article_list', 'Article@categoryDescendantPublishedArticleList');
                         Route::get('articles/user', 'Article@userArticleList');
                         Route::get('articles/audit_user', 'Article@auditUserArticleList');
                         Route::get('articles/{id}/check', 'Article@checkArticle');

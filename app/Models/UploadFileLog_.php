@@ -42,7 +42,7 @@ class UploadFileLog_ extends UploadFileLog
             if (empty($url)) throw new \Exception('上传失败');
 
             $Obj = new UploadFileLog;
-            $Obj->user_id = User_::getMyId();
+//            $Obj->user_id = User_::getMyId();
             $Obj->url = $url;
             $success = $Obj->save();
         } catch (\Exception $e) {

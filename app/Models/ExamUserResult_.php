@@ -191,6 +191,7 @@ class ExamUserResult_ extends ExamUserResult
             }
 
             $answers = $requestData['answers'];
+
             //整理考试结果
             $questionsIdToIndex = [];
 
@@ -258,6 +259,7 @@ class ExamUserResult_ extends ExamUserResult
             $Obj->answers_snapshot = $answers;
             $success = $Obj->save();
             $data = $Obj->toArray();
+
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();

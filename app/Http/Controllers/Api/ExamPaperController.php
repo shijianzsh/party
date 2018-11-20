@@ -26,7 +26,7 @@ class ExamPaperController extends \App\Http\Controllers\Controller
             ]
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request->query(), '$filter' => $filter];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 

@@ -26,7 +26,7 @@ class VoteController extends \App\Http\Controllers\Controller
             ]
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request, '$filter' => $filter];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 

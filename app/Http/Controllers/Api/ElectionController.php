@@ -28,7 +28,7 @@ class ElectionController extends Controller
             ]
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $request, '$filter' => $filter];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 

@@ -43,7 +43,7 @@ class User extends \App\Http\Controllers\Controller
             []
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $list];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 
@@ -63,7 +63,7 @@ class User extends \App\Http\Controllers\Controller
             []
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $list];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 
@@ -83,7 +83,7 @@ class User extends \App\Http\Controllers\Controller
             []
         );
 
-        $result = ['success' => 1, 'data' => $list, '$request' => $list];
+        $result = ['success' => 1, 'data' => $list];
         return response()->json($result);
     }
 

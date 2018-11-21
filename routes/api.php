@@ -72,6 +72,9 @@ Route::namespace('Api')->group(
 
                 Route::get('departments/select_component', 'Department@selectComponentList');
 
+                Route::resource('carousels', 'CarouselController');
+
+                Route::resource('carousel_items', 'CarouselItemController');
                 Route::group(
                     ['middleware' => [
                         \App\Http\Middleware\VerifyAccessToken::class,

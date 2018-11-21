@@ -11,13 +11,21 @@ namespace App\Http\Controllers\Api;
 use App\Services\SMS\SMS;
 use App\Services\Socket\Push;
 use App\Models\AuthMap_;
+use App\Models\User;
 use function foo\func;
 use DB;
+use Illuminate\Support\Collection;
+
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\Controller;
 
 class Test extends \App\Http\Controllers\Controller
 {
     function __invoke()
     {
+        return Excel::download((object)['1'=>2], 'users.xlsx');
+
         $data = $this->getData();
         var_dump($data);
         exit;
@@ -170,7 +178,7 @@ class Test extends \App\Http\Controllers\Controller
             foreach ($row as $key => $value) {
                 $keyArr = explode(' ', $key);
                 if (count($keyArr) === 1) {
-                    switch ($key){
+                    switch ($key) {
                         case 'intact_number':
                             $toInsertData_main[$key] = $row['r_number_prefix'] . $row['intact_number'];
                             break;

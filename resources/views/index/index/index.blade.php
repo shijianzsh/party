@@ -65,9 +65,10 @@
 
         </div>
 
-        @component('index.index.components.9_comment')
-            <strong>Whoops!</strong> Something went wrong!
-        @endcomponent
+        <div style="height: 340px"></div>
+        {{--@component('index.index.components.9_comment')--}}
+            {{--<strong>Whoops!</strong> Something went wrong!--}}
+        {{--@endcomponent--}}
     </div>
 
     <script>

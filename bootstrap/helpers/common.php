@@ -54,6 +54,7 @@ function is_str_chinese(string $str): bool
 function get_first_charter(string $str): string
 {
     if (empty($str)) throw new Exception('get_first_charter param empty error');
+    if (is_numeric($str)) return '#';
 
     $fchar = ord($str{0});
 

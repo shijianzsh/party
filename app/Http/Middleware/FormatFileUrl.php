@@ -49,6 +49,7 @@ class FormatFileUrl
             case 'thumbnail_format':
             case 'thumbnail':
             case 'monitor_map_format':
+            case 'image_url':
                 if (empty($str) || !strpos($str, "http")) {
                     $result = $str;
                 } else {

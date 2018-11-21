@@ -9,8 +9,8 @@
     <script type="text/javascript" src="/static/common/lib/vue/vue.min.js"></script>
     <script type="text/javascript" src="/static/index/js/jquery1.42.min.js"></script>
 
-    <link rel="stylesheet" href="http://unpkg.com/iview/dist/styles/iview.css">
-    <script src="http://unpkg.com/iview/dist/iview.min.js"></script>
+    <link rel="stylesheet" href="/static/common/lib/iview-2.0/dist/styles/iview.css">
+    <script src="/static/common/lib/iview-2.0/dist/iview.min.js"></script>
 </head>
 <body>
 
@@ -23,7 +23,6 @@
 @component('index.layout.components.footer')
     <strong>Whoops!</strong> Something went wrong!
 @endcomponent
-
 
 <script type="text/javascript" src="/static/index/js/jquery.superslide.2.1.1.js"></script>
 <script src="/static/index/js/jquery_flexslider.js"></script>

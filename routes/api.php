@@ -27,7 +27,7 @@ Route::namespace('Api')->group(
             if ($signature) {
                 $hash = "sha1=" . hash_hmac('sha1', file_get_contents("php://input"), $secret);
                 if (strcmp($signature, $hash) == 0) {
-                    echo shell_exec("cd {$path} && git pull");
+                    echo shell_exec("cd {$path} && git reset --har d&& git pull");
                     exit();
                 }
             }

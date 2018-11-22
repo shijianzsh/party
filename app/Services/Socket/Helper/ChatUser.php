@@ -78,7 +78,7 @@ trait ChatUser
     {
         $sendData = [
             'key' => $this->CHAT_SEND_KEY_MAP['有人上线'],
-            'user_id' => $uid,
+            'uid' => $uid,
         ];
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], null, $sendData);
     }
@@ -87,7 +87,7 @@ trait ChatUser
     {
         $sendData = [
             'key' => $this->CHAT_SEND_KEY_MAP['有人下线'],
-            'user_id' => $uid,
+            'uid' => $uid,
         ];
         $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'], null, $sendData);
 

@@ -50,7 +50,7 @@ class ChatUserMessage_ extends ChatUserMessage
 
         return [
             'rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -94,10 +94,13 @@ class ChatUserMessage_ extends ChatUserMessage
             $data = ChatUserMessage
                 ::where(function ($query) use ($fromUserId, $toUserId) {
                     $query
-                        ->orWhere('from_user_id', $fromUserId)
-                        ->orWhere('from_user_id', $toUserId)
-                        ->orWhere('to_user_id', $fromUserId)
-                        ->orWhere('to_user_id', $toUserId);
+                        ->where('from_user_id', $fromUserId)
+                        ->where('to_user_id', $toUserId);
+                })
+                ->orWhere(function ($query) use ($fromUserId, $toUserId) {
+                    $query
+                        ->where('from_user_id', $toUserId)
+                        ->where('to_user_id', $fromUserId);
                 })
                 ->get()
                 ->toArray();

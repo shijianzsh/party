@@ -106,13 +106,16 @@ trait ChatUser
 
     public function chatSetSession(array $data = ['from_user_id' => null, 'session_user_id' => null])
     {
-        $check = $this->getUserChatMessageList($data['from_user_id'], $data['session_user_id']);
-        echo $check;
-        $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'],
-            $data['from_user_id'],
-            [
-                'key' => $this->CHAT_SEND_KEY_MAP['聊天设置session返回聊天记录'],
-                'rows' => $check['data']
-            ]);
+        try{
+            $check = $this->getUserChatMessageList($data['from_user_id'], $data['session_user_id']);
+            $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['聊天'],
+                $data['from_user_id'],
+                [
+                    'key' => $this->CHAT_SEND_KEY_MAP['聊天设置session返回聊天记录'],
+                    'rows' => $check['data'],
+                ]);
+        }catch(\Exception $e){
+            var_export($e->getMessage());
+        }
     }
 }

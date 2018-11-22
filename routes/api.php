@@ -75,6 +75,18 @@ Route::namespace('Api')->group(
                 Route::resource('carousels', 'CarouselController');
 
                 Route::resource('carousel_items', 'CarouselItemController');
+
+                Route::get('articles/published', 'Article@publishedArticleList');
+                Route::get('articles/{category_id}/category_descendant_published_article_list', 'Article@categoryDescendantPublishedArticleList');
+                Route::get('articles/user', 'Article@userArticleList');
+                Route::get('articles/{id}/check', 'Article@checkArticle');
+                Route::get('articles/audit_user', 'Article@auditUserArticleList');
+                Route::post('articles/{id}/audit', 'Article@audit');
+                Route::resource('articles', 'ArticleController');
+
+                Route::get('categories/{id}/children_and_published_article', 'Category@getCategoryChildrenAndPublishedArticleList');
+                Route::resource('categories', 'CategoryController');
+
                 Route::group(
                     ['middleware' => [
                         \App\Http\Middleware\VerifyAccessToken::class,
@@ -120,18 +132,7 @@ Route::namespace('Api')->group(
                         Route::get('user_learning_records/{user_id}/duration', 'UserLearningRecord@duration');
                         Route::resource('user_learning_records', 'UserLearningRecordController')->except(['store', 'update']);
 
-                        Route::get('articles/published', 'Article@publishedArticleList');
-                        Route::get('articles/{category_id}/category_descendant_published_article_list', 'Article@categoryDescendantPublishedArticleList');
-                        Route::get('articles/user', 'Article@userArticleList');
-                        Route::get('articles/audit_user', 'Article@auditUserArticleList');
-                        Route::get('articles/{id}/check', 'Article@checkArticle');
-                        Route::post('articles/{id}/audit', 'Article@audit');
-                        Route::resource('articles', 'ArticleController');
-
                         Route::resource('article_comments', 'ArticleCommentController');
-
-                        Route::get('categories/{id}/children_and_published_article', 'Category@getCategoryChildrenAndPublishedArticleList');
-                        Route::resource('categories', 'CategoryController');
 
                         Route::get('comments/audit_user', 'Comment@auditUserCommentList');
                         Route::post('comments/{id}/audit', 'Comment@audit');

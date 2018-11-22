@@ -34,8 +34,9 @@ class FormatFileUrl
         foreach ($arr as $key => &$value) {
             if (is_array($value)) {
                 $value = $this->formatArray($value);
-            }
-            if (is_string($key) && is_string($value) && !empty($value)) {
+            } elseif (is_string($key) && is_json($value)) {
+                $value = json_encode(json_decode($this->formatArray($value), true));
+            } elseif (is_string($key) && is_string($value) && !empty($value)) {
                 $value = $this->formatString($key, $value);
             }
         }

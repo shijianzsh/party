@@ -13,9 +13,9 @@ class User extends _BaseModel
         'type_format',
         'user_borned_at_format',
         'thumbnail_format',
-        'role_ids',
-        'roles_format',
         'transfer_format',
+//        'role_ids',
+//        'roles_format',
 //        'auths_format',//数据库访问太多了 被动加载
     ];
     protected $casts = [

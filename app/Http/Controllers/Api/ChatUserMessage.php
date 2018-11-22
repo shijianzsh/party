@@ -22,6 +22,11 @@ class ChatUserMessage extends \App\Http\Controllers\Controller
 
     public function check($from_user_id, $to_user_id)
     {
-        return response()->json(ChatUserMessage_::markChecked($from_user_id, $to_user_id));
+        try {
+            $result = ChatUserMessage_::markChecked($from_user_id, $to_user_id);
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json(['success' => 0, 'msg' => $e->getMessage(), 'data' => null]);
+        }
     }
 }

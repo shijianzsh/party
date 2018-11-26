@@ -16,7 +16,13 @@ class Upload
         $path = 'upload/' . date("Ymd");
         is_dir($path) or mkdir($path);
 
-        move_uploaded_file($_FILES["file"]["tmp_name"], $path . "/" . $_FILES["file"]["name"]);
+        if (!file_exists($_FILES["file"]["tmp_name"])) throw new \Exception('handleUpload temp_file !file_exists:'.json_encode($_FILES));
+
+        $move = move_uploaded_file($_FILES["file"]["tmp_name"], $path . "/" . $_FILES["file"]["name"]);
+
+        if (!$move) throw new \Exception('handleUpload move error');
+        if (!file_exists($path . "/" . $_FILES["file"]["name"])) throw new \Exception('handleUpload file !file_exists');
+
         return $url = env('FILE_URL') . '/' . $path . '/' . $_FILES["file"]["name"];
     }
 }

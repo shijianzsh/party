@@ -115,7 +115,11 @@ trait ChatUser
                     'rows' => $check['data'],
                 ]);
         }catch(\Exception $e){
-            var_export($e->getMessage());
+            var_export([
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+            ]);
         }
     }
 }

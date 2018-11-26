@@ -14,6 +14,9 @@ class UserActivist extends _BaseModel
     ];
 
     protected $casts = [
+        'user_excerpt' => 'json',
+        'party_rewards_and_punishment_record' => 'json',
+        'user_family_member' => 'json',
         'more' => 'json',
     ];
     protected $fillable = ['code', 'status', 'audit_user_id', 'recommend_user_id'];

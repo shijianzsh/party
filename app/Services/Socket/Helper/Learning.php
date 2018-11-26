@@ -19,20 +19,28 @@ trait Learning
     private function learningRecordRequest(int $type, int $userId, int $targetId)
     {
         return RequestHelper::post("api/user_learning_records",
-            ['data'=>['type' => $type, 'user_id' => $userId, 'target_id' => $targetId]]);
+            ['data' => ['type' => $type, 'user_id' => $userId, 'target_id' => $targetId]]);
     }
 
-    public function learningRecord(array $data = ['type'=>null,'target_id' => null])
+    public function learningRecord(array $data = ['type' => null, 'target_id' => null])
     {
-        if (!($data['target_id'] ?? null) || !($data['type'] ?? null))
-            throw new \Exception('learningRecord');
+        try {
+            if (!($data['target_id'] ?? null) || !($data['type'] ?? null))
+                throw new \Exception('learningRecord');
 
-        $userId = $this->uid()->get();
-        $request = $this->learningRecordRequest($data['type'], $userId, $data['target_id']);
+            $userId = $this->uid()->get();
+            $request = $this->learningRecordRequest($data['type'], $userId, $data['target_id']);
 
-        $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['学习'],
-            $userId,
-            ['key' => $this->LEARNING_SEND_KEY_MAP['记录'], 'request' => $request]);
+            $this->sendToEventUid(MainWorker::ON_MESSAGE_REQUEST_KEY_EVENT['学习'],
+                $userId,
+                ['key' => $this->LEARNING_SEND_KEY_MAP['记录'], 'request' => $request]);
+        } catch (\Exception $e) {
+            var_export([
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+            ]);
+        }
 
     }
 }

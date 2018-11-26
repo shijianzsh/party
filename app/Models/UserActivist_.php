@@ -104,9 +104,12 @@ class UserActivist_ extends User
             'user_cellphone' => 'required',
             'user_duty' => 'required',
             'user_excerpt' => 'required',
-//            'user_login' => 'required',
-//            'user_password' => 'required',
+            'user_education_level'=>'required',
+            'user_education_background'=>'required',
+            'user_education_degree'=>'required',
+
             'more_thumbnail' => 'required',
+            'more_files' => 'required',
         ]);
 
         try {
@@ -127,15 +130,19 @@ class UserActivist_ extends User
                 $Obj->user_cellphone = $requestData['user_cellphone'];
                 $Obj->user_duty = $requestData['user_duty'];
                 $Obj->user_excerpt = $requestData['user_excerpt'];
+                $Obj->user_education_level = $requestData['user_education_level'];
+                $Obj->user_education_background = $requestData['user_education_background'];
+                $Obj->user_education_degree = $requestData['user_education_degree'];
 
                 $Obj->more = [
                     'thumbnail' => $requestData['more_thumbnail'] ?? null,
+                    'files' => $requestData['more_files'] ?? null,
                 ];
                 $Obj->save();
 
                 $activist = new UserActivist([
                     'code' => rand_str(),
-                    'status' => UserActivist::AUDIT_STATUS['未初审'],
+                    'audit_status' => UserActivist::AUDIT_STATUS['未初审'],
                     'audit_user_id' => $requestData['audit_user_id'],
                     'recommend_user_id' => $requestData['recommend_user_id'],
                 ]);

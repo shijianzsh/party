@@ -12,7 +12,7 @@ class Election extends _BaseModel
         'attend_user_ids',//预计要参加投票的ids
         'election_user_ids',//选举人员ids
         'result_user_ids',//参加了投票的ids
-        'option_user_ids',
+//        'option_user_ids',
         'started_at_format',
         'ended_at_format',
     ];
@@ -72,9 +72,9 @@ class Election extends _BaseModel
         return $rows ? array_unique(array_column($rows->toArray(), 'user_id')) : [];
     }
 
-    public function getOptionUserIdsAttribute()
-    {
-        $rows = $this->options;
-        return $rows ? array_unique(array_column($rows->toArray(), 'content_user_id')) : [];
-    }
+//    public function getOptionUserIdsAttribute()
+//    {
+//        $rows = $this->options;
+//        return $rows ? array_unique(array_column($rows->toArray(), 'content_user_id')) : [];
+//    }
 }

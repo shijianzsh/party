@@ -119,7 +119,7 @@ class SocketHelper
     public function send($data = null, $success = 1, $msg = null): self
     {
         try {
-            $sendData = ($this->getFlash() && empty($data))
+            $sendData = (!empty($this->getFlash()) && empty($data))
                 ? $this->getFlash()
                 : (!empty($data) ? $data : null);
         } catch (\Exception $e) {

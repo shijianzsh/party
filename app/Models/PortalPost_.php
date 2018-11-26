@@ -81,7 +81,7 @@ class PortalPost_ extends PortalPost
             $Obj->offset($offset)->limit($pageSize);
         }
 
-        $get = $Obj->get();
+        $get = $Obj->get()->makeHidden('post_content');
 
         return ['rows' => $get->toArray(),
             'pagination' => getPagination($currentPage, $pageSize, $total)
@@ -173,7 +173,7 @@ class PortalPost_ extends PortalPost
             $Obj->offset($offset)->limit($pageSize);
         }
 
-        $get = $Obj->get();
+        $get = $Obj->get()->makeHidden('post_content');
 
         return ['rows' => $get->toArray(),
             'pagination' => getPagination($currentPage, $pageSize, $total)
@@ -263,7 +263,7 @@ class PortalPost_ extends PortalPost
             $Obj->offset($offset)->limit($pageSize);
         }
 
-        $get = $Obj->get();
+        $get = $Obj->get()->makeHidden('post_content');
 
         return ['rows' => $get->toArray(),
             'pagination' => getPagination($currentPage, $pageSize, $total)
@@ -347,7 +347,7 @@ class PortalPost_ extends PortalPost
             $Obj->offset($offset)->limit($pageSize);
         }
 
-        $get = $Obj->get();
+        $get = $Obj->get()->makeHidden('post_content');
 
         return [
             'rows' => $get->toArray(),
@@ -427,7 +427,7 @@ class PortalPost_ extends PortalPost
             $Obj->offset($offset)->limit($pageSize);
         }
 
-        $get = $Obj->get();
+        $get = $Obj->get()->makeHidden('post_content');
 
         return [
             'rows' => $get->toArray(),

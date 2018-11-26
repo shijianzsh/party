@@ -17,3 +17,5 @@ if(preg_match($pregs,$str)){
     echo 'no';
 }
 
+
+//TODO 考试交卷请求json简化为答案的数组

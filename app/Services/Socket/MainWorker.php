@@ -90,9 +90,6 @@ class MainWorker
                     break;
                 case self::ON_MESSAGE_REQUEST_KEY_EVENT['学习']:
                     switch ($requestKey) {
-//                        case self::ON_MESSAGE_REQUEST_KEY_MAP['注册']:
-//                            $Helper->learningRegister($requestValue);
-//                            break;
                         case self::ON_MESSAGE_REQUEST_KEY_MAP['学习计时']:
                             $Helper->learningRecord($requestValue);
                             break;

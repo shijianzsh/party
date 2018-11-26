@@ -35,7 +35,7 @@ class FormatFileUrl
             if (is_array($value)) {
                 $value = $this->formatArray($value);
             } elseif (is_string($key) && is_json($value)) {
-                $value = json_encode(json_decode($this->formatArray($value), true));
+                $value = json_encode($this->formatArray(json_decode($value, true)));
             } elseif (is_string($key) && is_string($value) && !empty($value)) {
                 $value = $this->formatString($key, $value);
             }
@@ -51,10 +51,10 @@ class FormatFileUrl
             case 'thumbnail':
             case 'monitor_map_format':
             case 'image_url':
-                if (empty($str) || !strpos($str, "http")) {
-                    $result = $str;
-                } else {
+                if (!empty($str) && strpos($str, "http") === false) {
                     $result = env('FILE_URL') . $str;
+                } else {
+                    $result = $str;
                 }
                 break;
             default:

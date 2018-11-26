@@ -62,7 +62,7 @@ class Department_ extends Department
 
         return [
             'rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -120,7 +120,7 @@ class Department_ extends Department
 
         return [
             'rows' => $get->toArray(),
-            'pagination' =>getPagination($currentPage, $pageSize, $total)
+            'pagination' => getPagination($currentPage, $pageSize, $total)
         ];
     }
 
@@ -139,8 +139,37 @@ class Department_ extends Department
             $Obj->where('parent_id', $departmentId);
         }
 
-        $get = $Obj->get(['id','parent_id','name','path']);
+        $get = $Obj->get(['id', 'parent_id', 'name', 'path']);
         return $get->toArray();
+    }
+
+    static public function getSelectUsersComponentList(
+        array $filter = [
+            'department_id' => null,
+        ],
+        array $with = []
+    ): array
+    {
+        $departmentId =& $filter['department_id'];
+
+        $Obj = Department::with(array_merge($with, ['Users'=>function($query){
+            $query->makeHidden(['transfers','transfer_format']);
+        }]));
+
+        if (!empty($departmentId)) {
+            $Obj->where('parent_id', $departmentId);
+        }
+
+        $get = $Obj->get(['id', 'parent_id', 'name', 'path']);
+        $rows = $get->toArray();
+
+        $result = [];
+        for ($i = 0; $i < count($rows); $i++) {
+            if (count($rows[$i]['users'])) {
+                $result[] = $rows[$i];
+            }
+        }
+        return $result;
     }
 
     static public function getDepartmentCoordinateList(int $departmentId): array
@@ -178,7 +207,7 @@ class Department_ extends Department
     {
         $userId = User_::getMyId();
         $User = User::find($userId);
-        if(empty($User))throw new \Exception('department getMyId user null error'.$userId);
+        if (empty($User)) throw new \Exception('department getMyId user null error' . $userId);
         return $User->department_id;
     }
 

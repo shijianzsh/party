@@ -33,7 +33,6 @@ Route::namespace('Api')->group(
             }
             http_response_code(404);
         });
-
         Route::get('/test', 'Test');
 
         Route::get('/token', 'Token');
@@ -71,6 +70,7 @@ Route::namespace('Api')->group(
                 Route::resource('activists', 'ActivistController');
 
                 Route::get('departments/select_component', 'Department@selectComponentList');
+                Route::get('departments/select_users_component', 'Department@selectUsersComponentList');
 
                 Route::resource('carousels', 'CarouselController');
 

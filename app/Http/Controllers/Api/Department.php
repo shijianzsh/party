@@ -39,6 +39,20 @@ class Department extends \App\Http\Controllers\Controller
         return response()->json($result);
     }
 
+    public function selectUsersComponentList(Request $request)
+    {
+        $filter = $request->query('filter') ? json_decode($request->query('filter'), true) : [];
+
+        $list = Department_::getSelectUsersComponentList(
+            [
+                'department_id' => &$filter['department_id']
+            ],
+            (array)$request->query('with', [])
+        );
+        $result = ['success' => 1, 'data' => $list];
+        return response()->json($result);
+    }
+
     /**
      * 获取当前单位旗下所有单位的坐标信息
      *

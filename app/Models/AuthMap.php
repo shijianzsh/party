@@ -7,7 +7,7 @@ namespace App\Models;
  */
 class AuthMap extends _BaseModel
 {
-    const PAGE_SIZE = 9999;
+    const PAGE_SIZE = 0;
 
     protected $appends = ['path_format', 'auth_format'];
 

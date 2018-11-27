@@ -653,18 +653,18 @@ class User_ extends User
 
             $user_format = $user->toArray();
 
-            foreach ($user_format as $key => $value) {
-                switch ($key) {
-                    case 'id':
-                    case 'type':
-                    case 'type_format':
-                    case 'department_id':
-                        continue;
-                    default:
-                        unset($user_format[$key]);
-                        break;
-                }
-            }
+//            foreach ($user_format as $key => $value) {
+//                switch ($key) {
+//                    case 'id':
+//                    case 'type':
+//                    case 'type_format':
+//                    case 'department_id':
+//                        continue;
+//                    default:
+//                        unset($user_format[$key]);
+//                        break;
+//                }
+//            }
 
             $data = array_merge(
                 $getAccessToken['data'],

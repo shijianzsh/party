@@ -55,7 +55,7 @@ class ArticleController extends \App\Http\Controllers\Controller
      */
     public function show($id)
     {
-        $row = PortalPost_::getPost($id, []);
+        $row = PortalPost_::getPost($id);
 
         $result = ['success' => 1, 'data' => $row];
         return response()->json($result);

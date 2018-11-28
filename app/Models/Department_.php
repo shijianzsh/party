@@ -152,8 +152,8 @@ class Department_ extends Department
     {
         $departmentId =& $filter['department_id'];
 
-        $Obj = Department::with(array_merge($with, ['Users'=>function($query){
-            $query->makeHidden(['transfers','transfer_format']);
+        $Obj = Department::with(array_merge($with, ['users'=>function($query){
+//            $query->select('id','user_name');
         }]));
 
         if (!empty($departmentId)) {

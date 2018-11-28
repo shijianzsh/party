@@ -640,7 +640,7 @@ class User_ extends User
                         'party_democratic_organization_record',
                         'party_rewards_and_punishment_record',
                         'transfer_format',
-                        ]);
+                    ]);
 
             if (empty($user)) {
                 throw new \Exception('用户不存在或密码错误');

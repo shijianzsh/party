@@ -53,7 +53,7 @@ class ExamUserResult_ extends ExamUserResult
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
+        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getExamUserSubmittedResultList(
@@ -100,7 +100,7 @@ class ExamUserResult_ extends ExamUserResult
 
         $get = $Obj->get();
 
-        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
+        return ['rows' => $get->toArray(), 'pagination' => getPagination($currentPage, $pageSize, $total)];
     }
 
     static public function getExamUserResult(int $id, bool $getObject = false)
@@ -116,7 +116,7 @@ class ExamUserResult_ extends ExamUserResult
         return $result;
     }
 
-    static public function getUserExamResultByPaperId($user_id, $paper_id)
+    static public function getUserExamResultByPaperId(int $user_id,int $paper_id)
     {
         $Obj = ExamUserResult
             ::where('user_id', $user_id)
@@ -128,6 +128,8 @@ class ExamUserResult_ extends ExamUserResult
     static public function startExam(int $paperId, int $userId): array
     {
         try {
+            $userId = $userId ? $userId : User_::getMyId();
+
             $paper = ExamPaper_::getExamPaper($paperId, true);
             if (!$paper->questions_count) {
                 throw new \Exception('查询考试题目错误');
@@ -168,13 +170,12 @@ class ExamUserResult_ extends ExamUserResult
             $Obj->paper_snapshot = $paper->toArray();
             $success = $Obj->save();
 
-            $data = $Obj;
+            $data = $Obj->toArray();
         } catch (\Exception $e) {
             $success = 0;
             $msg = $e->getMessage();
         }
 
-        end:
         return ['success' => (int)($success ?? 1), 'data' => $data ?? null, 'msg' => $msg ?? null];
     }
 

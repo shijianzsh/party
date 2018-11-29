@@ -41,7 +41,7 @@ class ExamResult extends \App\Http\Controllers\Controller
      */
     public function start(Request $request, $id)
     {
-        $result = ExamUserResult_::startExam($id, $request->input('user_id'));
+        $result = ExamUserResult_::startExam($id, $request->input('user_id',0));
         return response()->json($result);
     }
 

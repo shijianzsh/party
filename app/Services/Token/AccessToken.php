@@ -76,7 +76,7 @@ class AccessToken extends TokenBase
         }
 
         if ($user->access_token !== $accessToken) {
-            throw new \Exception('access_token错误，请重新登录');
+            throw new \Exception('access_token error,please login again.');
         }
 
         $this->setUserIdToSession($data['user_id']);

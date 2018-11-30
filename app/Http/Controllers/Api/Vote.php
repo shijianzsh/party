@@ -13,6 +13,24 @@ use App\Models\Vote_;
 
 class Vote extends \App\Http\Controllers\Controller
 {
+    public function getVoteAndElectionList(Request $request)
+    {
+        $filter = $request->query('filter') ? json_decode($request->query('filter'),true): [];
+        $list = Vote_::getVoteAndElectionList(
+            $request->input('current_page', 0),
+            $request->input('page_size', 0),
+            [
+                'initiate_user_id' =>&$filter['initiate_user_id'],
+                'keyword' => &$filter['keyword'],
+                'start_timestamp' => &$filter['start_timestamp'],
+                'end_timestamp' =>&$filter['end_timestamp'],
+            ]
+        );
+
+        $result = ['success' => 1, 'data' => $list];
+        return response()->json($result);
+    }
+
     public function getPublicizedVote(Request $request, $id)
     {
         $result = Vote_::getPublicizedVote($id);

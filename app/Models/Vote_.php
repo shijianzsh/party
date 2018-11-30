@@ -4,8 +4,9 @@ namespace App\Models;
 
 use DB;
 use Carbon\Carbon;
+use App\Models\Election;
 
-class Vote_ extends _BaseModel
+class Vote_ extends Vote
 {
     static public function getVoteList(
         int $currentPage = 0,
@@ -44,6 +45,70 @@ class Vote_ extends _BaseModel
         if ($endTimestamp) {
             $Obj->where('ended_at', '<=', $endTimestamp);
         }
+
+        $total = $Obj->count();
+
+        if ($currentPage) {
+            $pageSize = !$pageSize ? self::PAGE_SIZE : $pageSize;
+        } else {
+            $pageSize = 0;
+        }
+        if ($currentPage && $pageSize) {
+            $offset = ($currentPage - 1) * $pageSize;
+            $Obj->offset($offset)->limit($pageSize);
+        }
+
+        $get = $Obj->get();
+
+        return ['rows' => $get->toArray(), 'pagination' =>getPagination($currentPage, $pageSize, $total)];
+    }
+
+    static public function getVoteAndElectionList(
+        int $currentPage = 0,
+        int $pageSize = 0,
+        array $filter = [
+            'initiate_user_id' => null,
+            'keyword' => null,
+            'start_timestamp' => 0,
+            'end_timestamp' => 0
+        ]
+    ): array
+    {
+        $initiate_user_id =& $filter['initiate_user_id'];
+        $keyword =& $filter['keyword'];
+        $startTimestamp =& $filter['start_timestamp'];
+        $endTimestamp =& $filter['end_timestamp'];
+
+        $Obj1=DB::table('vote')
+            ->selectRaw("id as this_id,'vote' as this_type,title,is_publicized,created_at,updated_at");
+        $Obj2=DB::table('election')
+            ->selectRaw("id as this_id,'election' as this_type,title,is_publicized,created_at,updated_at");
+
+        $querySql = $Obj1->union($Obj2)->toSql();
+
+        $Obj = DB::table(DB::raw("($querySql) as a"));
+
+        $Obj->orderBy('updated_at', 'desc');
+
+        if ($initiate_user_id !== null) {
+            $Obj->where('initiate_user_id', $initiate_user_id);
+        }
+
+        //TODO
+//        if ($keyword !== null) {
+//            $Obj->where(function ($query) use ($keyword) {
+//                $query->where('initiate_content', 'like', "%{$keyword}%")
+//                    ->orWhere('publicity_content', 'like', "%{$keyword}%");
+//            });
+//        }
+
+//        if ($startTimestamp) {
+//            $Obj->where('started_at', '>=', $startTimestamp);
+//        }
+//
+//        if ($endTimestamp) {
+//            $Obj->where('ended_at', '<=', $endTimestamp);
+//        }
 
         $total = $Obj->count();
 

@@ -153,6 +153,7 @@ Route::namespace('Api')->group(
                         Route::resource('elections', 'ElectionController');
 
                         Route::get('votes/{id}/publicized', 'Vote@getPublicizedVote');
+                        Route::get('votes/and_elections_list', 'Vote@getVoteAndElectionList');
                         Route::get('votes/{id}/attend', 'Vote@getAttendVote');
                         Route::post('votes/{id}/attend_submit', 'Vote@AttendSubmit');
                         Route::post('votes/{id}/update_publicity_content', 'Vote@UpdatePublicityContent');

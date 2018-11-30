@@ -116,7 +116,7 @@ class ExamUserResult_ extends ExamUserResult
         return $result;
     }
 
-    static public function getUserExamResultByPaperId(int $user_id,int $paper_id)
+    static public function getUserExamResultByPaperId(int $user_id, int $paper_id)
     {
         $Obj = ExamUserResult
             ::where('user_id', $user_id)
@@ -191,20 +191,6 @@ class ExamUserResult_ extends ExamUserResult
                 throw new \Exception($validator->errors()->first());
             }
 
-            $answers = $requestData['answers'];
-
-            //整理考试结果
-            $questionsIdToIndex = [];
-
-            for ($i = 0; $i < count($answers); $i++) {
-                if (empty($answers[$i]['user_answers'])) {
-                    throw new \Exception('试卷存在未作答的题目');
-                }
-
-                $tempId = $answers[$i]['question_id'];
-                $questionsIdToIndex[$tempId] = $i;
-            }
-
             $Obj = ExamUserResult::find($examUserResultId);
             if (!$Obj) {
                 throw new \Exception('查询考试记录错误');
@@ -216,6 +202,32 @@ class ExamUserResult_ extends ExamUserResult
             if (!$paper) {
                 throw new \Exception('查询试卷信息错误');
             }
+
+            $questions = $paper->questions;
+
+            $answers = $requestData['answers'];
+
+            if (count($questions) !== count($answers)) {
+                throw new \Exception('提交答案数量不相符');
+            }
+
+            for ($i = 0; $i < count($questions); $i++) {
+                $questions[$i]['user_answers'] = $answers[$i];
+            }
+
+            //整理考试结果
+            $questionsIdToIndex = [];
+
+            for ($i = 0; $i < count($questions); $i++) {
+//                if (empty($questions[$i]['user_answers'])) {
+//                    throw new \Exception('试卷存在未作答的题目');
+//                }
+
+                $tempId = $questions[$i]['question_id'];
+                $questionsIdToIndex[$tempId] = $i;
+            }
+
+
             if ($paper->questions_count !== count($questionsIdToIndex)) {
                 throw new \Exception('答案数量错误');
             }
@@ -236,15 +248,15 @@ class ExamUserResult_ extends ExamUserResult
             foreach ($paper->questions as $question) {
                 $key = $question['question_id'];
                 if (array_key_exists($key, $questionsIdToIndex)) {
-                    $tempAnswer1 = $answers[$questionsIdToIndex[$key]]['user_answers'];
+                    $tempAnswer1 = $questions[$questionsIdToIndex[$key]]['user_answers'];
                     $tempAnswer2 = $question['answers'];
 
                     if (Exam::isSameAnswers($tempAnswer1, $tempAnswer2)) {
                         $score += $question['question_score'];
-                        $answers[$questionsIdToIndex[$key]]['is_correct'] = 1;
+                        $questions[$questionsIdToIndex[$key]]['is_correct'] = 1;
                     } else {
-                        $answers[$questionsIdToIndex[$key]]['is_correct'] = 0;
-                        $collection[] = $answers[$questionsIdToIndex[$key]];
+                        $questions[$questionsIdToIndex[$key]]['is_correct'] = 0;
+                        $collection[] = $questions[$questionsIdToIndex[$key]];
                     }
                 }
             }
@@ -257,7 +269,7 @@ class ExamUserResult_ extends ExamUserResult
             $Obj->is_submitted = 1;
             $Obj->score = $score;
             $Obj->is_passed = $isPassed;
-            $Obj->answers_snapshot = $answers;
+            $Obj->answers_snapshot = $questions;
             $success = $Obj->save();
             $data = $Obj->toArray();
 

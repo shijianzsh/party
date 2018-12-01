@@ -181,6 +181,10 @@ class ExamUserResult_ extends ExamUserResult
 
     static public function submitExam(int $examUserResultId, array $requestData): array
     {
+        if(array_key_exists(0,$requestData)){
+            $requestData=$requestData[0];
+        }
+
         $validator = \Validator::make($requestData, [
             'answers' => 'required',
             'is_auto_submit' => 'required',

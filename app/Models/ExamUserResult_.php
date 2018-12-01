@@ -278,6 +278,6 @@ class ExamUserResult_ extends ExamUserResult
             $msg = $e->getMessage();
         }
 
-        return ['success' => (int)($success ?? 1), 'data' => $data ?? null, 'msg' => $msg ?? null];
+        return ['success' => (int)($success ?? 1), 'data' => $data ?? null, 'msg' => $msg ?? null,'$requestData'=>$requestData];
     }
 }

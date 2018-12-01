@@ -53,7 +53,7 @@ class ExamResult extends \App\Http\Controllers\Controller
      */
     public function submit(Request $request, $id)
     {
-        $result = ExamUserResult_::submitExam($id, $request->input('data'));
+        $result = ExamUserResult_::submitExam($id, (array)$request->input('data'));
         return response()->json($result);
     }
 }
